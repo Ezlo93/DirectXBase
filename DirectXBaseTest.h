@@ -14,5 +14,5 @@ public:
     void Draw();
 
 private:
-
+    float clearColor[4];
 };

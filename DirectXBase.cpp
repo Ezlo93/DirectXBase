@@ -401,6 +401,8 @@ void DirectXBase::UpdateFPSCounter()
         out << wndTitle << L"     FPS: " << fps << L" Frame Time: " << mspf << L"ms";
         SetWindowText(wndHandle, out.str().c_str());
 
+        frameCount = 0;
+        timeElapsed += 1.0f;
 
     }
 
