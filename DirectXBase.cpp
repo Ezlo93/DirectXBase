@@ -1,4 +1,7 @@
 #include "DirectXBase.h"
+#include <sstream>
+
+
 
 namespace {
     DirectXBase* directXBase = 0;
@@ -103,7 +106,7 @@ bool DirectXBase::InitWindow()
     }
 
     /*wnd size*/
-    RECT rect = { 0,0,wndWidth, wndHeight };
+    RECT rect = { 0,0,(LONG)wndWidth, (LONG)wndHeight };
     AdjustWindowRect(&rect, WS_EX_OVERLAPPEDWINDOW, false);
 
     wndHandle = CreateWindow(L"DXWINDOW", wndTitle.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
@@ -243,6 +246,8 @@ int DirectXBase::Run()
 {
     MSG msg = { 0 };
 
+    gTime.Reset();
+    
     while (msg.message != WM_QUIT)
     {
         /*if window message*/
@@ -254,12 +259,12 @@ int DirectXBase::Run()
         /*continue game loop*/
         else
         {
-            //timer
+            gTime.Inc();
 
             if (!wndInactive)
             {
 
-                Update(1.f);
+                Update(gTime.getDeltaTime());
                 Draw();
             }
             else
@@ -287,12 +292,12 @@ LRESULT DirectXBase::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if (LOWORD(wParam) == WA_INACTIVE)
         {
             wndInactive = true;
-            //mTimer.Stop();
+            gTime.Stop();
         }
         else
         {
             wndInactive = false;
-            //mTimer.Start();
+            gTime.Start();
         }
         return 0;
 
@@ -347,14 +352,14 @@ LRESULT DirectXBase::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_ENTERSIZEMOVE:
         wndInactive = true;
         wndResizing = true;
-        //mTimer.Stop();
+        gTime.Stop();
         return 0;
 
         // finished resizing
     case WM_EXITSIZEMOVE:
         wndInactive = false;
         wndResizing = false;
-        //mTimer.Start();
+        gTime.Start();
         OnWindowResize();
         return 0;
 
@@ -372,15 +377,32 @@ LRESULT DirectXBase::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         ((MINMAXINFO*)lParam)->ptMinTrackSize.x = 800;
         ((MINMAXINFO*)lParam)->ptMinTrackSize.y = 600;
         return 0;
-
-    case WM_LBUTTONDOWN:
-    case WM_MBUTTONDOWN:
-    case WM_RBUTTONDOWN:
-    case WM_LBUTTONUP:
-    case WM_MBUTTONUP:
-    case WM_RBUTTONUP:
-    case WM_MOUSEMOVE:
     }
 
     return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+/*show fps and frame time in title bar*/
+void DirectXBase::UpdateFPSCounter()
+{
+    static int frameCount = 0;
+    static float timeElapsed = 0.0f;
+
+    frameCount++;
+
+    if ((gTime.getTotalTime() - timeElapsed) >= 1.0f)
+    {
+        float fps = (float)frameCount;
+        float mspf = 1000.0f / fps;
+
+        std::wostringstream out;
+        out.precision(6);
+
+        out << wndTitle << L"     FPS: " << fps << L" Frame Time: " << mspf << L"ms";
+        SetWindowText(wndHandle, out.str().c_str());
+
+
+    }
+
+
 }

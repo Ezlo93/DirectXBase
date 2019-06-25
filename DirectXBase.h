@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <d3d11.h>
 #include <string>
+#include "GameTime.h"
 
 #define DXRelease(x) { if(x){x->Release(); x = 0; }}
 
@@ -21,8 +22,8 @@ public:
 
     /*to be overriden by child class*/
     virtual bool Initialisation();
-    virtual void Update(float deltaTime);
-    virtual void Draw();
+    virtual void Update(float deltaTime)=0;
+    virtual void Draw()=0;
     virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
     virtual void OnWindowResize();
 
@@ -42,6 +43,7 @@ protected:
     UINT wndWidth, wndHeight;
 
     /*dx11 related*/
+    GameTime gTime;
     ID3D11Device* device;
     ID3D11DeviceContext* deviceContext;
     IDXGISwapChain* swapChain;
