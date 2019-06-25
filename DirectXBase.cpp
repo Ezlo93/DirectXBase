@@ -263,7 +263,7 @@ int DirectXBase::Run()
 
             if (!wndInactive)
             {
-
+                UpdateFPSCounter();
                 Update(gTime.getDeltaTime());
                 Draw();
             }
