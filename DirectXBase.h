@@ -2,6 +2,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#pragma comment(lib, "d3d11.lib")
 #include <d3d11.h>
 #include <string>
 #include "GameTime.h"
@@ -26,12 +27,13 @@ public:
     virtual void Draw()=0;
     virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
     virtual void OnWindowResize();
+    virtual bool goFullscreen(bool s);
 
 protected:
 
     bool InitWindow();
     bool InitDirect3D();
-
+    
     void UpdateFPSCounter();
 
     /*windows related*/

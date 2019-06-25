@@ -1,6 +1,16 @@
+/*DirectXBaseTest.cpp 
+    minimum template for directx11 application
+
+    extends DirectXBase class
+
+    Nicolai Sehrt
+*/
+
 #include "DirectXBaseTest.h"
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
+
+#pragma warning (disable : 28251)
 
 int WINAPI WinMain(HINSTANCE hInstance,
                    HINSTANCE hPrevInstance,
@@ -43,6 +53,8 @@ bool DXTest::Initialisation()
 
     /*...*/
 
+    //goFullscreen(true);
+
     return true;
 }
 
@@ -52,6 +64,21 @@ void DXTest::OnWindowResize()
     DirectXBase::OnWindowResize();
 
     /*recalc. aspect ratio*/
+}
+
+bool DXTest::goFullscreen(bool s)
+{
+    if (!DirectXBase::goFullscreen(s))
+    {
+        return false;
+    }
+
+    OnWindowResize();
+
+    /*potentially additional proj matrix etc recalc*/
+    
+
+    return true;
 }
 
 

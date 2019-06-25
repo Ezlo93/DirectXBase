@@ -1,3 +1,10 @@
+/*GameTime.cpp
+    provides a timer that keeps track of total and delta time between frames
+
+    Nicolai Sehrt
+*/
+
+
 #include <Windows.h>
 #include "GameTime.h"
 

@@ -1,3 +1,11 @@
+/*DirectXBase.cpp
+    minimum template for directx11 application
+
+
+    Nicolai Sehrt
+*/
+
+
 #include "DirectXBase.h"
 #include <sstream>
 
@@ -8,6 +16,7 @@ namespace {
 }
 
 /*used for windows message handling*/
+#pragma warning(suppress: 28251)
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return directXBase->MsgProc(hwnd, msg, wParam, lParam);
 }
@@ -203,6 +212,7 @@ void DirectXBase::OnWindowResize()
     swapChain->ResizeBuffers(2, wndWidth, wndHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
     ID3D11Texture2D* backBuffer;
     swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
+#pragma warning(suppress: 6387)
     device->CreateRenderTargetView(backBuffer, 0, &renderTargetView);
     DXRelease(backBuffer);
 
@@ -222,6 +232,7 @@ void DirectXBase::OnWindowResize()
     dSDesc.MiscFlags = 0;
 
     device->CreateTexture2D(&dSDesc, 0, &depthStencilBuffer);
+#pragma warning(suppress: 6387)
     device->CreateDepthStencilView(depthStencilBuffer, 0, &depthStencilView);
 
     deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
@@ -407,4 +418,26 @@ void DirectXBase::UpdateFPSCounter()
     }
 
 
+}
+
+/*set fullscreen*/
+bool DirectXBase::goFullscreen(bool s)
+{
+    IDXGIOutput* display = 0;
+
+    HRESULT hr = swapChain->GetContainingOutput(&display);
+
+    if (FAILED(hr))
+    {
+        return false;
+    }
+
+    hr = swapChain->SetFullscreenState(s, display);
+
+    if (FAILED(hr))
+    {
+        return false;
+    }
+
+    return true;
 }

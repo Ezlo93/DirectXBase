@@ -12,6 +12,7 @@ public:
     void OnWindowResize();
     void Update(float deltaTime);
     void Draw();
+    bool goFullscreen(bool s);
 
 private:
     float clearColor[4];
