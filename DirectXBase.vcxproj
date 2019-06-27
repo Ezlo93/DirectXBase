@@ -130,7 +130,9 @@
     <ClCompile Include="GameTime.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="d3dx11effect.h" />
     <ClInclude Include="DirectXBase.h" />
+    <ClInclude Include="DirectXBaseTest.h" />
     <ClInclude Include="GameTime.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

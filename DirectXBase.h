@@ -4,10 +4,15 @@
 #include <Windows.h>
 #pragma comment(lib, "d3d11.lib")
 #include <d3d11.h>
+#include <DirectXMath.h>
+#include <DirectXPackedVector.h>
 #include <string>
 #include "GameTime.h"
 
 #define DXRelease(x) { if(x){x->Release(); x = 0; }}
+
+using namespace DirectX;
+using namespace DirectX::PackedVector;
 
 class DirectXBase {
 
