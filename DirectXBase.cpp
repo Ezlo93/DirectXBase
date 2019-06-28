@@ -55,6 +55,7 @@ DirectXBase::~DirectXBase()
 
     DXRelease(deviceContext);
     DXRelease(device);
+
 }
 
 /*getter*/
@@ -83,7 +84,6 @@ bool DirectXBase::Initialisation()
     }
     else
     {
-       
         return true;
     }
 }

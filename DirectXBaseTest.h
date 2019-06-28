@@ -1,8 +1,13 @@
 #pragma once
 
 #include "DirectXBase.h"
+#ifdef _DEBUG
 #pragma comment(lib, "Effects11d.lib")
+#else
+#pragma comment(lib, "Effects11.lib")
+#endif
 #include "d3dx11effect.h"
+#include "ControllerInput.h"
 
 struct Vertex
 {
@@ -23,8 +28,9 @@ public:
     bool goFullscreen(bool s);
 
 private:
-    float clearColor[4];
+    ControllerInput* controllerInput;
 
+    float clearColor[4];
 
     void buildCube();
     void buildShader();

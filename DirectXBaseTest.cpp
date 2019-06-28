@@ -63,6 +63,8 @@ bool DXTest::Initialisation()
 
     //goFullscreen(true);
 
+    controllerInput = new ControllerInput();
+
     XMMATRIX I = XMMatrixIdentity();
     XMStoreFloat4x4(&boxWorld, I);
 
@@ -100,26 +102,46 @@ bool DXTest::goFullscreen(bool s)
 
 void DXTest::Update(float deltaTime)
 {
-    
+    controllerInput->Update(deltaTime);
 
     /*game logic*/
-    if (GetAsyncKeyState('W') & 0x8000)
-        gCamera.walk(10.0f * deltaTime);
+    XINPUT_STATE c1 = controllerInput->getState(0)->state;
 
-    if (GetAsyncKeyState('S') & 0x8000)
-        gCamera.walk(-10.0f * deltaTime);
+    if (controllerInput->getState(0)->isConnected)
+    {
 
-    if (GetAsyncKeyState('A') & 0x8000)
-        gCamera.strafe(-10.0f * deltaTime);
 
-    if (GetAsyncKeyState('D') & 0x8000)
-        gCamera.strafe(10.0f * deltaTime);
+        float tlX = controllerInput->normalizeThumbs(c1.Gamepad.sThumbLX);
+        float tlY = controllerInput->normalizeThumbs(c1.Gamepad.sThumbLY);
 
-    if (GetAsyncKeyState('R') & 0x8000)
-        gCamera.roll(1.0f * deltaTime);
+        float trX = controllerInput->normalizeThumbs(c1.Gamepad.sThumbRX);
+        float trY = controllerInput->normalizeThumbs(c1.Gamepad.sThumbRY);
+        trY *= -1;
 
-    if (GetAsyncKeyState('Q') & 0x8000)
-        gCamera.roll(-1.0f * deltaTime);
+        float ws = tlY * 10.f * deltaTime;
+        float ss = tlX * 10.f * deltaTime;
+
+        gCamera.walk(ws);
+        gCamera.strafe(ss);
+
+        float yaw = 1.5f * deltaTime * trX;
+        float pitch = 1.5f * deltaTime * trY;
+
+        gCamera.yaw(yaw);
+        gCamera.pitch(pitch);
+
+        if (c1.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
+        {
+            gCamera.roll(1.f * deltaTime);
+        }
+
+        if (c1.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
+        {
+            gCamera.roll(-1.f * deltaTime);
+        }
+
+
+    }
 
 }
 

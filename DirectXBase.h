@@ -61,8 +61,4 @@ protected:
     ID3D11DepthStencilView* depthStencilView;
     D3D11_VIEWPORT mainViewport;
 
-
-
-
-
 };
