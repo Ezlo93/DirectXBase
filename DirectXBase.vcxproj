@@ -125,11 +125,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DirectXBase.cpp" />
     <ClCompile Include="DirectXBaseTest.cpp" />
     <ClCompile Include="GameTime.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="d3dx11effect.h" />
     <ClInclude Include="DirectXBase.h" />
     <ClInclude Include="DirectXBaseTest.h" />

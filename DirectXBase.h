@@ -8,6 +8,7 @@
 #include <DirectXPackedVector.h>
 #include <string>
 #include "GameTime.h"
+#include "Camera.h"
 
 #define DXRelease(x) { if(x){x->Release(); x = 0; }}
 
@@ -51,6 +52,7 @@ protected:
 
     /*dx11 related*/
     GameTime gTime;
+    Camera gCamera;
     ID3D11Device* device;
     ID3D11DeviceContext* deviceContext;
     IDXGISwapChain* swapChain;

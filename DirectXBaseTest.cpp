@@ -24,6 +24,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
     if (!dxbase.Initialisation())
         return 0;
 
+    dxbase.OnWindowResize();
+
     return dxbase.Run();
 }
 
@@ -31,6 +33,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 DXTest::DXTest(HINSTANCE hProgramID) : DirectXBase(hProgramID)
 {
     wndTitle = L"DirectXBaseTest";
+
+    gCamera.setPosition(0.f, 3.f, -20.f);
 
     /*clear color to silver*/
     clearColor[0] = 0.75f;
@@ -60,9 +64,7 @@ bool DXTest::Initialisation()
     //goFullscreen(true);
 
     XMMATRIX I = XMMatrixIdentity();
-    XMStoreFloat4x4(&mWorld, I);
-    XMStoreFloat4x4(&mView, I);
-    XMStoreFloat4x4(&mProj, I);
+    XMStoreFloat4x4(&boxWorld, I);
 
     buildCube();
     buildShader();
@@ -76,9 +78,8 @@ void DXTest::OnWindowResize()
 {
     DirectXBase::OnWindowResize();
 
-    /*recalc. aspect ratio*/
-    XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * XM_PI, getAspectRatio(), 1.0f, 1000.0f);
-    XMStoreFloat4x4(&mProj, P);
+    /*recalc camera*/
+    gCamera.setLens(0.25f * XM_PI, getAspectRatio(), 1.f, 1000.f);
 }
 
 bool DXTest::goFullscreen(bool s)
@@ -102,14 +103,23 @@ void DXTest::Update(float deltaTime)
     
 
     /*game logic*/
+    if (GetAsyncKeyState('W') & 0x8000)
+        gCamera.walk(10.0f * deltaTime);
 
+    if (GetAsyncKeyState('S') & 0x8000)
+        gCamera.walk(-10.0f * deltaTime);
 
-    XMVECTOR pos = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-    XMVECTOR target = XMVectorZero();
-    XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+    if (GetAsyncKeyState('A') & 0x8000)
+        gCamera.strafe(-10.0f * deltaTime);
 
-    XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
-    XMStoreFloat4x4(&mView, V);
+    if (GetAsyncKeyState('D') & 0x8000)
+        gCamera.strafe(10.0f * deltaTime);
+
+    if (GetAsyncKeyState('R') & 0x8000)
+        gCamera.roll(1.0f * deltaTime);
+
+    if (GetAsyncKeyState('Q') & 0x8000)
+        gCamera.roll(-1.0f * deltaTime);
 
 }
 
@@ -129,12 +139,17 @@ void DXTest::Draw()
     deviceContext->IASetIndexBuffer(boxIB, DXGI_FORMAT_R32_UINT, 0);
 
     // Set constants
-    XMMATRIX world = XMLoadFloat4x4(&mWorld);
-    XMMATRIX view = XMLoadFloat4x4(&mView);
-    XMMATRIX proj = XMLoadFloat4x4(&mProj);
-    XMMATRIX resworldViewProj = world * view * proj;
+    gCamera.UpdateViewMatrix();
 
-    worldViewProj->SetMatrix(reinterpret_cast<float*>(&resworldViewProj));
+
+    XMMATRIX view = gCamera.getView();
+    XMMATRIX proj = gCamera.getProj();
+    XMMATRIX viewProj = gCamera.getViewProj();
+
+    XMMATRIX world = XMLoadFloat4x4(&boxWorld);
+    XMMATRIX wvp = world * view * proj;
+
+    worldViewProj->SetMatrix(reinterpret_cast<float*>(&wvp));
 
     D3DX11_TECHNIQUE_DESC techDesc;
     technique->GetDesc(&techDesc);
@@ -156,13 +171,13 @@ void DXTest::buildCube()
     Vertex vertices[] =
     {
         { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(0.8f,0.1f,0.71f,1.f)   },
-        { XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(0.8f,0.1f,0.71f,1.f)   },
+        { XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(0.2f,0.7f,0.71f,1.f)   },
         { XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(0.8f,0.1f,0.71f,1.f)   },
-        { XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(0.8f,0.1f,0.71f,1.f)   },
+        { XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(0.2f,0.7f,0.71f,1.f)   },
         { XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(0.8f,0.5f,0.31f,1.f)   },
-        { XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(0.8f,0.5f,0.31f,1.f)   },
+        { XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(0.2f,0.7f,0.31f,1.f)   },
         { XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(0.8f,0.5f,0.81f,1.f)   },
-        { XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(0.8f,0.5f,0.71f,1.f)   },
+        { XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(0.2f,0.7f,0.71f,1.f)   },
     };
 
     D3D11_BUFFER_DESC vbd;

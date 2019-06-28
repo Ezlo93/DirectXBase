@@ -39,7 +39,5 @@ private:
 
     ID3D11InputLayout* inputLayout;
 
-    XMFLOAT4X4 mWorld;
-    XMFLOAT4X4 mView;
-    XMFLOAT4X4 mProj;
+    XMFLOAT4X4 boxWorld;
 };
