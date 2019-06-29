@@ -8,12 +8,7 @@
 #endif
 #include "d3dx11effect.h"
 #include "ControllerInput.h"
-
-struct Vertex
-{
-    XMFLOAT3 Pos;
-    XMFLOAT4 Color;
-};
+#include "Skybox.h"
 
 class DXTest : public DirectXBase
 {
@@ -35,6 +30,8 @@ private:
     void buildCube();
     void buildShader();
     void buildLayout();
+
+    Skybox *skybox;
 
     ID3D11Buffer* boxVB;
     ID3D11Buffer* boxIB;

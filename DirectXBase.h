@@ -6,6 +6,7 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
+#include "DDSTextureLoader.h"
 #include <string>
 #include "GameTime.h"
 #include "Camera.h"

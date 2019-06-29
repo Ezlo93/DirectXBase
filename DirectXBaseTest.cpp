@@ -7,6 +7,9 @@
 */
 
 #include "DirectXBaseTest.h"
+#include "RenderStates.h"
+#include "Shader.h"
+#include "InputLayout.h"
 #include <fstream>
 #include <vector>
 
@@ -46,10 +49,19 @@ DXTest::DXTest(HINSTANCE hProgramID) : DirectXBase(hProgramID)
 
 DXTest::~DXTest()
 {
+
+
+    delete skybox; skybox = 0;
+
     DXRelease(boxVB);
     DXRelease(boxIB);
     DXRelease(inputLayout);
     DXRelease(effect);
+
+    RenderStates::Destroy();
+    Shaders::Destroy();
+    InputLayouts::Destroy();
+
 }
 
 bool DXTest::Initialisation()
@@ -61,9 +73,14 @@ bool DXTest::Initialisation()
 
     /*...*/
 
-    //goFullscreen(true);
+    Shaders::Init(device);
+    InputLayouts::Init(device);
+    RenderStates::Init(device);
 
     controllerInput = new ControllerInput();
+
+    skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 30.f);
+
 
     XMMATRIX I = XMMatrixIdentity();
     XMStoreFloat4x4(&boxWorld, I);
@@ -71,6 +88,8 @@ bool DXTest::Initialisation()
     buildCube();
     buildShader();
     buildLayout();
+
+    //goFullscreen(true);
 
     return true;
 }
@@ -155,7 +174,7 @@ void DXTest::Draw()
     deviceContext->IASetInputLayout(inputLayout);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    UINT stride = sizeof(Vertex);
+    UINT stride = sizeof(Vertex::BasicColor);
     UINT offset = 0;
     deviceContext->IASetVertexBuffers(0, 1, &boxVB, &stride, &offset);
     deviceContext->IASetIndexBuffer(boxIB, DXGI_FORMAT_R32_UINT, 0);
@@ -183,6 +202,14 @@ void DXTest::Draw()
         deviceContext->DrawIndexed(36, 0, 0);
     }
 
+
+    //render sky box last
+    skybox->Draw(deviceContext, gCamera);
+    deviceContext->RSSetState(0);
+    deviceContext->OMSetDepthStencilState(0, 0);
+
+
+    //show backbuffer
     swapChain->Present(0, 0);
 }
 
@@ -190,7 +217,7 @@ void DXTest::Draw()
 void DXTest::buildCube()
 {
     // Create vertex buffer
-    Vertex vertices[] =
+    Vertex::BasicColor vertices[] =
     {
         { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(0.8f,0.1f,0.71f,1.f)   },
         { XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(0.2f,0.7f,0.71f,1.f)   },
@@ -204,7 +231,7 @@ void DXTest::buildCube()
 
     D3D11_BUFFER_DESC vbd;
     vbd.Usage = D3D11_USAGE_IMMUTABLE;
-    vbd.ByteWidth = sizeof(Vertex) * 8;
+    vbd.ByteWidth = sizeof(Vertex::BasicColor) * 8;
     vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     vbd.CPUAccessFlags = 0;
     vbd.MiscFlags = 0;
@@ -275,7 +302,7 @@ void DXTest::buildLayout()
 void DXTest::buildShader()
 {
 
-    std::ifstream fin(L"shader/color.fxo", std::ios::binary);
+    std::ifstream fin(L"data/shader/color.fxo", std::ios::binary);
 
     fin.seekg(0, std::ios_base::end);
     int size = (int)fin.tellg();

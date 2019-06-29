@@ -127,17 +127,27 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ControllerInput.cpp" />
+    <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DirectXBase.cpp" />
     <ClCompile Include="DirectXBaseTest.cpp" />
     <ClCompile Include="GameTime.cpp" />
+    <ClCompile Include="InputLayout.cpp" />
+    <ClCompile Include="RenderStates.cpp" />
+    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Skybox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ControllerInput.h" />
     <ClInclude Include="d3dx11effect.h" />
+    <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="DirectXBase.h" />
     <ClInclude Include="DirectXBaseTest.h" />
     <ClInclude Include="GameTime.h" />
+    <ClInclude Include="InputLayout.h" />
+    <ClInclude Include="RenderStates.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="Skybox.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
