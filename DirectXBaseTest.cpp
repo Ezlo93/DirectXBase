@@ -50,7 +50,7 @@ DXTest::DXTest(HINSTANCE hProgramID) : DirectXBase(hProgramID)
 DXTest::~DXTest()
 {
 
-
+    delete input;
     delete skybox; skybox = 0;
     delete input;
 
