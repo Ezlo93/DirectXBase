@@ -7,7 +7,7 @@
 #pragma comment(lib, "Effects11.lib")
 #endif
 #include "d3dx11effect.h"
-#include "ControllerInput.h"
+#include "InputManager.h"
 #include "Skybox.h"
 
 class DXTest : public DirectXBase
@@ -23,7 +23,8 @@ public:
     bool goFullscreen(bool s);
 
 private:
-    ControllerInput* controllerInput;
+
+    InputManager* input;
 
     float clearColor[4];
 

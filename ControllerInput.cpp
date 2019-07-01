@@ -130,3 +130,8 @@ float ControllerInput::normalizeThumbs(int in)
 {
     return (in / 32768.f);
 }
+
+float ControllerInput::normalizeTriggers(int in)
+{
+    return (in / 255.f);
+}

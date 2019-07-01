@@ -52,6 +52,7 @@ DXTest::~DXTest()
 
 
     delete skybox; skybox = 0;
+    delete input;
 
     DXRelease(boxVB);
     DXRelease(boxIB);
@@ -73,11 +74,12 @@ bool DXTest::Initialisation()
 
     /*...*/
 
+    input = new InputManager();
+
     Shaders::Init(device);
     InputLayouts::Init(device);
     RenderStates::Init(device);
 
-    controllerInput = new ControllerInput();
 
     skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 30.f);
 
@@ -121,46 +123,32 @@ bool DXTest::goFullscreen(bool s)
 
 void DXTest::Update(float deltaTime)
 {
-    controllerInput->Update(deltaTime);
 
     /*game logic*/
-    XINPUT_STATE c1 = controllerInput->getState(0)->state;
 
-    if (controllerInput->getState(0)->isConnected)
-    {
+    input->Update(deltaTime);
 
 
-        float tlX = controllerInput->normalizeThumbs(c1.Gamepad.sThumbLX);
-        float tlY = controllerInput->normalizeThumbs(c1.Gamepad.sThumbLY);
+    /*basic movement and camera*/
+    InputData* in = input->getInput(1);
 
-        float trX = controllerInput->normalizeThumbs(c1.Gamepad.sThumbRX);
-        float trY = controllerInput->normalizeThumbs(c1.Gamepad.sThumbRY);
-        trY *= -1;
+    float tlX = in->trigger[THUMB_LX];
+    float tlY = in->trigger[THUMB_LY];
 
-        float ws = tlY * 10.f * deltaTime;
-        float ss = tlX * 10.f * deltaTime;
+    float trX = in->trigger[THUMB_RX];
+    float trY = in->trigger[THUMB_RY] * -1;
 
-        gCamera.walk(ws);
-        gCamera.strafe(ss);
+    float ws = tlY * 10.f * deltaTime;
+    float ss = tlX * 10.f * deltaTime;
 
-        float yaw = 1.5f * deltaTime * trX;
-        float pitch = 1.5f * deltaTime * trY;
+    gCamera.walk(ws);
+    gCamera.strafe(ss);
 
-        gCamera.yaw(yaw);
-        gCamera.pitch(pitch);
+    float yaw = 1.5f * deltaTime * trX;
+    float pitch = 1.5f * deltaTime * trY;
 
-        if (c1.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
-        {
-            gCamera.roll(1.f * deltaTime);
-        }
-
-        if (c1.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
-        {
-            gCamera.roll(-1.f * deltaTime);
-        }
-
-
-    }
+    gCamera.yaw(yaw);
+    gCamera.pitch(pitch);
 
 }
 

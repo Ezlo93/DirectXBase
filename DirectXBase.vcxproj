@@ -132,6 +132,7 @@
     <ClCompile Include="DirectXBaseTest.cpp" />
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="InputLayout.cpp" />
+    <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="RenderStates.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Skybox.cpp" />
@@ -145,7 +146,9 @@
     <ClInclude Include="DirectXBaseTest.h" />
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="InputLayout.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="RenderStates.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
   </ItemGroup>

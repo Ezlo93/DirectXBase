@@ -104,6 +104,7 @@ class ControllerInput{
         bool isConnected(int index);
         ControllerState* getState(int index);
         float normalizeThumbs(int in);
+        float normalizeTriggers(int in);
 
     private:
         ControllerState controllers[MAX_CONTROLLERS];
