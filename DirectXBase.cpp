@@ -126,6 +126,7 @@ bool DirectXBase::InitWindow()
 
     ShowWindow(wndHandle, SW_SHOW);
     UpdateWindow(wndHandle);
+    ShowCursor(false);
 
     return true;
 

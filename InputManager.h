@@ -51,13 +51,18 @@ public:
     ~InputManager();
 
     void Update(float deltaTime);
+    void UpdateMouse(POINT& p);
+
 
     InputData* getInput(int index);
     InputData* getPrevInput(int index);
+
 
 private:
     ControllerInput* controller;
 
     InputData data[INPUT_MAX];
     InputData prevData[INPUT_MAX];
+
+    POINT mouseDelta;
 };

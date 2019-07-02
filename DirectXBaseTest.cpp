@@ -125,6 +125,36 @@ void DXTest::Update(float deltaTime)
 
     /*game logic*/
 
+    /*need update mouse here*/
+    if (!wndInactive)
+    {
+        int wndCenterX, wndCenterY;
+        POINT mousePos;
+        RECT r;
+
+        GetWindowRect(wndHandle, &r);
+        wndCenterX = r.left + wndWidth / 2;
+        wndCenterY = r.top + wndHeight / 2;
+
+
+        if (GetCursorPos(&mousePos))
+        {
+
+            mousePos.x -= wndCenterX;
+            mousePos.y -= wndCenterY;
+        }
+
+        SetCursorPos(wndCenterX, wndCenterY);
+        input->UpdateMouse(mousePos);
+    }
+    else
+    {
+        POINT m;
+        m.x = 0;
+        m.y = 0;
+        input->UpdateMouse(m);
+    }
+
     input->Update(deltaTime);
 
 

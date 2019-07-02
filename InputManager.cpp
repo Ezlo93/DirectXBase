@@ -6,6 +6,7 @@ InputManager::InputManager()
     RtlSecureZeroMemory(&prevData[0], sizeof(InputData) * INPUT_MAX);
 
     controller = new ControllerInput();
+    mouseDelta = {};
 }
 
 InputManager::~InputManager()
@@ -18,8 +19,7 @@ void InputManager::Update(float deltaTime)
 
     //read keyboard mouse to index 0
     short keyboard[256];
-    bool keyReturn;
-
+    
     memset(keyboard, 0, sizeof(short)*256);
     
     for (int i = 0; i < 256; i++)
@@ -46,12 +46,12 @@ void InputManager::Update(float deltaTime)
 
     if (data[0].isConnected)
     {
-        data[0].trigger[THUMB_LY] = keyboard[83] ? -1 : 0;
-        data[0].trigger[THUMB_LY] += keyboard[87] ? 1 : 0;
-        data[0].trigger[THUMB_LX] = keyboard[65] ? -1 : 0;
-        data[0].trigger[THUMB_LX] += keyboard[68]  ? 1 : 0;
-        //data[0].trigger[THUMB_RX] = keyboard[87] ? 1 : 0;
-        //data[0].trigger[THUMB_RY] = keyboard[87] ? 1 : 0;
+        data[0].trigger[THUMB_LY] = keyboard[83] ? -1.f : 0.f;
+        data[0].trigger[THUMB_LY] += keyboard[87] ? 1.f : 0.f;
+        data[0].trigger[THUMB_LX] = keyboard[65] ? -1.f : 0.f;
+        data[0].trigger[THUMB_LX] += keyboard[68]  ? 1.f : 0.f;
+        data[0].trigger[THUMB_RX] = (float)mouseDelta.x;
+        data[0].trigger[THUMB_RY] = (float)mouseDelta.y;
         //data[0].trigger[LEFT_TRIGGER] = keyboard[87] ? 1 : 0;
         //data[0].trigger[RIGHT_TRIGGER] = keyboard[87] ? 1 : 0;
     }
@@ -145,6 +145,12 @@ void InputManager::Update(float deltaTime)
     }
 
 
+}
+
+void InputManager::UpdateMouse(POINT& p)
+{
+    p.y *= -1;
+    mouseDelta = p;
 }
 
 InputData* InputManager::getInput(int index)
