@@ -14,20 +14,49 @@ InputManager::~InputManager()
 
 void InputManager::Update(float deltaTime)
 {
+    //read devices first
+
+    //read keyboard mouse to index 0
+    short keyboard[256];
+    bool keyReturn;
+
+    memset(keyboard, 0, sizeof(short)*256);
+    
+    for (int i = 0; i < 256; i++)
+    {
+        keyboard[i] = GetAsyncKeyState(i);
+    }
+
+    //read controllers to 1-5
+    controller->Update(deltaTime);
+
     //set previous
     for (int i = 0; i < INPUT_MAX; i++)
     {
         prevData[i] = data[i];
     }
 
-    //read keyboard mouse to index 0
-
-    //read controllers to 1-5
-    controller->Update(deltaTime);
-
     //clear previous
-    RtlSecureZeroMemory(&data[0], sizeof(InputData)*MAX_CONTROLLERS);
+    RtlSecureZeroMemory(&data[0], sizeof(InputData)*(MAX_CONTROLLERS+1));
 
+    //read keyboard
+
+    data[0].type = TYPE_KEYBOARD;
+    data[0].isConnected = true;
+
+    if (data[0].isConnected)
+    {
+        data[0].trigger[THUMB_LY] = keyboard[83] ? -1 : 0;
+        data[0].trigger[THUMB_LY] += keyboard[87] ? 1 : 0;
+        data[0].trigger[THUMB_LX] = keyboard[65] ? -1 : 0;
+        data[0].trigger[THUMB_LX] += keyboard[68]  ? 1 : 0;
+        //data[0].trigger[THUMB_RX] = keyboard[87] ? 1 : 0;
+        //data[0].trigger[THUMB_RY] = keyboard[87] ? 1 : 0;
+        //data[0].trigger[LEFT_TRIGGER] = keyboard[87] ? 1 : 0;
+        //data[0].trigger[RIGHT_TRIGGER] = keyboard[87] ? 1 : 0;
+    }
+
+    //read controllers
     for (int c = 0; c < MAX_CONTROLLERS; c++)
     {
         

@@ -50,9 +50,8 @@ DXTest::DXTest(HINSTANCE hProgramID) : DirectXBase(hProgramID)
 DXTest::~DXTest()
 {
 
-    delete input;
+    delete input; input = 0;
     delete skybox; skybox = 0;
-    delete input;
 
     DXRelease(boxVB);
     DXRelease(boxIB);
@@ -130,7 +129,7 @@ void DXTest::Update(float deltaTime)
 
 
     /*basic movement and camera*/
-    InputData* in = input->getInput(1);
+    InputData* in = input->getInput(0);
 
     float tlX = in->trigger[THUMB_LX];
     float tlY = in->trigger[THUMB_LY];
