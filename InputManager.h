@@ -34,6 +34,8 @@
 #define THUMB_RX 4
 #define THUMB_RY 5
 
+
+
 struct InputData
 {
     int type;
@@ -52,11 +54,11 @@ public:
 
     void Update(float deltaTime);
     void UpdateMouse(POINT& p);
-
+    void SetMouseSense(float sense);
 
     InputData* getInput(int index);
     InputData* getPrevInput(int index);
-
+    
 
 private:
     ControllerInput* controller;
@@ -64,5 +66,7 @@ private:
     InputData data[INPUT_MAX];
     InputData prevData[INPUT_MAX];
 
+    int charToVKey(char c);
     POINT mouseDelta;
+    float mouseSense;
 };

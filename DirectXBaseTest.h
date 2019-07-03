@@ -25,6 +25,7 @@ public:
 private:
 
     InputManager* input;
+    int controllingInput = -1;
 
     float clearColor[4];
 

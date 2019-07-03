@@ -159,7 +159,29 @@ void DXTest::Update(float deltaTime)
 
 
     /*basic movement and camera*/
-    InputData* in = input->getInput(0);
+
+    if (controllingInput == -1)
+    {
+        for (int i = 0; i < INPUT_MAX; i++)
+        {
+            InputData* n = input->getInput(i);
+
+            if (n->buttons[BUTTON_A])
+            {
+                controllingInput = i;
+                break;
+            }
+
+            if (i == INPUT_MAX-1)
+            {
+                return;
+            }
+        }
+
+    }
+
+
+    InputData* in = input->getInput(controllingInput);
 
     float tlX = in->trigger[THUMB_LX];
     float tlY = in->trigger[THUMB_LY];
@@ -178,6 +200,11 @@ void DXTest::Update(float deltaTime)
 
     gCamera.yaw(yaw);
     gCamera.pitch(pitch);
+
+    if (in->buttons[BACK])
+    {
+        exit(0);
+    }
 
 }
 

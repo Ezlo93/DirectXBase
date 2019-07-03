@@ -7,6 +7,7 @@ InputManager::InputManager()
 
     controller = new ControllerInput();
     mouseDelta = {};
+    mouseSense = .5f;
 }
 
 InputManager::~InputManager()
@@ -46,14 +47,31 @@ void InputManager::Update(float deltaTime)
 
     if (data[0].isConnected)
     {
-        data[0].trigger[THUMB_LY] = keyboard[83] ? -1.f : 0.f;
-        data[0].trigger[THUMB_LY] += keyboard[87] ? 1.f : 0.f;
-        data[0].trigger[THUMB_LX] = keyboard[65] ? -1.f : 0.f;
-        data[0].trigger[THUMB_LX] += keyboard[68]  ? 1.f : 0.f;
-        data[0].trigger[THUMB_RX] = (float)mouseDelta.x;
-        data[0].trigger[THUMB_RY] = (float)mouseDelta.y;
-        //data[0].trigger[LEFT_TRIGGER] = keyboard[87] ? 1 : 0;
-        //data[0].trigger[RIGHT_TRIGGER] = keyboard[87] ? 1 : 0;
+        /*trigger*/
+        data[0].trigger[THUMB_LY] = keyboard[charToVKey('s')] ? -1.f : 0.f;
+        data[0].trigger[THUMB_LY] += keyboard[charToVKey('w')] ? 1.f : 0.f;
+        data[0].trigger[THUMB_LX] = keyboard[charToVKey('a')] ? -1.f : 0.f;
+        data[0].trigger[THUMB_LX] += keyboard[charToVKey('d')]  ? 1.f : 0.f;
+        data[0].trigger[THUMB_RX] = (float)mouseDelta.x * mouseSense;
+        data[0].trigger[THUMB_RY] = (float)mouseDelta.y * mouseSense;
+        data[0].trigger[LEFT_TRIGGER] = keyboard[charToVKey('q')] ? 1.f : 0.f;
+        data[0].trigger[RIGHT_TRIGGER] = keyboard[charToVKey('e')] ? 1.f : 0.f;
+
+        /*buttons*/
+        data[0].buttons[BUTTON_A] = keyboard[VK_SPACE];
+        data[0].buttons[BUTTON_B] = keyboard[VK_CONTROL];
+        data[0].buttons[BUTTON_X] = keyboard[charToVKey('x')];
+        data[0].buttons[BUTTON_Y] = keyboard[charToVKey('y')];
+        data[0].buttons[DPAD_UP] = keyboard[VK_UP];
+        data[0].buttons[DPAD_DOWN] = keyboard[VK_DOWN];
+        data[0].buttons[DPAD_LEFT] = keyboard[VK_LEFT];
+        data[0].buttons[DPAD_RIGHT] = keyboard[VK_RIGHT];
+        data[0].buttons[LEFT_SHOULDER] = 0;
+        data[0].buttons[RIGHT_SHOULDER] = 0;
+        data[0].buttons[START] = keyboard[VK_RETURN];
+        data[0].buttons[BACK] = keyboard[VK_ESCAPE];
+        data[0].buttons[LEFT_THUMB] = 0;
+        data[0].buttons[RIGHT_THUMB] = 0;
     }
 
     //read controllers
@@ -153,6 +171,19 @@ void InputManager::UpdateMouse(POINT& p)
     mouseDelta = p;
 }
 
+void InputManager::SetMouseSense(float sense)
+{
+    if (sense > 0)
+    {
+        mouseSense = sense;
+    }
+    else
+    {
+        mouseSense = 1.f;
+    }
+    
+}
+
 InputData* InputManager::getInput(int index)
 {
     return &data[index];
@@ -161,4 +192,10 @@ InputData* InputManager::getInput(int index)
 InputData* InputManager::getPrevInput(int index)
 {
     return &prevData[index];
+}
+
+int InputManager::charToVKey(char c)
+{
+    int k = (int)c - 32;
+    return (k < 65 || k > 90) ? -1 : k;
 }
