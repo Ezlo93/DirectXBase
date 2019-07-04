@@ -71,14 +71,6 @@ bool DXTest::Initialisation()
         return false;
     }
 
-    /*only run once*/
-    CreateMutexA(0, false, "dxbasemutex___");
-    if (GetLastError() == ERROR_ALREADY_EXISTS)
-    {
-        MessageBox(wndHandle, L"Application already running!", L"Error", MB_OK);
-        return 0;
-    }
-
     /*...*/
 
     input = new InputManager();

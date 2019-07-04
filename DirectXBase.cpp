@@ -116,7 +116,7 @@ bool DirectXBase::InitWindow()
     RECT rect = { 0,0,(LONG)wndWidth, (LONG)wndHeight };
     AdjustWindowRect(&rect, WS_EX_OVERLAPPEDWINDOW, false);
 
-    wndHandle = CreateWindow(L"DXWINDOW", wndTitle.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
+    wndHandle = CreateWindow(L"DXWINDOW", wndTitle.c_str(), WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
         (rect.right - rect.left), (rect.bottom - rect.top), 0, 0, programID, 0);
 
     if (!wndHandle)
@@ -124,6 +124,14 @@ bool DirectXBase::InitWindow()
         return false;
     }
 
+    /*only run once*/
+    CreateMutexA(0, false, "___dxbasemutex___");
+    if (GetLastError() == ERROR_ALREADY_EXISTS)
+    {
+        MessageBox(wndHandle, L"Application already running!", L"Error", MB_OK);
+        return 0;
+    }
+    SetWindowPos(wndHandle, wndHandle, 100, 100, 0, 0, 0);
     ShowWindow(wndHandle, SW_SHOW);
     UpdateWindow(wndHandle);
     ShowCursor(false);
