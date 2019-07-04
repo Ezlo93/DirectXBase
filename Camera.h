@@ -1,9 +1,10 @@
 #pragma once
 
+#define CAMERA_RESTRICTION_ANGLE 10.f
+
 #include <DirectXMath.h>
 
 using namespace DirectX;
-
 
 class Camera
 {
@@ -70,7 +71,7 @@ private:
     XMFLOAT3 up;
     XMFLOAT3 look;
 
-
+    XMVECTOR yAxis;
     XMFLOAT4X4 viewMatrix;
     XMFLOAT4X4 projMatrix;
 

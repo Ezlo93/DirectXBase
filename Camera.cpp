@@ -5,7 +5,7 @@ Camera::Camera() : position(0.f,0.f,0.f), right(1.f,0.f,0.f),up(0.f,1.f,0.f),loo
 {
     // 0.25f * pi = 90° FOV
     setLens(0.25f * XM_PI, 1.f, 1.f, 1000.f);
-
+    yAxis = XMVectorSet(0.f, 1.0f, 0.f, 0.f);
 }
 
 Camera::~Camera()
@@ -177,6 +177,20 @@ void Camera::pitch(float angle)
 {
     XMMATRIX R = XMMatrixRotationAxis(XMLoadFloat3(&right), angle);
 
+    /*dont overrotate camera*/
+
+    /*compute angle between look vector and y axis*/
+    XMVECTOR t = XMVector3TransformNormal(XMLoadFloat3(&look), R);
+    XMVECTOR a = XMVector3AngleBetweenNormals(yAxis, t);
+
+    float convertedAngle = XMConvertToDegrees(XMVectorGetX(a));
+
+    if (convertedAngle < CAMERA_RESTRICTION_ANGLE || convertedAngle > (180.f-CAMERA_RESTRICTION_ANGLE))
+    {
+        return;
+    }
+
+    /*set values if test passed*/
     XMStoreFloat3(&up, XMVector3TransformNormal(XMLoadFloat3(&up), R));
     XMStoreFloat3(&look, XMVector3TransformNormal(XMLoadFloat3(&look), R));
 }
