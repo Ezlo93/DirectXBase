@@ -116,7 +116,7 @@ bool DirectXBase::InitWindow()
     RECT rect = { 0,0,(LONG)wndWidth, (LONG)wndHeight };
     AdjustWindowRect(&rect, WS_EX_OVERLAPPEDWINDOW, false);
 
-    wndHandle = CreateWindow(L"DXWINDOW", wndTitle.c_str(), WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
+    wndHandle = CreateWindowEx(0, L"DXWINDOW", wndTitle.c_str(), WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
         (rect.right - rect.left), (rect.bottom - rect.top), 0, 0, programID, 0);
 
     if (!wndHandle)

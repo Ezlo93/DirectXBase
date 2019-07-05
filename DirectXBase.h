@@ -10,6 +10,7 @@
 #include <string>
 #include "GameTime.h"
 #include "Camera.h"
+#include "Model.h"
 
 #define DXRelease(x) { if(x){x->Release(); x = 0; }}
 
