@@ -63,6 +63,8 @@ struct Mesh
     bool hasTextureCoordinates = false;
     bool hasTangentu = false;
 
+    ID3D11Buffer* vertex, * index;
+
 };
 
 
@@ -73,13 +75,14 @@ public:
 
     std::vector<Mesh> meshes;
 
-    Model()
-    {
+    Model(ID3D11Device* dev);
+    ~Model();
 
-    }
+    void Draw(ID3D11DeviceContext* context);
+    void CreateBuffers();
 
-    ~Model()
-    {
 
-    }
+private:
+    ID3D11Device* device;
+
 };
