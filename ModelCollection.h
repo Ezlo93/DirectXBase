@@ -5,12 +5,12 @@
 #include <string>
 #include <map>
 
-class ModelManager
+class ModelCollection
 {
 
 public:
-    ModelManager(ID3D11Device* dev);
-    ~ModelManager();
+    ModelCollection(ID3D11Device* dev);
+    ~ModelCollection();
     bool Add(std::string file);
     Model* Get(std::string id);
 

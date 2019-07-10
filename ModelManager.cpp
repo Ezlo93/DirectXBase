@@ -1,4 +1,4 @@
-#include "ModelManager.h"
+#include "ModelCollection.h"
 
 ModelManager::ModelManager(ID3D11Device* dev)
 {

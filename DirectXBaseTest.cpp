@@ -52,6 +52,8 @@ DXTest::~DXTest()
 
     delete input; input = 0;
     delete skybox; skybox = 0;
+    delete textureCollection;
+    delete modelCollection;
 
     DXRelease(boxVB);
     DXRelease(boxIB);
@@ -74,6 +76,10 @@ bool DXTest::Initialisation()
     /*...*/
 
     input = new InputManager();
+    textureCollection = new TextureCollection(device);
+    modelCollection = new ModelCollection(device);
+
+    modelCollection->Add("data/models/wolf.fbx");
 
     Shaders::Init(device);
     InputLayouts::Init(device);
@@ -243,7 +249,8 @@ void DXTest::Draw()
         technique->GetPassByIndex(p)->Apply(0, deviceContext);
 
         // 36 indices for the box.
-        deviceContext->DrawIndexed(36, 0, 0);
+        modelCollection->Get("wolf")->Draw(deviceContext);
+        //deviceContext->DrawIndexed(36, 0, 0);
     }
 
 

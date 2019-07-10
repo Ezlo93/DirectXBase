@@ -9,6 +9,8 @@
 #include "d3dx11effect.h"
 #include "InputManager.h"
 #include "Skybox.h"
+#include "ModelCollection.h"
+#include "TextureCollection.h"
 
 class DXTest : public DirectXBase
 {
@@ -23,6 +25,9 @@ public:
     bool goFullscreen(bool s);
 
 private:
+
+    ModelCollection* modelCollection;
+    TextureCollection* textureCollection;
 
     InputManager* input;
     int controllingInput = -1;

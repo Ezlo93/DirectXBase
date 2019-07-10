@@ -3,6 +3,8 @@
 #include "DirectXBase.h"
 #include <vector>
 
+
+
 namespace Vertex
 {
     // Basic 32-byte vertex structure.
@@ -54,8 +56,9 @@ namespace Material {
 }
 
 
-struct Mesh
+class Mesh
 {
+public:
     std::vector<Vertex::PosTexNormalTan> vertices;
     std::vector<UINT> indices;
     Material::Standard material;
@@ -64,7 +67,58 @@ struct Mesh
     bool hasTangentu = false;
 
     ID3D11Buffer* vertex, * index;
+    std::string textureID;
 
+    ~Mesh()
+    {
+        vertex->Release(); vertex = 0;
+        index->Release(); index = 0;
+    }
+
+
+    /*draw mesh*/
+    void Draw(ID3D11DeviceContext* context)
+    {
+
+        UINT stride = sizeof(Vertex::PosTexNormalTan);
+        UINT offset = 0;
+
+        context->IASetVertexBuffers(0, 1, &vertex, &stride, &offset);
+        context->IASetIndexBuffer(index, DXGI_FORMAT_R32_UINT, 0);
+
+        context->DrawIndexed((UINT)(indices.size()), 0, 0);
+
+    }
+
+
+    /*create vertex and index buffer on gpu*/
+    void createBuffers(ID3D11Device* device)
+    {
+
+        D3D11_BUFFER_DESC vbd;
+        vbd.Usage = D3D11_USAGE_IMMUTABLE;
+        vbd.ByteWidth = (UINT)(sizeof(Vertex::PosTexNormalTan) * vertices.size());
+        vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        vbd.CPUAccessFlags = 0;
+        vbd.MiscFlags = 0;
+
+        D3D11_SUBRESOURCE_DATA initData;
+        initData.pSysMem = &vertices[0];
+
+        device->CreateBuffer(&vbd, &initData, &vertex);
+
+        D3D11_BUFFER_DESC ibd;
+        ibd.Usage = D3D11_USAGE_IMMUTABLE;
+        ibd.ByteWidth = (UINT)(sizeof(UINT) * indices.size());
+        ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+        ibd.CPUAccessFlags = 0;
+        ibd.MiscFlags = 0;
+
+        initData.pSysMem = &indices[0];
+
+        device->CreateBuffer(&ibd, &initData, &index);
+
+    }
 };
 
 
@@ -73,7 +127,7 @@ class Model
 
 public:
 
-    std::vector<Mesh> meshes;
+    std::vector<Mesh*> meshes;
 
     Model(ID3D11Device* dev);
     ~Model();
