@@ -43,6 +43,7 @@ bool ModelCollection::Add(std::string file)
 
     if (!loader->Load(file, m))
     {
+        throw std::exception("failed to load model");
         return false;
     }
 

@@ -146,6 +146,7 @@
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ModelCollection.cpp" />
     <ClCompile Include="RenderStates.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="TextureCollection.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="ModelCollection.h" />
     <ClInclude Include="RenderStates.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="TextureCollection.h" />

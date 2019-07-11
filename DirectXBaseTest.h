@@ -9,8 +9,9 @@
 #include "d3dx11effect.h"
 #include "InputManager.h"
 #include "Skybox.h"
-#include "ModelCollection.h"
-#include "TextureCollection.h"
+#include "ResourceManager.h"
+
+
 
 #define MODEL_PATH "data/models"
 #define TEXTURE_PATH "data/textures"
@@ -29,17 +30,14 @@ public:
 
 private:
 
-    ModelCollection* modelCollection;
-    TextureCollection* textureCollection;
-
     InputManager* input;
     int controllingInput = -1;
+
+    ResourceManager* res;
 
     float clearColor[4];
 
     void buildCube();
-    void buildShader();
-    void buildLayout();
 
     Skybox *skybox;
 
@@ -47,10 +45,7 @@ private:
     ID3D11Buffer* boxIB;
 
     ID3DX11Effect* effect;
-    ID3DX11EffectTechnique* technique;
     ID3DX11EffectMatrixVariable* worldViewProj;
-
-    ID3D11InputLayout* inputLayout;
 
     XMFLOAT4X4 boxWorld;
 };

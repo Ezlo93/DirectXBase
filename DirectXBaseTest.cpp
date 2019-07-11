@@ -52,12 +52,10 @@ DXTest::~DXTest()
 
     delete input; input = 0;
     delete skybox; skybox = 0;
-    delete textureCollection; textureCollection = 0;
-    delete modelCollection; modelCollection = 0;
+    delete res; res = 0;
 
     DXRelease(boxVB);
     DXRelease(boxIB);
-    DXRelease(inputLayout);
     DXRelease(effect);
 
     RenderStates::Destroy();
@@ -85,24 +83,15 @@ bool DXTest::Initialisation()
     /*...*/
 
     input = new InputManager();
-    textureCollection = new TextureCollection(device);
-    modelCollection = new ModelCollection(device);
+    res = new ResourceManager(device, deviceContext);
     
     /*load all models*/
-    for (const auto& entry : std::filesystem::directory_iterator(modelPath))
-    {
-        DBOUT(L"Loading model " << entry.path().c_str() << std::endl);
-        modelCollection->Add(entry.path().u8string());
-    }
+    res->AddModelsFromFolder(modelPath);
 
     /*load all textures*/
-    for (const auto& entry : std::filesystem::directory_iterator(texturePath))
-    {
-        DBOUT(L"Loading texture " << entry.path().c_str() << std::endl);
-        textureCollection->Add(entry.path().u8string());
-    }
+    res->AddTexturesFromFolder(texturePath);
 
-    if (!textureCollection->SetDefaultTexture("default"))
+    if (!res->getTextureCollection()->SetDefaultTexture("default"))
     {
         throw std::exception("default texture not found");
     }
@@ -119,8 +108,6 @@ bool DXTest::Initialisation()
     XMStoreFloat4x4(&boxWorld, I);
 
     buildCube();
-    buildShader();
-    buildLayout();
 
     //goFullscreen(true);
 
@@ -277,7 +264,7 @@ void DXTest::Draw()
         deviceContext->IASetIndexBuffer(boxIB, DXGI_FORMAT_R32_UINT, 0);
 
         Shaders::basicTextureShader->SetWorldViewProj(wvp);
-        Shaders::basicTextureShader->SetTexture(textureCollection->Get("default"));
+        Shaders::basicTextureShader->SetTexture(res->getTexture("lol"));
         currentTech->GetPassByIndex(p)->Apply(0, deviceContext);
 
         // 36 indices for the box.
@@ -362,48 +349,4 @@ void DXTest::buildCube()
     D3D11_SUBRESOURCE_DATA iinitData;
     iinitData.pSysMem = indices;
     device->CreateBuffer(&ibd, &iinitData, &boxIB);
-}
-
-
-void DXTest::buildLayout()
-{
-    // Create the vertex input layout.
-    D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-    {
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
-    };
-
-    // Create the input layout
-    D3DX11_PASS_DESC passDesc;
-    technique->GetPassByIndex(0)->GetDesc(&passDesc);
-    device->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature,
-       passDesc.IAInputSignatureSize, &inputLayout);
-}
-
-
-void DXTest::buildShader()
-{
-
-    std::ifstream fin(L"data/shader/color.fxo", std::ios::binary);
-
-    fin.seekg(0, std::ios_base::end);
-    int size = (int)fin.tellg();
-    fin.seekg(0, std::ios_base::beg);
-
-    if (size <= 0)
-    {
-        MessageBox(wndHandle, L"Can't access shader!", L"Error", 0);
-    }
-
-    std::vector<char> compiledShader(size);
-
-    fin.read(&compiledShader[0], size);
-    fin.close();
-
-    D3DX11CreateEffectFromMemory(&compiledShader[0], size,
-       0, device, &effect);
-
-    technique = effect->GetTechniqueByName("ColorTech");
-    worldViewProj = effect->GetVariableByName("gWorldViewProj")->AsMatrix();
 }

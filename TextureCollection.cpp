@@ -44,6 +44,7 @@ bool TextureCollection::Add(std::string file)
 
     if (FAILED(hr))
     {
+        throw std::exception("failed to create srv from file");
         return false;
     }
 
@@ -76,6 +77,7 @@ bool TextureCollection::SetDefaultTexture(std::string id)
 {
     if (collection.find(id) == collection.end())
     {
+        throw std::exception("can't set default texture");
         return false;
     }
 
