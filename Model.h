@@ -7,7 +7,6 @@
 
 namespace Vertex
 {
-    // Basic 32-byte vertex structure.
 
     struct BasicColor
     {

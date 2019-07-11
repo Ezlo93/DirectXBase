@@ -8,11 +8,20 @@
 #include <DirectXPackedVector.h>
 #include "DDSTextureLoader.h"
 #include <string>
+#include <iostream>
+#include <sstream>
 #include "GameTime.h"
 #include "Camera.h"
 #include "Model.h"
 
 #define DXRelease(x) { if(x){x->Release(); x = 0; }}
+
+#define DBOUT( s )           \
+{                            \
+   std::wostringstream os_;    \
+   os_ << s;                   \
+   OutputDebugString( os_.str().c_str() );  \
+}
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;

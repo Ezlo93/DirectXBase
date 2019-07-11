@@ -12,6 +12,9 @@
 #include "ModelCollection.h"
 #include "TextureCollection.h"
 
+#define MODEL_PATH "data/models"
+#define TEXTURE_PATH "data/textures"
+
 class DXTest : public DirectXBase
 {
 public:

@@ -1,11 +1,12 @@
 #include "TextureCollection.h"
 #include "DDSTextureLoader.h"
+#include <stdexcept>
 
 /*keep device for texture loading*/
 TextureCollection::TextureCollection(ID3D11Device* dev)
 {
     device = dev;
-
+    defaultID = DEFAULT_NONE;
 }
 
 /*release all shader resource views in the destructor*/
@@ -56,9 +57,28 @@ ID3D11ShaderResourceView* TextureCollection::Get(std::string id)
 
     if (collection.find(id) == collection.end())
     {
-        return nullptr;
+        if (defaultID == DEFAULT_NONE)
+        {
+            throw std::invalid_argument("texture not in collection");
+            return nullptr;
+        }
+        else
+        {
+            return collection[defaultID];
+        }
     }
 
     return collection[id];
 
+}
+
+bool TextureCollection::SetDefaultTexture(std::string id)
+{
+    if (collection.find(id) == collection.end())
+    {
+        return false;
+    }
+
+    defaultID = id;
+    return true;
 }

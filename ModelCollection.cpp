@@ -57,6 +57,7 @@ Model* ModelCollection::Get(std::string id)
 {
     if (collection.find(id) == collection.end())
     {
+        throw std::invalid_argument("model not in collection");
         return nullptr;
     }
     

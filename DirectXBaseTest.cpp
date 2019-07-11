@@ -12,7 +12,7 @@
 #include "InputLayout.h"
 #include <fstream>
 #include <vector>
-
+#include <filesystem>
 
 #pragma warning (disable : 28251)
 
@@ -52,8 +52,8 @@ DXTest::~DXTest()
 
     delete input; input = 0;
     delete skybox; skybox = 0;
-    delete textureCollection;
-    delete modelCollection;
+    delete textureCollection; textureCollection = 0;
+    delete modelCollection; modelCollection = 0;
 
     DXRelease(boxVB);
     DXRelease(boxIB);
@@ -73,13 +73,39 @@ bool DXTest::Initialisation()
         return false;
     }
 
+    /*check data structure integrity*/
+    std::filesystem::path modelPath(MODEL_PATH);
+    std::filesystem::path texturePath(TEXTURE_PATH);
+
+    if (!std::filesystem::exists(modelPath) || !std::filesystem::exists(texturePath))
+    {
+        return false;
+    }
+
     /*...*/
 
     input = new InputManager();
     textureCollection = new TextureCollection(device);
     modelCollection = new ModelCollection(device);
+    
+    /*load all models*/
+    for (const auto& entry : std::filesystem::directory_iterator(modelPath))
+    {
+        DBOUT(L"Loading model " << entry.path().c_str() << std::endl);
+        modelCollection->Add(entry.path().u8string());
+    }
 
-    modelCollection->Add("data/models/wolf.fbx");
+    /*load all textures*/
+    for (const auto& entry : std::filesystem::directory_iterator(texturePath))
+    {
+        DBOUT(L"Loading texture " << entry.path().c_str() << std::endl);
+        textureCollection->Add(entry.path().u8string());
+    }
+
+    if (!textureCollection->SetDefaultTexture("default"))
+    {
+        throw std::exception("default texture not found");
+    }
 
     Shaders::Init(device);
     InputLayouts::Init(device);
@@ -221,13 +247,11 @@ void DXTest::Draw()
     deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
     /*draw*/
-    deviceContext->IASetInputLayout(inputLayout);
+    deviceContext->IASetInputLayout(InputLayouts::Basic32);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    UINT stride = sizeof(Vertex::BasicColor);
+    UINT stride = sizeof(Vertex::Basic32);
     UINT offset = 0;
-    deviceContext->IASetVertexBuffers(0, 1, &boxVB, &stride, &offset);
-    deviceContext->IASetIndexBuffer(boxIB, DXGI_FORMAT_R32_UINT, 0);
 
     // Set constants
     gCamera.UpdateViewMatrix();
@@ -240,17 +264,25 @@ void DXTest::Draw()
     XMMATRIX world = XMLoadFloat4x4(&boxWorld);
     XMMATRIX wvp = world * view * proj;
 
-    worldViewProj->SetMatrix(reinterpret_cast<float*>(&wvp));
+    /*set per frame constats*/
+
+    /*set used technique*/
+    ID3DX11EffectTechnique* currentTech = Shaders::basicTextureShader->BasicTextureTechnique;
 
     D3DX11_TECHNIQUE_DESC techDesc;
-    technique->GetDesc(&techDesc);
+    currentTech->GetDesc(&techDesc);
     for (UINT p = 0; p < techDesc.Passes; ++p)
     {
-        technique->GetPassByIndex(p)->Apply(0, deviceContext);
+        deviceContext->IASetVertexBuffers(0, 1, &boxVB, &stride, &offset);
+        deviceContext->IASetIndexBuffer(boxIB, DXGI_FORMAT_R32_UINT, 0);
+
+        Shaders::basicTextureShader->SetWorldViewProj(wvp);
+        Shaders::basicTextureShader->SetTexture(textureCollection->Get("default"));
+        currentTech->GetPassByIndex(p)->Apply(0, deviceContext);
 
         // 36 indices for the box.
-        modelCollection->Get("wolf")->Draw(deviceContext);
-        //deviceContext->DrawIndexed(36, 0, 0);
+        //modelCollection->Get("Wolf")->Draw(deviceContext);
+        deviceContext->DrawIndexed(36, 0, 0);
     }
 
 
@@ -268,21 +300,21 @@ void DXTest::Draw()
 void DXTest::buildCube()
 {
     // Create vertex buffer
-    Vertex::BasicColor vertices[] =
+    Vertex::Basic32 vertices[] =
     {
-        { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(0.8f,0.1f,0.71f,1.f)   },
-        { XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(0.2f,0.7f,0.71f,1.f)   },
-        { XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(0.8f,0.1f,0.71f,1.f)   },
-        { XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(0.2f,0.7f,0.71f,1.f)   },
-        { XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(0.8f,0.5f,0.31f,1.f)   },
-        { XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(0.2f,0.7f,0.31f,1.f)   },
-        { XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(0.8f,0.5f,0.81f,1.f)   },
-        { XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(0.2f,0.7f,0.71f,1.f)   },
+        { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.8f,0.1f,0.71f), XMFLOAT2(0,0)   },
+        { XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT3(0.2f,0.7f,0.71f),  XMFLOAT2(1,0)   },
+        { XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT3(0.8f,0.1f,0.71f),  XMFLOAT2(1,1)   },
+        { XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT3(0.2f,0.7f,0.71f),  XMFLOAT2(0,1)   },
+        { XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT3(0.8f,0.5f,0.31f),  XMFLOAT2(0,0)   },
+        { XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT3(0.2f,0.7f,0.31f),  XMFLOAT2(1,0)   },
+        { XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT3(0.8f,0.5f,0.81f),  XMFLOAT2(1,1)   },
+        { XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT3(0.2f,0.7f,0.71f),  XMFLOAT2(0,1)   },
     };
 
     D3D11_BUFFER_DESC vbd;
     vbd.Usage = D3D11_USAGE_IMMUTABLE;
-    vbd.ByteWidth = sizeof(Vertex::BasicColor) * 8;
+    vbd.ByteWidth = sizeof(Vertex::Basic32) * 8;
     vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     vbd.CPUAccessFlags = 0;
     vbd.MiscFlags = 0;

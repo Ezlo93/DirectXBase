@@ -3,15 +3,18 @@
 #include <vector>
 
 SkyboxShader* Shaders::skyShader = 0;
+BasicTextureShader* Shaders::basicTextureShader = 0;
 
 void Shaders::Init(ID3D11Device* device)
 {
     skyShader = new SkyboxShader(device, L"data/shader/skybox.fxo");
+    basicTextureShader = new BasicTextureShader(device, L"data/shader/basictexture.fxo");
 }
 
 void Shaders::Destroy()
 {
     delete skyShader; skyShader = 0;
+    delete basicTextureShader; basicTextureShader = 0;
 }
 
 
@@ -28,8 +31,14 @@ Shader::Shader(ID3D11Device* device, const std::wstring& filename)
     fin.read(&compiledShader[0], size);
     fin.close();
 
-    D3DX11CreateEffectFromMemory(&compiledShader[0], size,
+    HRESULT hr = D3DX11CreateEffectFromMemory(&compiledShader[0], size,
        0, device, &effect);
+
+    if (FAILED(hr))
+    {
+        throw std::exception("failed to load shader");
+    }
+
 }
 
 Shader::~Shader()
@@ -39,6 +48,8 @@ Shader::~Shader()
 
 /*shader*/
 
+
+/*skybox shader*/
 SkyboxShader::SkyboxShader(ID3D11Device* device, const std::wstring& filename)
     : Shader(device, filename)
 {
@@ -49,4 +60,26 @@ SkyboxShader::SkyboxShader(ID3D11Device* device, const std::wstring& filename)
 
 SkyboxShader::~SkyboxShader()
 {
+    DXRelease(SkyTech);
+    DXRelease(WorldViewProj);
+    DXRelease(CubeMap);
+}
+
+/*basic texture shader*/
+
+BasicTextureShader::BasicTextureShader(ID3D11Device* device, const std::wstring& filename) : Shader(device, filename)
+{
+    BasicTextureTechnique = effect->GetTechniqueByName("BasicTextureTech");
+    WorldViewProj = effect->GetVariableByName("gWorldViewProj")->AsMatrix();
+    DiffuseMap = effect->GetVariableByName("diffuseMap")->AsShaderResource();
+    TexTransform = effect->GetVariableByName("gTexTransform")->AsMatrix();
+
+}
+
+BasicTextureShader::~BasicTextureShader()
+{
+    DXRelease(BasicTextureTechnique);
+    DXRelease(WorldViewProj);
+    DXRelease(DiffuseMap);
+    DXRelease(TexTransform);
 }
