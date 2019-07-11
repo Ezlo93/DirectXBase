@@ -86,10 +86,16 @@ bool DXTest::Initialisation()
     res = new ResourceManager(device, deviceContext);
     
     /*load all models*/
-    res->AddModelsFromFolder(modelPath);
+    if (!res->AddModelsFromFolder(modelPath))
+    {
+        MessageBox(wndHandle, L"Failed to load model!", L"Error", MB_OK);
+    }
 
     /*load all textures*/
-    res->AddTexturesFromFolder(texturePath);
+    if(!res->AddTexturesFromFolder(texturePath))
+    {
+        MessageBox(wndHandle, L"Failed to load texture!", L"Error", MB_OK);
+    }
 
     if (!res->getTextureCollection()->SetDefaultTexture("default"))
     {

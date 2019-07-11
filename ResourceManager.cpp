@@ -24,7 +24,10 @@ bool ResourceManager::AddModelsFromFolder(std::filesystem::path p)
     for (const auto& entry : std::filesystem::directory_iterator(p))
     {
         DBOUT(L"Loading model " << entry.path().c_str() << std::endl);
-        AddModelFromFile(entry.path().u8string());
+        if (!AddModelFromFile(entry.path().u8string()))
+        {
+            return false;
+        }
     }
 
     return true;
@@ -36,7 +39,10 @@ bool ResourceManager::AddTexturesFromFolder(std::filesystem::path p)
     for (const auto& entry : std::filesystem::directory_iterator(p))
     {
         DBOUT(L"Loading texture " << entry.path().c_str() << std::endl);
-        AddTextureFromFile(entry.path().u8string());
+        if (!AddTextureFromFile(entry.path().u8string()))
+        {
+            return false;
+        }
     }
 
     return true;
