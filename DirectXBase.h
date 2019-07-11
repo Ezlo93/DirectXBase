@@ -16,12 +16,16 @@
 
 #define DXRelease(x) { if(x){x->Release(); x = 0; }}
 
+#ifdef _DEBUG
 #define DBOUT( s )           \
 {                            \
    std::wostringstream os_;    \
    os_ << s;                   \
    OutputDebugString( os_.str().c_str() );  \
 }
+#else
+#define DBOUT(s){}
+#endif
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
