@@ -1,9 +1,7 @@
 #pragma once
 
-#include "DirectXBase.h"
+#include "util.h"
 #include "ModelLoader.h"
-#include <string>
-#include <map>
 
 class ModelCollection
 {

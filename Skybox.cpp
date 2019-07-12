@@ -1,6 +1,7 @@
 #include "Skybox.h"
 #include "Shader.h"
 #include "InputLayout.h"
+#include "DDSTextureLoader.h"
 
 Skybox::Skybox(ID3D11Device* device, const std::wstring& skyboxFile, float radius) : iBuffer(0), vBuffer(0),skyboxSRV(0),sizeIndexBuffer(0)
 {

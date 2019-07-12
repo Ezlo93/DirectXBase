@@ -4,10 +4,15 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
+#include <stdexcept>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <map>
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
-
+using namespace std;
 
 /*often used macros and functions*/
 

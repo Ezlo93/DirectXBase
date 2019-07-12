@@ -7,7 +7,6 @@
 
 
 #include "DirectXBase.h"
-#include <sstream>
 
 namespace {
     DirectXBase* directXBase = 0;

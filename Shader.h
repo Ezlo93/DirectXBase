@@ -1,7 +1,6 @@
 #pragma once
-#include "DirectXBase.h"
-#include <DirectXMath.h>
-#include <string>
+
+#include "util.h"
 #include "d3dx11effect.h"
 
 class Shader

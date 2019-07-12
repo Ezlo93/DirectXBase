@@ -4,8 +4,6 @@
     Nicolai Sehrt
 */
 
-
-#include <Windows.h>
 #include "GameTime.h"
 
 GameTime::GameTime()

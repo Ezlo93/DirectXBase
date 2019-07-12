@@ -1,8 +1,6 @@
 #pragma once
 
-#include <string>
-#include <map>
-#include <d3d11.h>
+#include "util.h"
 
 #define DEFAULT_NONE "!none!"
 

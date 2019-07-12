@@ -2,9 +2,7 @@
 
 #define CAMERA_RESTRICTION_ANGLE 10.f
 
-#include <DirectXMath.h>
-
-using namespace DirectX;
+#include "util.h"
 
 class Camera
 {

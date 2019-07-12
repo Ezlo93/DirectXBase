@@ -1,9 +1,6 @@
 #pragma once
 
-#include "DirectXBase.h"
-#include <vector>
-
-
+#include "util.h"
 
 namespace Vertex
 {
@@ -70,8 +67,8 @@ public:
 
     ~Mesh()
     {
-        vertex->Release(); vertex = 0;
-        index->Release(); index = 0;
+        DXRelease(vertex);
+        DXRelease(index);   
     }
 
 

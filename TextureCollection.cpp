@@ -1,6 +1,5 @@
 #include "TextureCollection.h"
 #include "DDSTextureLoader.h"
-#include <stdexcept>
 
 /*keep device for texture loading*/
 TextureCollection::TextureCollection(ID3D11Device* dev)

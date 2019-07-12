@@ -1,7 +1,6 @@
 #pragma once
 
-#include <d3d11.h>
-#include <string>
+#include "util.h"
 #include "TextureCollection.h"
 #include "ModelCollection.h"
 #include <filesystem>

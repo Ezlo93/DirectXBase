@@ -1,6 +1,5 @@
 #include "Shader.h"
 #include <fstream>
-#include <vector>
 
 SkyboxShader* Shaders::skyShader = 0;
 BasicTextureShader* Shaders::basicTextureShader = 0;

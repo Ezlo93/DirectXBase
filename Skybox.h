@@ -1,9 +1,7 @@
 #pragma once
 
-#include "DirectXBase.h"
+#include "util.h"
 #include "Camera.h"
-#include <string>
-#include <vector>
 
 class Skybox
 {

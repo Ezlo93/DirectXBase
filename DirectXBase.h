@@ -4,7 +4,6 @@
 #include <Windows.h>
 #include "util.h"
 #include "DDSTextureLoader.h"
-#include <string>
 #include <iostream>
 #include <sstream>
 #include "GameTime.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DirectXBase.h"
+#include "util.h"
 
 
 class InputLayoutDesc

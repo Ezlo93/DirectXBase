@@ -11,7 +11,6 @@
 #include "Shader.h"
 #include "InputLayout.h"
 #include <fstream>
-#include <vector>
 #include <filesystem>
 
 #pragma warning (disable : 28251)

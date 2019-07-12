@@ -6,7 +6,6 @@
 #include <assimp\scene.h>
 #include <assimp\postprocess.h>
 #include <assimp\material.h>
-#include <string>
 
 class ModelLoader
 {
