@@ -130,7 +130,7 @@ void DXTest::OnWindowResize()
     DirectXBase::OnWindowResize();
 
     /*recalc camera*/
-    gCamera.setLens(0.25f * XM_PI, getAspectRatio(), 1.f, 1000.f);
+    gCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
 }
 
 bool DXTest::goFullscreen(bool s)
@@ -243,6 +243,7 @@ void DXTest::Draw()
     deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
     deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
+#ifndef _DEBUG
     gCamera.UpdateViewMatrix();
 
     XMMATRIX view = gCamera.getView();
@@ -264,7 +265,7 @@ void DXTest::Draw()
     D3DX11_TECHNIQUE_DESC techDesc;
     currentTech->GetDesc(&techDesc);
 
-    for (auto& m : res->getModel("Wolf")->meshes)
+    for (auto& m : res->getModel("plant")->meshes)
     {
 
         for (UINT p = 0; p < techDesc.Passes; ++p)
@@ -274,6 +275,7 @@ void DXTest::Draw()
 
             Shaders::basicTextureShader->SetWorldViewProj(wvp);
             Shaders::basicTextureShader->SetTexture(res->getTexture("lol"));
+
             currentTech->GetPassByIndex(p)->Apply(0, deviceContext);
 
             deviceContext->DrawIndexed((UINT)(m->indices.size()), 0, 0);
@@ -284,7 +286,8 @@ void DXTest::Draw()
         }
 
     }
-#ifndef _DEBUG
+#endif // !_DEBUG
+
 
     /*draw*/
     deviceContext->IASetInputLayout(InputLayouts::Basic32);
@@ -324,7 +327,7 @@ void DXTest::Draw()
         //res->getModel("default")->Draw(deviceContext);
         deviceContext->DrawIndexed(36, 0, 0);
     }
-#endif // !_DEBUG
+
 
     //render sky box last
     skybox->Draw(deviceContext, gCamera);

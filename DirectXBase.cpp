@@ -22,8 +22,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 DirectXBase::DirectXBase(HINSTANCE hProgramID) :
     programID(hProgramID),
     wndTitle(L"DirectXBase"),
-    wndWidth(1280),
-    wndHeight(720),
+    wndWidth(800),
+    wndHeight(600),
     wndHandle(0),
     wndInactive(false),
     wndMaximized(false),
