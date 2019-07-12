@@ -20,6 +20,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
                    LPSTR lpCmdLine,
                    int nShowCmd)
 {
+    auto start = chrono::system_clock::now();
+
 
     DXTest dxbase(hInstance);
 
@@ -27,6 +29,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
         return 0;
 
     dxbase.OnWindowResize();
+
+    auto end = chrono::system_clock::now();
+    chrono::duration<double> elapsed = end - start;
+
+    DBOUT("Loading finished in " << elapsed.count() << " seconds");
 
     return dxbase.Run();
 }
