@@ -299,10 +299,10 @@ void DXTest::buildCube()
         { XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT3(0.2f,0.7f,0.71f),  XMFLOAT2(1,0)   },
         { XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT3(0.8f,0.1f,0.71f),  XMFLOAT2(1,1)   },
         { XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT3(0.2f,0.7f,0.71f),  XMFLOAT2(0,1)   },
-        { XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT3(0.8f,0.5f,0.31f),  XMFLOAT2(0,0)   },
-        { XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT3(0.2f,0.7f,0.31f),  XMFLOAT2(1,0)   },
-        { XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT3(0.8f,0.5f,0.81f),  XMFLOAT2(1,1)   },
-        { XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT3(0.2f,0.7f,0.71f),  XMFLOAT2(0,1)   },
+        { XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT3(0.8f,0.5f,0.31f),  XMFLOAT2(1,0)   },
+        { XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT3(0.2f,0.7f,0.31f),  XMFLOAT2(0,0)   },
+        { XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT3(0.8f,0.5f,0.81f),  XMFLOAT2(0,1)   },
+        { XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT3(0.2f,0.7f,0.71f),  XMFLOAT2(1,1)   },
     };
 
     D3D11_BUFFER_DESC vbd;

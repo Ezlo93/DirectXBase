@@ -2,10 +2,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
-#pragma comment(lib, "d3d11.lib")
-#include <d3d11.h>
-#include <DirectXMath.h>
-#include <DirectXPackedVector.h>
+#include "util.h"
 #include "DDSTextureLoader.h"
 #include <string>
 #include <iostream>
@@ -13,22 +10,6 @@
 #include "GameTime.h"
 #include "Camera.h"
 #include "Model.h"
-
-#define DXRelease(x) { if(x){x->Release(); x = 0; }}
-
-#ifdef _DEBUG
-#define DBOUT( s )           \
-{                            \
-   std::wostringstream os_;    \
-   os_ << s;                   \
-   OutputDebugString( os_.str().c_str() );  \
-}
-#else
-#define DBOUT(s){}
-#endif
-
-using namespace DirectX;
-using namespace DirectX::PackedVector;
 
 class DirectXBase {
 
