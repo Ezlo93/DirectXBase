@@ -5,6 +5,7 @@ ModelCollection::ModelCollection(ID3D11Device* dev)
     device = dev;
     loader = new ModelLoader();
 
+    defaultID = DEFAULT_NONE;
 }
 
 /*clear collection*/
@@ -46,7 +47,7 @@ bool ModelCollection::Add(std::string file)
         throw std::exception("failed to load model");
         return false;
     }
-
+    m->CreateBuffers();
     /* id is file name without extension*/
     collection.insert(std::make_pair(id, m));
 
@@ -58,10 +59,31 @@ Model* ModelCollection::Get(std::string id)
 {
     if (collection.find(id) == collection.end())
     {
-        throw std::invalid_argument("model not in collection");
-        return nullptr;
+        if (defaultID == DEFAULT_NONE)
+        {
+            throw std::invalid_argument("model not in collection");
+            return nullptr;
+        }
+        else
+        {
+            return collection[defaultID];
+        }
+        
     }
     
     return collection[id];
 
+}
+
+
+bool ModelCollection::SetDefaultModel(std::string id)
+{
+    if (collection.find(id) == collection.end())
+    {
+        throw std::exception("can't set default model");
+        return false;
+    }
+
+    defaultID = id;
+    return true;
 }

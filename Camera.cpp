@@ -4,7 +4,7 @@
 Camera::Camera() : position(0.f,0.f,0.f), right(1.f,0.f,0.f),up(0.f,1.f,0.f),look(0.f,0.f,1.f)
 {
     // 0.25f * pi = 90° FOV
-    setLens(0.25f * XM_PI, 1.f, 1.f, 1000.f);
+    setLens(0.25f * XM_PI, 1.f, .1f, 1000.f);
     yAxis = XMVectorSet(0.f, 1.0f, 0.f, 0.f);
 }
 

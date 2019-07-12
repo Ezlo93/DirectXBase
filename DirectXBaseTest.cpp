@@ -103,10 +103,8 @@ bool DXTest::Initialisation()
         MessageBox(wndHandle, L"Failed to load texture!", L"Error", MB_OK);
     }
 
-    if (!res->getTextureCollection()->SetDefaultTexture("default"))
-    {
-        throw std::exception("default texture not found");
-    }
+    res->getTextureCollection()->SetDefaultTexture("default");
+    res->getModelCollection()->SetDefaultModel("default");
 
     Shaders::Init(device);
     InputLayouts::Init(device);
@@ -245,6 +243,49 @@ void DXTest::Draw()
     deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
     deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
+    gCamera.UpdateViewMatrix();
+
+    XMMATRIX view = gCamera.getView();
+    XMMATRIX proj = gCamera.getProj();
+    XMMATRIX viewProj = gCamera.getViewProj();
+
+    XMMATRIX world = XMLoadFloat4x4(&boxWorld);
+    XMMATRIX wvp = world * view * proj;
+
+    deviceContext->IASetInputLayout(InputLayouts::PosTexNormalTan);
+    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    UINT stride = sizeof(Vertex::PosTexNormalTan);
+    UINT offset = 0;
+
+    /*set used technique*/
+    ID3DX11EffectTechnique* currentTech = Shaders::basicTextureShader->BasicTextureTechnique;
+
+    D3DX11_TECHNIQUE_DESC techDesc;
+    currentTech->GetDesc(&techDesc);
+
+    for (auto& m : res->getModel("Wolf")->meshes)
+    {
+
+        for (UINT p = 0; p < techDesc.Passes; ++p)
+        {
+            deviceContext->IASetVertexBuffers(0, 1, &m->vertex, &stride, &offset);
+            deviceContext->IASetIndexBuffer(m->index, DXGI_FORMAT_R32_UINT, 0);
+
+            Shaders::basicTextureShader->SetWorldViewProj(wvp);
+            Shaders::basicTextureShader->SetTexture(res->getTexture("lol"));
+            currentTech->GetPassByIndex(p)->Apply(0, deviceContext);
+
+            deviceContext->DrawIndexed((UINT)(m->indices.size()), 0, 0);
+
+            // 36 indices for the box.
+            //res->getModel("default")->Draw(deviceContext);
+            //deviceContext->DrawIndexed(36, 0, 0);
+        }
+
+    }
+#ifndef _DEBUG
+
     /*draw*/
     deviceContext->IASetInputLayout(InputLayouts::Basic32);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -280,10 +321,10 @@ void DXTest::Draw()
         currentTech->GetPassByIndex(p)->Apply(0, deviceContext);
 
         // 36 indices for the box.
-        //modelCollection->Get("Wolf")->Draw(deviceContext);
+        //res->getModel("default")->Draw(deviceContext);
         deviceContext->DrawIndexed(36, 0, 0);
     }
-
+#endif // !_DEBUG
 
     //render sky box last
     skybox->Draw(deviceContext, gCamera);
