@@ -22,8 +22,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 DirectXBase::DirectXBase(HINSTANCE hProgramID) :
     programID(hProgramID),
     wndTitle(L"DirectXBase"),
-    wndWidth(800),
-    wndHeight(600),
+    wndWidth(1280),
+    wndHeight(720),
     wndHandle(0),
     wndInactive(false),
     wndMaximized(false),
@@ -65,7 +65,7 @@ HINSTANCE DirectXBase::getProgramID()
 
 float DirectXBase::getAspectRatio()
 {
-    return (float)(wndWidth / wndHeight);
+    return ((float)(wndWidth) / (float)(wndHeight));
 }
 
 HWND DirectXBase::getWindowHandle()
@@ -115,7 +115,12 @@ bool DirectXBase::InitWindow()
     RECT rect = { 0,0,(LONG)wndWidth, (LONG)wndHeight };
     AdjustWindowRect(&rect, WS_EX_OVERLAPPEDWINDOW, false);
 
-    wndHandle = CreateWindowEx(0, L"DXWINDOW", wndTitle.c_str(), WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
+    /*borderless*/
+    //wndHandle = CreateWindowEx(0, L"DXWINDOW", wndTitle.c_str(), WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
+    //    (rect.right - rect.left), (rect.bottom - rect.top), 0, 0, programID, 0);
+
+    /*border*/
+    wndHandle = CreateWindowEx(0, L"DXWINDOW", wndTitle.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
         (rect.right - rect.left), (rect.bottom - rect.top), 0, 0, programID, 0);
 
     if (!wndHandle)
