@@ -61,8 +61,8 @@ void InputLayouts::Init(ID3D11Device* device)
     //
 
     Shaders::basicTextureShader->BasicTextureTechnique->GetPassByIndex(0)->GetDesc(&passDesc);
-    device->CreateInputLayout(InputLayoutDesc::Basic32, 3, passDesc.pIAInputSignature,
-       passDesc.IAInputSignatureSize, &Basic32);
+    device->CreateInputLayout(InputLayoutDesc::PosTexNormalTan, 4, passDesc.pIAInputSignature,
+       passDesc.IAInputSignatureSize, &PosTexNormalTan);
     /*
     //
     // NormalMap

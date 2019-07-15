@@ -81,7 +81,7 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
             m->meshes[i]->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(pos.x, pos.z, pos.y), //!!! Z UP ??
                                             XMFLOAT2(tex.x , tex.y), //TODO tex coords
                                             XMFLOAT3(norm.x, norm.y, norm.z),
-                                            XMFLOAT4(0.f, 0.f, 0.f, 0.f) //TODO
+                                            XMFLOAT3(0.f, 0.f, 0.f) //TODO
             ));
 
         }

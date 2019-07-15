@@ -38,12 +38,7 @@ private:
 
     float clearColor[4];
 
-    void buildCube();
-
     Skybox *skybox;
-
-    ID3D11Buffer* boxVB;
-    ID3D11Buffer* boxIB;
 
     ID3DX11Effect* effect;
     ID3DX11EffectMatrixVariable* worldViewProj;

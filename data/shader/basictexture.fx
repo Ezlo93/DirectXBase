@@ -14,7 +14,7 @@ Texture2D diffuseMap;
 SamplerState samAnisotropic
 {
 	Filter = ANISOTROPIC;
-	MaxAnisotropy = 4;
+	MaxAnisotropy = 16;
 
 	AddressU = WRAP;
 	AddressV = WRAP;
@@ -23,8 +23,9 @@ SamplerState samAnisotropic
 struct VertexIn
 {
 	float3 PosL    : POSITION;
-	float3 NormalL : NORMAL;
-	float2 Tex     : TEXCOORD;
+	float2 Tex : TEXCOORD;
+	float3 NormalL     : NORMAL;
+	float3 TangentU : TANGENT;
 };
 
 struct VertexOut

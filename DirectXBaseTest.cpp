@@ -60,8 +60,6 @@ DXTest::~DXTest()
     delete skybox; skybox = 0;
     delete res; res = 0;
 
-    DXRelease(boxVB);
-    DXRelease(boxIB);
     DXRelease(effect);
 
     RenderStates::Destroy();
@@ -91,13 +89,18 @@ bool DXTest::Initialisation()
     input = new InputManager();
     res = new ResourceManager(device, deviceContext);
     
+    /*create default cube*/
+    res->getModelCollection()->AddModel("default", res->getModelCollection()->CreateCubeModel(5.f, 2.f, 2.f));
+
+
+
     /*load all models*/
     if (!res->AddModelsFromFolder(modelPath))
     {
         MessageBox(wndHandle, L"Failed to load model!", L"Error", MB_OK);
     }
-
     /*load all textures*/
+
     if(!res->AddTexturesFromFolder(texturePath))
     {
         MessageBox(wndHandle, L"Failed to load texture!", L"Error", MB_OK);
@@ -116,8 +119,6 @@ bool DXTest::Initialisation()
 
     XMMATRIX I = XMMatrixIdentity();
     XMStoreFloat4x4(&boxWorld, I);
-
-    buildCube();
 
     //goFullscreen(true);
 
@@ -243,7 +244,7 @@ void DXTest::Draw()
     deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
     deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-#ifndef _DEBUG
+
     gCamera.UpdateViewMatrix();
 
     XMMATRIX view = gCamera.getView();
@@ -253,6 +254,7 @@ void DXTest::Draw()
     XMMATRIX world = XMLoadFloat4x4(&boxWorld);
     XMMATRIX wvp = world * view * proj;
 
+    deviceContext->RSSetState(RenderStates::noCullRS);
     deviceContext->IASetInputLayout(InputLayouts::PosTexNormalTan);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -274,21 +276,17 @@ void DXTest::Draw()
             deviceContext->IASetIndexBuffer(m->index, DXGI_FORMAT_R32_UINT, 0);
 
             Shaders::basicTextureShader->SetWorldViewProj(wvp);
-            Shaders::basicTextureShader->SetTexture(res->getTexture("lol"));
+            Shaders::basicTextureShader->SetTexture(res->getTexture("plant_tex"));
 
             currentTech->GetPassByIndex(p)->Apply(0, deviceContext);
 
             deviceContext->DrawIndexed((UINT)(m->indices.size()), 0, 0);
-
-            // 36 indices for the box.
-            //res->getModel("default")->Draw(deviceContext);
-            //deviceContext->DrawIndexed(36, 0, 0);
         }
 
     }
-#endif // !_DEBUG
 
 
+#ifndef _DEBUG
     /*draw*/
     deviceContext->IASetInputLayout(InputLayouts::Basic32);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -327,7 +325,7 @@ void DXTest::Draw()
         //res->getModel("default")->Draw(deviceContext);
         deviceContext->DrawIndexed(36, 0, 0);
     }
-
+#endif // !_DEBUG
 
     //render sky box last
     skybox->Draw(deviceContext, gCamera);
@@ -337,72 +335,4 @@ void DXTest::Draw()
 
     //show backbuffer
     swapChain->Present(0, 0);
-}
-
-
-void DXTest::buildCube()
-{
-    // Create vertex buffer
-    Vertex::Basic32 vertices[] =
-    {
-        { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.8f,0.1f,0.71f), XMFLOAT2(0,0)   },
-        { XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT3(0.2f,0.7f,0.71f),  XMFLOAT2(1,0)   },
-        { XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT3(0.8f,0.1f,0.71f),  XMFLOAT2(1,1)   },
-        { XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT3(0.2f,0.7f,0.71f),  XMFLOAT2(0,1)   },
-        { XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT3(0.8f,0.5f,0.31f),  XMFLOAT2(1,0)   },
-        { XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT3(0.2f,0.7f,0.31f),  XMFLOAT2(0,0)   },
-        { XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT3(0.8f,0.5f,0.81f),  XMFLOAT2(0,1)   },
-        { XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT3(0.2f,0.7f,0.71f),  XMFLOAT2(1,1)   },
-    };
-
-    D3D11_BUFFER_DESC vbd;
-    vbd.Usage = D3D11_USAGE_IMMUTABLE;
-    vbd.ByteWidth = sizeof(Vertex::Basic32) * 8;
-    vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    vbd.CPUAccessFlags = 0;
-    vbd.MiscFlags = 0;
-    vbd.StructureByteStride = 0;
-    D3D11_SUBRESOURCE_DATA vinitData;
-    vinitData.pSysMem = vertices;
-    device->CreateBuffer(&vbd, &vinitData, &boxVB);
-
-
-    // Create the index buffer
-
-    UINT indices[] = {
-        // front face
-        0, 1, 2,
-        0, 2, 3,
-
-        // back face
-        4, 6, 5,
-        4, 7, 6,
-
-        // left face
-        4, 5, 1,
-        4, 1, 0,
-
-        // right face
-        3, 2, 6,
-        3, 6, 7,
-
-        // top face
-        1, 5, 6,
-        1, 6, 2,
-
-        // bottom face
-        4, 0, 3,
-        4, 3, 7
-    };
-
-    D3D11_BUFFER_DESC ibd;
-    ibd.Usage = D3D11_USAGE_IMMUTABLE;
-    ibd.ByteWidth = sizeof(UINT) * 36;
-    ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    ibd.CPUAccessFlags = 0;
-    ibd.MiscFlags = 0;
-    ibd.StructureByteStride = 0;
-    D3D11_SUBRESOURCE_DATA iinitData;
-    iinitData.pSysMem = indices;
-    device->CreateBuffer(&ibd, &iinitData, &boxIB);
 }

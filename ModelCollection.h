@@ -12,8 +12,11 @@ public:
     ModelCollection(ID3D11Device* dev);
     ~ModelCollection();
     bool Add(std::string file);
+    bool AddModel(std::string id, Model* m);
     Model* Get(std::string id);
     bool SetDefaultModel(std::string id);
+
+    Model* CreateCubeModel(float width, float height, float depth);
 
 private:
     ModelLoader* loader;

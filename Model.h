@@ -20,12 +20,18 @@ namespace Vertex
 
     struct PosTexNormalTan
     {
-        PosTexNormalTan(XMFLOAT3 p, XMFLOAT2 t, XMFLOAT3 n, XMFLOAT4 tu) : Pos(p), Tex(t), Normal(n), TangentU(tu) {}
+        PosTexNormalTan(XMFLOAT3 p, XMFLOAT2 t, XMFLOAT3 n, XMFLOAT3 tu) : Pos(p), Tex(t), Normal(n), TangentU(tu) {}
         PosTexNormalTan() : Pos(), Tex(), Normal(), TangentU() { RtlSecureZeroMemory(this, sizeof(this)); }
+        PosTexNormalTan(float px, float py, float pz,
+                        float u, float v,
+                        float nx, float ny, float nz,
+                        float tx, float ty, float tz
+                        )
+            : Pos(px, py, pz), Tex(u,v), Normal(nx,ny,nz), TangentU(tx,ty,tz){ }
         XMFLOAT3 Pos;
         XMFLOAT2 Tex;
         XMFLOAT3 Normal;
-        XMFLOAT4 TangentU;
+        XMFLOAT3 TangentU;
     };
 
     struct PosTexNormalTanSkinned
@@ -62,7 +68,7 @@ public:
     bool hasTextureCoordinates = false;
     bool hasTangentu = false;
 
-    ID3D11Buffer* vertex, * index;
+    ID3D11Buffer* vertex = 0, * index = 0;
     std::string textureID;
 
     ~Mesh()
