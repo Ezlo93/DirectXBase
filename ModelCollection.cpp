@@ -115,10 +115,10 @@ Model* ModelCollection::CreateCubeModel(float width, float height, float depth)
     /*define faces*/
     v[0] = Vertex::PosTexNormalTan(XMFLOAT3(-w, -h, -d), XMFLOAT2(0.f, 1.f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
     v[1] = Vertex::PosTexNormalTan(XMFLOAT3(-w, +h, -d), XMFLOAT2(0.f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
-    v[2] = Vertex::PosTexNormalTan(XMFLOAT3(+w, +h, -d), XMFLOAT2(1.f, .0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
+    v[2] = Vertex::PosTexNormalTan(XMFLOAT3(+w, +h, -d), XMFLOAT2(1.f, 0.f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
     v[3] = Vertex::PosTexNormalTan(XMFLOAT3(+w, -h, -d), XMFLOAT2(1.f, 1.f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
 
-    v[4] = Vertex::PosTexNormalTan(-w, -h, +d, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f);
+    v[4] = Vertex::PosTexNormalTan(-w, -h, +d, 1.f, 1.f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f);
     v[5] = Vertex::PosTexNormalTan(+w, -h, +d, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f);
     v[6] = Vertex::PosTexNormalTan(+w, +h, +d, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f);
     v[7] = Vertex::PosTexNormalTan(-w, +h, +d, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f);
@@ -146,7 +146,7 @@ Model* ModelCollection::CreateCubeModel(float width, float height, float depth)
     mesh->hasTextureCoordinates = true;
     mesh->hasTangentu = true;
 
-    mesh->textureID = "default";
+    mesh->textureID = "rr";
 
     mesh->vertices.assign(&v[0], &v[24]);
 
@@ -170,9 +170,9 @@ Model* ModelCollection::CreateCubeModel(float width, float height, float depth)
 
     /*material*/
 
-    mat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.f);
-    mat.Diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.f);
-    mat.Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.f);
+    mat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+    mat.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    mat.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
 
     mesh->material = mat;
 

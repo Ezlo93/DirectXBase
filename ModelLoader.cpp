@@ -79,9 +79,9 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
 
             /*convert to vertex data format*/
             m->meshes[i]->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(pos.x, pos.z, pos.y), //!!! Z UP ??
-                                            XMFLOAT2(tex.x , tex.y), //TODO tex coords
+                                            XMFLOAT2(tex.x , tex.y), //tex coords
                                             XMFLOAT3(norm.x, norm.y, norm.z),
-                                            XMFLOAT3(0.f, 0.f, 0.f) //TODO
+                                            XMFLOAT3(tangU.x , tangU.y, tangU.z)
             ));
 
         }

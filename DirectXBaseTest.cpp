@@ -90,7 +90,7 @@ bool DXTest::Initialisation()
     res = new ResourceManager(device, deviceContext);
     
     /*create default cube*/
-    res->getModelCollection()->AddModel("default", res->getModelCollection()->CreateCubeModel(5.f, 2.f, 2.f));
+    res->getModelCollection()->AddModel("default", res->getModelCollection()->CreateCubeModel(2.f, 2.f, 2.f));
 
 
 
@@ -267,7 +267,7 @@ void DXTest::Draw()
     D3DX11_TECHNIQUE_DESC techDesc;
     currentTech->GetDesc(&techDesc);
 
-    for (auto& m : res->getModel("plant")->meshes)
+    for (auto& m : res->getModel("default")->meshes)
     {
 
         for (UINT p = 0; p < techDesc.Passes; ++p)
@@ -276,10 +276,9 @@ void DXTest::Draw()
             deviceContext->IASetIndexBuffer(m->index, DXGI_FORMAT_R32_UINT, 0);
 
             Shaders::basicTextureShader->SetWorldViewProj(wvp);
-            Shaders::basicTextureShader->SetTexture(res->getTexture("plant_tex"));
+            Shaders::basicTextureShader->SetTexture(res->getTexture("plant_texs"));
 
             currentTech->GetPassByIndex(p)->Apply(0, deviceContext);
-
             deviceContext->DrawIndexed((UINT)(m->indices.size()), 0, 0);
         }
 
