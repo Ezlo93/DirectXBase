@@ -17,6 +17,7 @@ public:
     bool SetDefaultModel(std::string id);
 
     Model* CreateCubeModel(float width, float height, float depth);
+    Model* CreateSphereModel(float radius, int slices, int stacks);
 
 private:
     ModelLoader* loader;

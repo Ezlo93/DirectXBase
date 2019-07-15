@@ -90,8 +90,8 @@ bool DXTest::Initialisation()
     res = new ResourceManager(device, deviceContext);
     
     /*create default cube*/
-    res->getModelCollection()->AddModel("default", res->getModelCollection()->CreateCubeModel(2.f, 2.f, 2.f));
-
+    res->getModelCollection()->AddModel("defaultCube", res->getModelCollection()->CreateCubeModel(2.f, 2.f, 2.f));
+    res->getModelCollection()->AddModel("defaultSphere", res->getModelCollection()->CreateSphereModel(5.f, 64, 64));
 
 
     /*load all models*/
@@ -107,7 +107,7 @@ bool DXTest::Initialisation()
     }
 
     res->getTextureCollection()->SetDefaultTexture("default");
-    res->getModelCollection()->SetDefaultModel("default");
+    res->getModelCollection()->SetDefaultModel("defaultCube");
 
     Shaders::Init(device);
     InputLayouts::Init(device);
@@ -267,7 +267,7 @@ void DXTest::Draw()
     D3DX11_TECHNIQUE_DESC techDesc;
     currentTech->GetDesc(&techDesc);
 
-    for (auto& m : res->getModel("default")->meshes)
+    for (auto& m : res->getModel("defaultSphere")->meshes)
     {
 
         for (UINT p = 0; p < techDesc.Passes; ++p)
@@ -283,48 +283,6 @@ void DXTest::Draw()
         }
 
     }
-
-
-#ifndef _DEBUG
-    /*draw*/
-    deviceContext->IASetInputLayout(InputLayouts::Basic32);
-    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    UINT stride = sizeof(Vertex::Basic32);
-    UINT offset = 0;
-
-    // Set constants
-    gCamera.UpdateViewMatrix();
-
-
-    XMMATRIX view = gCamera.getView();
-    XMMATRIX proj = gCamera.getProj();
-    XMMATRIX viewProj = gCamera.getViewProj();
-
-    XMMATRIX world = XMLoadFloat4x4(&boxWorld);
-    XMMATRIX wvp = world * view * proj;
-
-    /*set per frame constats*/
-
-    /*set used technique*/
-    ID3DX11EffectTechnique* currentTech = Shaders::basicTextureShader->BasicTextureTechnique;
-
-    D3DX11_TECHNIQUE_DESC techDesc;
-    currentTech->GetDesc(&techDesc);
-    for (UINT p = 0; p < techDesc.Passes; ++p)
-    {
-        deviceContext->IASetVertexBuffers(0, 1, &boxVB, &stride, &offset);
-        deviceContext->IASetIndexBuffer(boxIB, DXGI_FORMAT_R32_UINT, 0);
-
-        Shaders::basicTextureShader->SetWorldViewProj(wvp);
-        Shaders::basicTextureShader->SetTexture(res->getTexture("lol"));
-        currentTech->GetPassByIndex(p)->Apply(0, deviceContext);
-
-        // 36 indices for the box.
-        //res->getModel("default")->Draw(deviceContext);
-        deviceContext->DrawIndexed(36, 0, 0);
-    }
-#endif // !_DEBUG
 
     //render sky box last
     skybox->Draw(deviceContext, gCamera);

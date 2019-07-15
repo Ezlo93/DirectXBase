@@ -182,3 +182,103 @@ Model* ModelCollection::CreateCubeModel(float width, float height, float depth)
 
     return model;
 }
+
+Model* ModelCollection::CreateSphereModel(float radius, int slices, int stacks)
+{
+    Model* model = new Model(device);
+    Mesh* mesh = new Mesh();
+    Material::Standard mat;
+
+    Vertex::PosTexNormalTan top(0.f, radius, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f);
+    Vertex::PosTexNormalTan bot(0.f, -radius, 0.f, 0.f, 1.f, 0.f, -1.f, 0.f, 1.f, 0.f, 0.f);
+
+
+    mesh->vertices.push_back(top);
+
+    float phiStep = XM_PI / stacks;
+    float thetaStep = XM_PI * 2.f / slices;
+
+
+    for (UINT i = 1; i <= stacks - 1; i++)
+    {
+        float phi = i * phiStep;
+
+        for (UINT j = 0; j <= slices; ++j)
+        {
+            float theta = j * thetaStep;
+
+            Vertex::PosTexNormalTan v;
+
+            v.Pos.x = radius * sinf(phi) * cosf(theta);
+            v.Pos.y = radius * cosf(phi);
+            v.Pos.z = radius * sinf(phi) * sinf(theta);
+
+            v.TangentU.x = -radius * sinf(phi) * sinf(theta);
+            v.TangentU.y = 0.0f;
+            v.TangentU.z = +radius * sinf(phi) * cosf(theta);
+
+            XMVECTOR T = XMLoadFloat3(&v.TangentU);
+            XMStoreFloat3(&v.TangentU, XMVector3Normalize(T));
+
+            XMVECTOR p = XMLoadFloat3(&v.Pos);
+            XMStoreFloat3(&v.Normal, XMVector3Normalize(p));
+
+            v.Tex.x = theta / XM_2PI;
+            v.Tex.y = phi / XM_PI;
+
+            mesh->vertices.push_back(v);
+        }
+    }
+
+    mesh->vertices.push_back(bot);
+
+    //indices
+
+    for (UINT i = 1; i <= slices; ++i)
+    {
+        mesh->indices.push_back(0);
+        mesh->indices.push_back(i + 1);
+        mesh->indices.push_back(i);
+    }
+
+    UINT baseIndex = 1;
+    UINT ringVertexCount = slices + 1;
+    for (UINT i = 0; i < stacks - 2; ++i)
+    {
+        for (UINT j = 0; j < slices; ++j)
+        {
+            mesh->indices.push_back(baseIndex + i * ringVertexCount + j);
+            mesh->indices.push_back(baseIndex + i * ringVertexCount + j + 1);
+            mesh->indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+
+            mesh->indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+            mesh->indices.push_back(baseIndex + i * ringVertexCount + j + 1);
+            mesh->indices.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+        }
+    }
+
+    UINT southPoleIndex = (UINT)mesh->vertices.size() - 1;
+
+    baseIndex = southPoleIndex - ringVertexCount;
+
+    for (UINT i = 0; i < slices; ++i)
+    {
+        mesh->indices.push_back(southPoleIndex);
+        mesh->indices.push_back(baseIndex + i);
+        mesh->indices.push_back(baseIndex + i + 1);
+    }
+
+    /*material*/
+
+    mat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+    mat.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    mat.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
+
+    mesh->material = mat;
+
+
+    model->meshes.clear();
+    model->meshes.push_back(mesh);
+
+    return model;
+}

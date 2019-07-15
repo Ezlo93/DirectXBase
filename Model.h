@@ -48,12 +48,12 @@ namespace Vertex
 namespace Material {
     struct Standard
     {
-        Standard() : Ambient(), Diffuse(), Specular() { RtlSecureZeroMemory(this, sizeof(this)); }
+        Standard() : Ambient(), Diffuse(), Specular(), Reflect() { RtlSecureZeroMemory(this, sizeof(this)); }
 
         XMFLOAT4 Ambient;
         XMFLOAT4 Diffuse;
         XMFLOAT4 Specular; // w = SpecPower
-        //XMFLOAT4 Reflect;
+        XMFLOAT4 Reflect;
     };
 }
 
