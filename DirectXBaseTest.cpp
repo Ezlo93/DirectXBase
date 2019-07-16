@@ -60,6 +60,11 @@ DXTest::~DXTest()
     delete skybox; skybox = 0;
     delete res; res = 0;
 
+    for (auto& m : modelsStatic)
+        delete m;
+
+    modelsStatic.clear();
+
     DXRelease(effect);
 
     RenderStates::Destroy();
@@ -116,10 +121,18 @@ bool DXTest::Initialisation()
 
     skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 30.f);
 
+    /*add static models for testing*/
+    ModelInstanceStatic *mis = new ModelInstanceStatic(device, deviceContext, res, "default");
+    mis->Rotation = XMMatrixRotationY(0.5f);
+    mis->Translation = XMMatrixTranslation(3.f, -1.f, 5.f);
 
-    XMMATRIX I = XMMatrixIdentity();
-    XMStoreFloat4x4(&boxWorld, I);
+    modelsStatic.push_back(mis);
+    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "defaultSphere"));
+    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "plant"));
+    modelsStatic[2]->Translation = XMMatrixTranslation(-8.f, 0, 0);
 
+
+    /*test light values*/
     gDirLights[0].Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
     gDirLights[0].Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
     gDirLights[0].Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
@@ -263,47 +276,18 @@ void DXTest::Draw()
 
     gCamera.UpdateViewMatrix();
 
-    XMMATRIX view = gCamera.getView();
-    XMMATRIX proj = gCamera.getProj();
-    XMMATRIX viewProj = gCamera.getViewProj();
-
-    XMMATRIX world = XMLoadFloat4x4(&boxWorld);
-    XMMATRIX wvp = world * view * proj;
-
     deviceContext->RSSetState(RenderStates::noCullRS);
     deviceContext->IASetInputLayout(InputLayouts::PosTexNormalTan);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    UINT stride = sizeof(Vertex::PosTexNormalTan);
-    UINT offset = 0;
-
-    /*set used technique*/
+    /*keep this because not object specific*/
     Shaders::basicTextureShader->SetEyePosW(gCamera.getPosition());
     Shaders::basicTextureShader->SetDirLights(gDirLights);
 
-    ID3DX11EffectTechnique* currentTech = Shaders::basicTextureShader->BasicTextureTechnique;
-
-    D3DX11_TECHNIQUE_DESC techDesc;
-    currentTech->GetDesc(&techDesc);
-
-    for (auto& m : res->getModel("defaultSphere")->meshes)
+    /*draw static models*/
+    for (auto& m : modelsStatic)
     {
-
-        for (UINT p = 0; p < techDesc.Passes; ++p)
-        {
-            deviceContext->IASetVertexBuffers(0, 1, &m->vertex, &stride, &offset);
-            deviceContext->IASetIndexBuffer(m->index, DXGI_FORMAT_R32_UINT, 0);
-
-            Shaders::basicTextureShader->SetWorldViewProj(wvp);
-            Shaders::basicTextureShader->SetWorld(world);
-            Shaders::basicTextureShader->SetMaterial(m->material);
-            Shaders::basicTextureShader->SetWorldInvTranspose(DXMath::InverseTranspose(world));
-            Shaders::basicTextureShader->SetTexture(res->getTexture("plant_texs"));
-
-            currentTech->GetPassByIndex(p)->Apply(0, deviceContext);
-            deviceContext->DrawIndexed((UINT)(m->indices.size()), 0, 0);
-        }
-
+        m->Draw(&gCamera, Shaders::basicTextureShader);
     }
 
     //render sky box last

@@ -15,16 +15,6 @@ Model::~Model()
     
 }
 
-/*draw all meshes of the model*/
-void Model::Draw(ID3D11DeviceContext* context)
-{
-    for (auto& m : meshes)
-    {
-        m->Draw(context);
-    }
-
-}
-
 /*create vertex and indexbuffers for all meshes of the model*/
 void Model::CreateBuffers()
 {

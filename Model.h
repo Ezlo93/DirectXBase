@@ -1,6 +1,7 @@
 #pragma once
 
 #include "util.h"
+//#include "Shader.h"
 
 namespace Vertex
 {
@@ -128,21 +129,6 @@ public:
     }
 
 
-    /*draw mesh*/
-    void Draw(ID3D11DeviceContext* context)
-    {
-
-        UINT stride = sizeof(Vertex::PosTexNormalTan);
-        UINT offset = 0;
-
-        context->IASetVertexBuffers(0, 1, &vertex, &stride, &offset);
-        context->IASetIndexBuffer(index, DXGI_FORMAT_R32_UINT, 0);
-
-        context->DrawIndexed((UINT)(indices.size()), 0, 0);
-
-    }
-
-
     /*create vertex and index buffer on gpu*/
     void createBuffers(ID3D11Device* device)
     {
@@ -184,10 +170,10 @@ public:
     Model(ID3D11Device* dev);
     ~Model();
 
-    void Draw(ID3D11DeviceContext* context);
     void CreateBuffers();
 
-
+    //Shader* shader;
+    //ID3DX11EffectTechnique* tech;
 private:
     ID3D11Device* device;
 

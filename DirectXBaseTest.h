@@ -11,7 +11,7 @@
 #include "Skybox.h"
 #include "ResourceManager.h"
 #include <chrono>
-
+#include "ModelInstanceStatic.h"
 
 
 #define MODEL_PATH "data/models"
@@ -35,6 +35,7 @@ private:
     int controllingInput = -1;
 
     ResourceManager* res;
+    std::vector<ModelInstanceStatic*> modelsStatic;
     DirectionalLight gDirLights[3];
 
     float clearColor[4];
@@ -42,7 +43,4 @@ private:
     Skybox *skybox;
 
     ID3DX11Effect* effect;
-    ID3DX11EffectMatrixVariable* worldViewProj;
-
-    XMFLOAT4X4 boxWorld;
 };
