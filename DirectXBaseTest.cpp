@@ -276,6 +276,9 @@ void DXTest::Draw()
             deviceContext->IASetIndexBuffer(m->index, DXGI_FORMAT_R32_UINT, 0);
 
             Shaders::basicTextureShader->SetWorldViewProj(wvp);
+            Shaders::basicTextureShader->SetWorld(world);
+            Shaders::basicTextureShader->SetMaterial(m->material);
+            Shaders::basicTextureShader->SetWorldInvTranspose(DXMath::InverseTranspose(world));
             Shaders::basicTextureShader->SetTexture(res->getTexture("plant_texs"));
 
             currentTech->GetPassByIndex(p)->Apply(0, deviceContext);

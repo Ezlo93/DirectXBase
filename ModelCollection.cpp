@@ -199,11 +199,11 @@ Model* ModelCollection::CreateSphereModel(float radius, int slices, int stacks)
     float thetaStep = XM_PI * 2.f / slices;
 
 
-    for (UINT i = 1; i <= stacks - 1; i++)
+    for (int i = 1; i <= stacks - 1; i++)
     {
         float phi = i * phiStep;
 
-        for (UINT j = 0; j <= slices; ++j)
+        for (int j = 0; j <= slices; ++j)
         {
             float theta = j * thetaStep;
 
@@ -234,18 +234,18 @@ Model* ModelCollection::CreateSphereModel(float radius, int slices, int stacks)
 
     //indices
 
-    for (UINT i = 1; i <= slices; ++i)
+    for (int i = 1; i <= slices; ++i)
     {
         mesh->indices.push_back(0);
         mesh->indices.push_back(i + 1);
         mesh->indices.push_back(i);
     }
 
-    UINT baseIndex = 1;
-    UINT ringVertexCount = slices + 1;
-    for (UINT i = 0; i < stacks - 2; ++i)
+    int baseIndex = 1;
+    int ringVertexCount = slices + 1;
+    for (int i = 0; i < stacks - 2; ++i)
     {
-        for (UINT j = 0; j < slices; ++j)
+        for (int j = 0; j < slices; ++j)
         {
             mesh->indices.push_back(baseIndex + i * ringVertexCount + j);
             mesh->indices.push_back(baseIndex + i * ringVertexCount + j + 1);
@@ -257,11 +257,11 @@ Model* ModelCollection::CreateSphereModel(float radius, int slices, int stacks)
         }
     }
 
-    UINT southPoleIndex = (UINT)mesh->vertices.size() - 1;
+    int southPoleIndex = (int)mesh->vertices.size() - 1;
 
     baseIndex = southPoleIndex - ringVertexCount;
 
-    for (UINT i = 0; i < slices; ++i)
+    for (int i = 0; i < slices; ++i)
     {
         mesh->indices.push_back(southPoleIndex);
         mesh->indices.push_back(baseIndex + i);

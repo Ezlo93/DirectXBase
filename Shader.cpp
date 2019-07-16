@@ -72,7 +72,10 @@ BasicTextureShader::BasicTextureShader(ID3D11Device* device, const std::wstring&
     WorldViewProj = effect->GetVariableByName("gWorldViewProj")->AsMatrix();
     DiffuseMap = effect->GetVariableByName("diffuseMap")->AsShaderResource();
     TexTransform = effect->GetVariableByName("gTexTransform")->AsMatrix();
-
+    World = effect->GetVariableByName("gWorld")->AsMatrix();
+    WorldInvTranspose = effect->GetVariableByName("gWorldInvTranspose")->AsMatrix();
+    EyePosW = effect->GetVariableByName("gEyePosW")->AsVector(); // not found??
+    Mat = effect->GetVariableByName("gMaterial");
 }
 
 BasicTextureShader::~BasicTextureShader()
@@ -81,4 +84,8 @@ BasicTextureShader::~BasicTextureShader()
     DXRelease(WorldViewProj);
     DXRelease(DiffuseMap);
     DXRelease(TexTransform);
+    DXRelease(World);
+    DXRelease(WorldInvTranspose);
+    DXRelease(EyePosW);
+    DXRelease(Mat);
 }

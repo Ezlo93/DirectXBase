@@ -1,5 +1,10 @@
 #include "light.fx"
 
+cbuffer cbPerFrame{
+	DirectionalLight gDirLights[3];
+	float3 gEyePosW;
+}
+
 cbuffer cbPerObject
 {
 	float4x4 gWorld;
@@ -61,6 +66,7 @@ float4 PS(VertexOut pin) : SV_Target
 
 
     return texColor;
+//return gMaterial.Ambient;
 }
 
 technique11 BasicTextureTech
