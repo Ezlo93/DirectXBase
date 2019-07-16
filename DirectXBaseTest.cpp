@@ -128,7 +128,7 @@ bool DXTest::Initialisation()
     modelsStatic.push_back(mis);
     modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "defaultSphere"));
     modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "plant"));
-    modelsStatic[2]->Translation.x -8.f;
+    modelsStatic[2]->Translation.x = -8.f;
 
 
     /*test light values*/
@@ -261,7 +261,7 @@ void DXTest::Update(float deltaTime)
 
     if (in->buttons[BUTTON_A])
     {
-        modelsStatic[1]->Scale.x += 1.1 * deltaTime;
+        modelsStatic[1]->Scale.x += 1.1f * deltaTime;
         modelsStatic[1]->Rotation.x = 90;
         modelsStatic[1]->Translation.z += 1.f * deltaTime;
        
