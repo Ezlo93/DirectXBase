@@ -123,13 +123,12 @@ bool DXTest::Initialisation()
 
     /*add static models for testing*/
     ModelInstanceStatic *mis = new ModelInstanceStatic(device, deviceContext, res, "default");
-    mis->Rotation = XMMatrixRotationY(0.5f);
-    mis->Translation = XMMatrixTranslation(3.f, -1.f, 5.f);
+    mis->Translation.x = 5.f;
 
     modelsStatic.push_back(mis);
     modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "defaultSphere"));
     modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "plant"));
-    modelsStatic[2]->Translation = XMMatrixTranslation(-8.f, 0, 0);
+    modelsStatic[2]->Translation.x -8.f;
 
 
     /*test light values*/
@@ -259,6 +258,15 @@ void DXTest::Update(float deltaTime)
 
     gCamera.yaw(yaw);
     gCamera.pitch(pitch);
+
+    if (in->buttons[BUTTON_A])
+    {
+        modelsStatic[1]->Scale.x += 1.1 * deltaTime;
+        modelsStatic[1]->Rotation.x = 90;
+        modelsStatic[1]->Translation.z += 1.f * deltaTime;
+       
+    }
+
 
     if (in->buttons[BACK])
     {

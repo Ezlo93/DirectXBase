@@ -8,9 +8,9 @@ ModelInstanceStatic::ModelInstanceStatic(ID3D11Device* d, ID3D11DeviceContext* c
     XMMATRIX I = XMMatrixIdentity();
     XMStoreFloat4x4(&World, I);
     XMStoreFloat4x4(&TextureTransform, I);
-    Rotation = I;
-    Scale = I;
-    Translation = I;
+    Rotation = XMFLOAT3(0.f,0.f,0.f);
+    Scale = XMFLOAT3(1.f, 1.f, 1.f);
+    Translation = XMFLOAT3(0.f, 0.f, 0.f);
     modelID = id;
     resources = r;
 }
@@ -21,7 +21,11 @@ ModelInstanceStatic::~ModelInstanceStatic()
 
 void ModelInstanceStatic::Draw(Camera* c, BasicTextureShader* s)
 {
-    XMStoreFloat4x4(&World, Rotation * Scale * Translation);
+    XMMATRIX _r = XMMatrixRotationRollPitchYaw(Rotation.x, Rotation.y, Rotation.z);
+    XMMATRIX _t = XMMatrixTranslation(Translation.x, Translation.y, Translation.z);
+    XMMATRIX _s = XMMatrixScaling(Scale.x, Scale.y, Scale.z);
+
+    XMStoreFloat4x4(&World, _r * _s * _t);
 
     XMMATRIX view = c->getView();
     XMMATRIX proj = c->getProj();

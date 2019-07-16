@@ -26,7 +26,7 @@ public:
 
     void Draw(Camera *c, BasicTextureShader *s);
 
-    XMMATRIX Translation, Rotation, Scale;
+    XMFLOAT3 Translation, Rotation, Scale;
     
     XMFLOAT4X4 TextureTransform;
 private:
