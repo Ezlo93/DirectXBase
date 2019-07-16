@@ -120,6 +120,22 @@ bool DXTest::Initialisation()
     XMMATRIX I = XMMatrixIdentity();
     XMStoreFloat4x4(&boxWorld, I);
 
+    gDirLights[0].Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+    gDirLights[0].Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+    gDirLights[0].Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
+    gDirLights[0].Direction = XMFLOAT3(0.707f, -0.707f, 0.0f);
+
+    gDirLights[1].Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+    gDirLights[1].Diffuse = XMFLOAT4(1.4f, 1.4f, 1.4f, 1.0f);
+    gDirLights[1].Specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 16.0f);
+    gDirLights[1].Direction = XMFLOAT3(-0.307f, 0.5f, 0.707f);
+
+
+    gDirLights[2].Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+    gDirLights[2].Diffuse = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+    gDirLights[2].Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+    gDirLights[2].Direction = XMFLOAT3(0.0f, -0.707f, -0.707f);
+
     //goFullscreen(true);
 
     return true;
@@ -262,6 +278,9 @@ void DXTest::Draw()
     UINT offset = 0;
 
     /*set used technique*/
+    Shaders::basicTextureShader->SetEyePosW(gCamera.getPosition());
+    Shaders::basicTextureShader->SetDirLights(gDirLights);
+
     ID3DX11EffectTechnique* currentTech = Shaders::basicTextureShader->BasicTextureTechnique;
 
     D3DX11_TECHNIQUE_DESC techDesc;

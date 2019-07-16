@@ -35,6 +35,7 @@ private:
     int controllingInput = -1;
 
     ResourceManager* res;
+    DirectionalLight gDirLights[3];
 
     float clearColor[4];
 
