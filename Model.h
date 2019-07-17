@@ -1,7 +1,6 @@
 #pragma once
 
 #include "util.h"
-//#include "Shader.h"
 
 namespace Vertex
 {
@@ -120,7 +119,8 @@ public:
     bool hasTangentu = false;
 
     ID3D11Buffer* vertex = 0, * index = 0;
-    std::string textureID;
+    std::string diffuseMapID;
+    std::string normalMapID;
 
     ~Mesh()
     {

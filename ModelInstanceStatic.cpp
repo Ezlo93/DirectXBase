@@ -57,7 +57,7 @@ void ModelInstanceStatic::Draw(Camera* c, BasicTextureShader* s)
             s->SetWorldViewProj(wvp);
             s->SetWorldInvTranspose(DXMath::InverseTranspose(world));
             s->SetMaterial(m->material);
-            s->SetTexture(resources->getTexture(m->textureID));;
+            s->SetTexture(resources->getTexture(m->diffuseMapID));
             s->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
 
             /*apply and draw*/

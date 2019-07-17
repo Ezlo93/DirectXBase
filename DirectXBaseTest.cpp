@@ -119,7 +119,7 @@ bool DXTest::Initialisation()
     RenderStates::Init(device);
 
 
-    skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 30.f);
+    skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 100.f);
 
     /*add static models for testing*/
     ModelInstanceStatic *mis = new ModelInstanceStatic(device, deviceContext, res, "default");
@@ -127,6 +127,7 @@ bool DXTest::Initialisation()
 
     modelsStatic.push_back(mis);
     modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "plant"));
+    modelsStatic[1]->Rotation.x = XMConvertToRadians(90);
 
     /*test light values*/
     gDirLights[0].Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
@@ -264,6 +265,8 @@ void DXTest::Update(float deltaTime)
        
     }*/
 
+    modelsStatic[1]->Rotation.z += XMConvertToRadians(5.f * deltaTime);
+
 
     if (in->buttons[BACK])
     {
@@ -282,6 +285,7 @@ void DXTest::Draw()
     gCamera.UpdateViewMatrix();
 
     deviceContext->RSSetState(0);
+    //deviceContext->RSSetState(RenderStates::noCullRS);
     deviceContext->IASetInputLayout(InputLayouts::PosTexNormalTan);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

@@ -63,8 +63,21 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
             {
                 char id[1024];
                 _splitpath_s(Path.data, NULL, 0, NULL, 0, id, 1024, NULL, 0);
-                m->meshes[i]->textureID = id;
+                m->meshes[i]->diffuseMapID = id;
             }
+        }
+
+        if (material->GetTextureCount(aiTextureType_NORMALS) > 0)
+        {
+            aiString Path;
+
+            if (material->GetTexture(aiTextureType_NORMALS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS)
+            {
+                char id[1024];
+                _splitpath_s(Path.data, NULL, 0, NULL, 0, id, 1024, NULL, 0);
+                m->meshes[i]->normalMapID = id;
+            }
+
         }
 
         /*get vertices: positions normals tex coords and tangentu */
@@ -92,7 +105,7 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
 
             /*convert to vertex data format*/
             m->meshes[i]->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(pos.x, pos.y, pos.z),
-                                            XMFLOAT2(tex.x , tex.y), //tex coords
+                                            XMFLOAT2(tex.x , tex.y),
                                             XMFLOAT3(norm.x, norm.y, norm.z),
                                             XMFLOAT3(tangU.x , tangU.y, tangU.z)
             ));
