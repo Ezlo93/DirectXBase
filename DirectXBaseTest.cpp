@@ -126,10 +126,7 @@ bool DXTest::Initialisation()
     mis->Translation.x = 5.f;
 
     modelsStatic.push_back(mis);
-    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "defaultSphere"));
     modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "plant"));
-    modelsStatic[2]->Translation.x = -8.f;
-
 
     /*test light values*/
     gDirLights[0].Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
@@ -259,13 +256,13 @@ void DXTest::Update(float deltaTime)
     gCamera.yaw(yaw);
     gCamera.pitch(pitch);
 
-    if (in->buttons[BUTTON_A])
+    /*if (in->buttons[BUTTON_A])
     {
-        modelsStatic[1]->Scale.x += 1.1f * deltaTime;
+       // modelsStatic[1]->Scale.x += 1.1f * deltaTime;
         modelsStatic[1]->Rotation.x = 90;
         modelsStatic[1]->Translation.z += 1.f * deltaTime;
        
-    }
+    }*/
 
 
     if (in->buttons[BACK])
@@ -284,7 +281,8 @@ void DXTest::Draw()
 
     gCamera.UpdateViewMatrix();
 
-    deviceContext->RSSetState(RenderStates::noCullRS);
+    deviceContext->RSSetState(0);
+    //deviceContext->RSSetState(RenderStates::noCullRS);
     deviceContext->IASetInputLayout(InputLayouts::PosTexNormalTan);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

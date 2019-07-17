@@ -19,8 +19,8 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
 {
     Assimp::Importer fbxImport;
 
-    const aiScene* loadedScene = fbxImport.ReadFile(fileName,aiProcessPreset_TargetRealtime_MaxQuality);
-
+    const aiScene* loadedScene = fbxImport.ReadFile(fileName, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_ConvertToLeftHanded);
+                                                    
     if (!loadedScene)
     {
         std::cerr << "Unable to load file " << fileName << ": " << fbxImport.GetErrorString() << std::endl;
@@ -78,7 +78,7 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
             }
 
             /*convert to vertex data format*/
-            m->meshes[i]->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(pos.x, pos.z, pos.y), //!!! Z UP ??
+            m->meshes[i]->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(pos.x, pos.y, pos.z),
                                             XMFLOAT2(tex.x , tex.y), //tex coords
                                             XMFLOAT3(norm.x, norm.y, norm.z),
                                             XMFLOAT3(tangU.x , tangU.y, tangU.z)
