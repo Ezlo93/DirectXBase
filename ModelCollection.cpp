@@ -146,7 +146,7 @@ Model* ModelCollection::CreateCubeModel(float width, float height, float depth)
     mesh->hasTextureCoordinates = true;
     mesh->hasTangentu = true;
 
-    mesh->textureID = "rr";
+    mesh->textureID = "default";
 
     mesh->vertices.assign(&v[0], &v[24]);
 
@@ -276,6 +276,7 @@ Model* ModelCollection::CreateSphereModel(float radius, int slices, int stacks)
 
     mesh->material = mat;
 
+    mesh->textureID = "default";
 
     model->meshes.clear();
     model->meshes.push_back(mesh);

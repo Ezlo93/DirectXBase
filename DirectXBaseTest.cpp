@@ -282,7 +282,6 @@ void DXTest::Draw()
     gCamera.UpdateViewMatrix();
 
     deviceContext->RSSetState(0);
-    //deviceContext->RSSetState(RenderStates::noCullRS);
     deviceContext->IASetInputLayout(InputLayouts::PosTexNormalTan);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
