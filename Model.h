@@ -121,6 +121,7 @@ public:
     ID3D11Buffer* vertex = 0, * index = 0;
     std::string diffuseMapID;
     std::string normalMapID;
+    std::string bumpMapID;
 
     ~Mesh()
     {

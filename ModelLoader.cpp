@@ -53,7 +53,9 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
         m->meshes[i]->material.Diffuse = XMFLOAT4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
         m->meshes[i]->material.Specular = XMFLOAT4(specular.r, specular.g, specular.b, shine);
 
-        aiString texPath;
+        m->meshes[i]->diffuseMapID = "none";
+        m->meshes[i]->normalMapID = "none";
+        m->meshes[i]->bumpMapID = "none";
 
         if ( material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
         {
@@ -76,6 +78,19 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
                 char id[1024];
                 _splitpath_s(Path.data, NULL, 0, NULL, 0, id, 1024, NULL, 0);
                 m->meshes[i]->normalMapID = id;
+            }
+
+        }
+
+        if (material->GetTextureCount(aiTextureType_DISPLACEMENT) > 0)
+        {
+            aiString Path;
+
+            if (material->GetTexture(aiTextureType_DISPLACEMENT, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS)
+            {
+                char id[1024];
+                _splitpath_s(Path.data, NULL, 0, NULL, 0, id, 1024, NULL, 0);
+                m->meshes[i]->bumpMapID = id;
             }
 
         }
