@@ -19,6 +19,8 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
 {
     Assimp::Importer fbxImport;
 
+    DBOUT("Loading model " << fileName.c_str() << endl);
+
     const aiScene* loadedScene = fbxImport.ReadFile(fileName, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_ConvertToLeftHanded);
                                                     
     if (!loadedScene)
@@ -38,8 +40,12 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
         m->meshes.push_back(new Mesh());
         m->meshes[i]->vertices.reserve(mesh->mNumVertices);
 
+        DBOUT("Mesh " << i << " (" << mesh->mName.C_Str() << ") with " << mesh->mNumVertices << " vertices" << endl;);
+
         /*get material from index*/
         aiMaterial* material = loadedScene->mMaterials[mesh->mMaterialIndex];
+
+        //aiColor4D ambient, diffuse, specular;
         aiColor4D ambient, diffuse, specular;
         float shine;
 
@@ -48,15 +54,26 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
 
         DBOUT("Material: " << name.data << endl);
 
+
         aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &ambient);
         aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
         aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specular);
         aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shine);
 
+        /*
         m->meshes[i]->material = Material::Standard();
-        m->meshes[i]->material.Ambient = XMFLOAT4(ambient.r, ambient.g, ambient.b, ambient.a);
-        m->meshes[i]->material.Diffuse = XMFLOAT4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
+        m->meshes[i]->material.Ambient = XMFLOAT4(ambient.r, ambient.g, ambient.b, 0.f);
+        m->meshes[i]->material.Diffuse = XMFLOAT4(diffuse.r, diffuse.g, diffuse.b, 0.f);
         m->meshes[i]->material.Specular = XMFLOAT4(specular.r, specular.g, specular.b, shine);
+        */
+
+        m->meshes[i]->material.Ambient = XMFLOAT4(1.f, 1.f, 1.f, 0.f);
+        m->meshes[i]->material.Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 0.f);
+        m->meshes[i]->material.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, shine);
+
+        DBOUT("Ambient: " << m->meshes[i]->material.Ambient.x << " " << m->meshes[i]->material.Ambient.y << " " << m->meshes[i]->material.Ambient.z << endl);
+        DBOUT("Diffuse: " << m->meshes[i]->material.Diffuse.x << " " << m->meshes[i]->material.Diffuse.y << " " << m->meshes[i]->material.Diffuse.z << endl);
+        DBOUT("Specular: " << m->meshes[i]->material.Specular.x << " " << m->meshes[i]->material.Specular.y << " " << m->meshes[i]->material.Specular.z << endl);
 
         m->meshes[i]->diffuseMapID = "none";
         m->meshes[i]->normalMapID = "none";

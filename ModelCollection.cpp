@@ -32,7 +32,13 @@ bool ModelCollection::Add(std::string file)
 
     /* id is file name without extension*/
     char id[128];
-    _splitpath_s(file.c_str(), NULL, 0, NULL, 0, id, 128, NULL, 0);
+    char ext[12];
+    _splitpath_s(file.c_str(), NULL, 0, NULL, 0, id, 128, ext, 12);
+
+    if (strcmp(ext, ".mtl") == 0)
+    {
+        return true;
+    }
 
     /*check if already exists*/
     if (collection.find(id) != collection.end())
