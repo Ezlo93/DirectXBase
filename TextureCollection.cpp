@@ -28,14 +28,22 @@ bool TextureCollection::Add(std::string file)
 
     ID3D11ShaderResourceView* srv = 0;
 
-    char id[1024];
-    _splitpath_s(file.c_str(), NULL, 0, NULL, 0, id, 1024, NULL, 0);
+    char id[128];
+    char ext[8];
+    _splitpath_s(file.c_str(), NULL, 0, NULL, 0, id, 128, ext, 8);
 
     /*check if already exists*/
 
+    if (strcmp(ext, ".dds") != 0)
+    {
+        DBOUT("skipping " << id << ext << " because it is not a DDS file"<<endl);
+        return true;
+    }
+
     if (collection.find(id) != collection.end())
     {
-        return false;
+        DBOUT("skipping " << id << ext << " because it is already in the collection"<<endl);
+        return true;
     }
 
     /*load*/

@@ -31,8 +31,8 @@ bool ModelCollection::Add(std::string file)
     Model *m;
 
     /* id is file name without extension*/
-    char id[1024];
-    _splitpath_s(file.c_str(), NULL, 0, NULL, 0, id, 1024, NULL, 0);
+    char id[128];
+    _splitpath_s(file.c_str(), NULL, 0, NULL, 0, id, 128, NULL, 0);
 
     /*check if already exists*/
     if (collection.find(id) != collection.end())
@@ -188,10 +188,12 @@ Model* ModelCollection::CreateSphereModel(float radius, int slices, int stacks)
     Model* model = new Model(device);
     Mesh* mesh = new Mesh();
     Material::Standard mat;
-
+                                //pos             //tex     //normal       //tang
     Vertex::PosTexNormalTan top(0.f, radius, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f);
-    Vertex::PosTexNormalTan bot(0.f, -radius, 0.f, 0.f, 1.f, 0.f, -1.f, 0.f, 1.f, 0.f, 0.f);
+    Vertex::PosTexNormalTan bot(0.f, -radius, 0.f, 0.f, 1.f,0.f, -1.f, 0.f, 1.f, 0.f, 0.f);
 
+    mesh->vertices.clear();
+    mesh->indices.clear();
 
     mesh->vertices.push_back(top);
 

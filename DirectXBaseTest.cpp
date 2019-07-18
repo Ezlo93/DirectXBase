@@ -96,7 +96,7 @@ bool DXTest::Initialisation()
     
     /*create default cube*/
     res->getModelCollection()->AddModel("defaultCube", res->getModelCollection()->CreateCubeModel(2.f, 2.f, 2.f));
-    res->getModelCollection()->AddModel("defaultSphere", res->getModelCollection()->CreateSphereModel(5.f, 64, 64));
+    res->getModelCollection()->AddModel("defaultSphere", res->getModelCollection()->CreateSphereModel(2.f, 32, 32));
 
 
     /*load all models*/
@@ -119,10 +119,11 @@ bool DXTest::Initialisation()
     RenderStates::Init(device);
 
 
+    //skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 100.f);
     skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 100.f);
 
     /*add static models for testing*/
-    ModelInstanceStatic *mis = new ModelInstanceStatic(device, deviceContext, res, "default");
+    ModelInstanceStatic *mis = new ModelInstanceStatic(device, deviceContext, res, "defaultSphere");
     mis->Translation.x = 5.f;
 
     modelsStatic.push_back(mis);
