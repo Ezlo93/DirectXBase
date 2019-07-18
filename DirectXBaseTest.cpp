@@ -93,7 +93,7 @@ bool DXTest::Initialisation()
 
     input = new InputManager();
     res = new ResourceManager(device, deviceContext);
-    
+
     /*create default cube*/
     res->getModelCollection()->AddModel("defaultCube", res->getModelCollection()->CreateCubeModel(2.f, 2.f, 2.f));
     res->getModelCollection()->AddModel("defaultSphere", res->getModelCollection()->CreateSphereModel(2.f, 32, 32));
@@ -106,7 +106,7 @@ bool DXTest::Initialisation()
     }
     /*load all textures*/
 
-    if(!res->AddTexturesFromFolder(texturePath))
+    if (!res->AddTexturesFromFolder(texturePath))
     {
         MessageBox(wndHandle, L"Failed to load texture!", L"Error", MB_OK);
     }
@@ -126,21 +126,29 @@ bool DXTest::Initialisation()
 
 
     /*add static models for testing*/
-    ModelInstanceStatic *mis = new ModelInstanceStatic(device, deviceContext, res, "plant");
+    ModelInstanceStatic* mis = new ModelInstanceStatic(device, deviceContext, res, "plant");
     mis->Translation.x = 5.f;
     mis->Rotation.x = XMConvertToRadians(90);
-    mis->usedTechnique = UTech::BasicNormalMap ;
+    mis->usedTechnique = UTech::BasicNormalMap;
     modelsStatic.push_back(mis);
 
-    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "barrel"));
+    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "defaultSphere"));
     modelsStatic[1]->Rotation.x = XMConvertToRadians(90);
-    modelsStatic[1]->usedTechnique = UTech::BasicNormalMap;
+    modelsStatic[1]->usedTechnique = UTech::Basic;
 
     modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "simpleman"));
     modelsStatic[2]->Rotation.x = XMConvertToRadians(90);
     modelsStatic[2]->usedTechnique = UTech::Basic;
     modelsStatic[2]->Translation.y = 6.f;
     modelsStatic[2]->Scale = XMFLOAT3(2.f, 2.f, 2.f);
+
+    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "defaultCube"));
+    modelsStatic[3]->Scale = XMFLOAT3(35.f, 1.f, 35.f);
+    modelsStatic[3]->usedTechnique = UTech::BasicNormalMap;
+    modelsStatic[3]->Translation.y -= 1.f;
+    modelsStatic[3]->OverwriteDiffuseMap("floor");
+    modelsStatic[3]->OverwriteNormalMap("floor_nmap");
+    XMStoreFloat4x4(&modelsStatic[3]->TextureTransform, XMMatrixScaling(20.f, 20.f, 20.f));
 
     //ASSERT(modelsStatic.size() == 3);
 

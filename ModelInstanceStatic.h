@@ -25,13 +25,22 @@ public:
     }
 
     void Draw(Camera *c);
+    void OverwriteDiffuseMap(std::string id);
+    void OverwriteNormalMap(std::string id);
 
     /*public properties*/
     XMFLOAT3 Translation, Rotation, Scale;
     XMFLOAT4X4 TextureTransform;
+
     UShader::UsedShader usedShader;
     UTech::UsedTechnique usedTechnique;
 private:
+
+    bool useOverwriteDiffuse;
+    bool useOverwriteNormalMap;
+    std::string ovrwrTex;
+    std::string ovrwrNrm;
+
     XMFLOAT4X4 World;
     ID3D11Device* device = 0;
     ID3D11DeviceContext* deviceContext = 0;

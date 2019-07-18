@@ -15,6 +15,10 @@ ModelInstanceStatic::ModelInstanceStatic(ID3D11Device* d, ID3D11DeviceContext* c
     resources = r;
     usedShader = UShader::Basic;
     usedTechnique = UTech::Basic;
+    ovrwrTex = "";
+    ovrwrNrm = "";
+    useOverwriteDiffuse = false;
+    useOverwriteNormalMap = false;
 }
 
 ModelInstanceStatic::~ModelInstanceStatic()
@@ -77,7 +81,16 @@ void ModelInstanceStatic::Draw(Camera* c)
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
                             Shaders::basicTextureShader->SetWorldInvTranspose(DXMath::InverseTranspose(world));
                             Shaders::basicTextureShader->SetMaterial(m->material);
-                            Shaders::basicTextureShader->SetTexture(resources->getTexture(m->diffuseMapID));
+
+                            if (useOverwriteDiffuse)
+                            {
+                                Shaders::basicTextureShader->SetTexture(resources->getTexture(ovrwrTex));
+                            }
+                            else
+                            {
+                                Shaders::basicTextureShader->SetTexture(resources->getTexture(m->diffuseMapID));
+                            }
+
                             Shaders::basicTextureShader->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
                             break;
 
@@ -86,11 +99,29 @@ void ModelInstanceStatic::Draw(Camera* c)
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
                             Shaders::basicTextureShader->SetWorldInvTranspose(DXMath::InverseTranspose(world));
                             Shaders::basicTextureShader->SetMaterial(m->material);
-                            Shaders::basicTextureShader->SetTexture(resources->getTexture(m->diffuseMapID));
-                            Shaders::basicTextureShader->SetNormalMap(resources->getTexture(m->normalMapID));
+
+                            if (useOverwriteDiffuse)
+                            {
+                                Shaders::basicTextureShader->SetTexture(resources->getTexture(ovrwrTex));
+                            }
+                            else
+                            {
+                                Shaders::basicTextureShader->SetTexture(resources->getTexture(m->diffuseMapID));
+                            }
+                            
+                            if (useOverwriteNormalMap)
+                            {
+                                 Shaders::basicTextureShader->SetNormalMap(resources->getTexture(ovrwrNrm));
+                            }
+                            else
+                            {
+                                Shaders::basicTextureShader->SetNormalMap(resources->getTexture(m->normalMapID));
+                            }
+
                             Shaders::basicTextureShader->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
                             break;
                     }
+                    break;
             }
 
 
@@ -104,4 +135,16 @@ void ModelInstanceStatic::Draw(Camera* c)
     }
 
 
+}
+
+void ModelInstanceStatic::OverwriteDiffuseMap(std::string id)
+{
+    useOverwriteDiffuse = true;
+    ovrwrTex = id;
+}
+
+void ModelInstanceStatic::OverwriteNormalMap(std::string id)
+{
+    useOverwriteNormalMap = true;
+    ovrwrNrm = id;
 }
