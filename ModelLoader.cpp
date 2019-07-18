@@ -88,6 +88,7 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
                 char id[1024];
                 _splitpath_s(Path.data, NULL, 0, NULL, 0, id, 1024, NULL, 0);
                 m->meshes[i]->diffuseMapID = id;
+                DBOUT("Diffuse Map: " << id << endl);
             }
         }
 
@@ -100,6 +101,7 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
                 char id[1024];
                 _splitpath_s(Path.data, NULL, 0, NULL, 0, id, 1024, NULL, 0);
                 m->meshes[i]->normalMapID = id;
+                DBOUT("Normal Map: " << id << endl);
             }
 
         }
@@ -113,6 +115,7 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
                 char id[1024];
                 _splitpath_s(Path.data, NULL, 0, NULL, 0, id, 1024, NULL, 0);
                 m->meshes[i]->bumpMapID = id;
+                DBOUT("Bump Map: " << id << endl);
             }
 
         }

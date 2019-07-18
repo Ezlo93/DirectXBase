@@ -132,9 +132,9 @@ bool DXTest::Initialisation()
     mis->usedTechnique = UTech::BasicNormalMap ;
     modelsStatic.push_back(mis);
 
-    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "defaultCube"));
+    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "barrel"));
     modelsStatic[1]->Rotation.x = XMConvertToRadians(90);
-    modelsStatic[1]->usedTechnique = UTech::Basic;
+    modelsStatic[1]->usedTechnique = UTech::BasicNormalMap;
 
     modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "simpleman"));
     modelsStatic[2]->Rotation.x = XMConvertToRadians(90);
