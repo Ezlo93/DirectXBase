@@ -169,11 +169,38 @@ bool DirectXBase::InitDirect3D()
         return false;
     }
 
+
+    /*query primary monitor and retrieve its refresh rate*/
+    bool result = true;
+
+    DISPLAY_DEVICE* displayDevice = new DISPLAY_DEVICE();
+    DEVMODEA* displayInfo = new DEVMODEA();
+
+    DWORD counter = 0;
+    DWORD primMonitor = -1;
+
+    while (result)
+    {
+        result = EnumDisplayDevices(NULL, counter, displayDevice, NULL);
+
+        if (displayDevice->StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE)
+        {
+            primMonitor = counter;
+            break;
+        }
+
+        counter++;
+    }
+
+    ASSERT(primMonitor >= 0);
+
+    EnumDisplaySettingsA(NULL, primMonitor, displayInfo);
+
     /*swap chain*/
     DXGI_SWAP_CHAIN_DESC sDesc;
     sDesc.BufferDesc.Width = wndWidth;
     sDesc.BufferDesc.Height = wndHeight;
-    sDesc.BufferDesc.RefreshRate.Numerator = 60; // !!!
+    sDesc.BufferDesc.RefreshRate.Numerator = displayInfo->dmDisplayFrequency; // !!!
     sDesc.BufferDesc.RefreshRate.Denominator = 1;
     sDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     sDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;

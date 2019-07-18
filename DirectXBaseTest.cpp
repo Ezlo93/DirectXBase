@@ -122,18 +122,30 @@ bool DXTest::Initialisation()
     /*create 100 unit radius sized skysphere*/
     skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 100.f);
 
+
+
+
     /*add static models for testing*/
     ModelInstanceStatic *mis = new ModelInstanceStatic(device, deviceContext, res, "plant");
     mis->Translation.x = 5.f;
     mis->Rotation.x = XMConvertToRadians(90);
     mis->usedTechnique = UTech::BasicNormalMap ;
-
     modelsStatic.push_back(mis);
-    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "dx11test"));
+
+    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "defaultCube"));
     modelsStatic[1]->Rotation.x = XMConvertToRadians(90);
     modelsStatic[1]->usedTechnique = UTech::Basic;
 
+    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "simpleman"));
+    modelsStatic[2]->Rotation.x = XMConvertToRadians(90);
+    modelsStatic[2]->usedTechnique = UTech::Basic;
+    modelsStatic[2]->Translation.y = 6.f;
+    modelsStatic[2]->Scale = XMFLOAT3(2.f, 2.f, 2.f);
+
     //ASSERT(modelsStatic.size() == 3);
+
+
+
 
     /*test light values*/
     gDirLights[0].Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
@@ -311,5 +323,6 @@ void DXTest::Draw()
 
 
     //show backbuffer
+                     //this value is vsync => 0 is off, 1 - 4 sync intervalls
     swapChain->Present(0, 0);
 }
