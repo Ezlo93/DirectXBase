@@ -107,7 +107,6 @@ struct SpotLight
     float Pad; // Pad the last float so we can set an array of lights if we wanted.
 };
 
-
 class Mesh
 {
 public:

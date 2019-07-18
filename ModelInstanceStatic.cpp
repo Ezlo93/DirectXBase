@@ -13,13 +13,15 @@ ModelInstanceStatic::ModelInstanceStatic(ID3D11Device* d, ID3D11DeviceContext* c
     Translation = XMFLOAT3(0.f, 0.f, 0.f);
     modelID = id;
     resources = r;
+    usedShader = UShader::Basic;
+    usedTechnique = UTech::Basic;
 }
 
 ModelInstanceStatic::~ModelInstanceStatic()
 {
 }
 
-void ModelInstanceStatic::Draw(Camera* c, BasicTextureShader* s)
+void ModelInstanceStatic::Draw(Camera* c)
 {
     XMMATRIX _r = XMMatrixRotationRollPitchYaw(Rotation.x, Rotation.y, Rotation.z);
     XMMATRIX _t = XMMatrixTranslation(Translation.x, Translation.y, Translation.z);
@@ -37,8 +39,19 @@ void ModelInstanceStatic::Draw(Camera* c, BasicTextureShader* s)
     UINT stride = sizeof(Vertex::PosTexNormalTan);
     UINT offset = 0;
 
-
-    ID3DX11EffectTechnique* tech = s->BasicTextureTechnique;
+    /*select tech*/
+    ID3DX11EffectTechnique* tech = 0;
+    
+    switch (usedShader)
+    {
+        case UShader::Basic:
+            switch (usedTechnique)
+            {
+                case UTech::Basic: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
+                case UTech::BasicNormalMap: tech = Shaders::basicTextureShader->BasicTextureNormalTechnique; break;
+            }
+            break;
+    }
 
     D3DX11_TECHNIQUE_DESC techDesc;
     tech->GetDesc(&techDesc);
@@ -52,13 +65,34 @@ void ModelInstanceStatic::Draw(Camera* c, BasicTextureShader* s)
             deviceContext->IASetVertexBuffers(0, 1, &m->vertex, &stride, &offset);
             deviceContext->IASetIndexBuffer(m->index, DXGI_FORMAT_R32_UINT, 0);
 
-            /*set per object constants*/
-            s->SetWorld(world);
-            s->SetWorldViewProj(wvp);
-            s->SetWorldInvTranspose(DXMath::InverseTranspose(world));
-            s->SetMaterial(m->material);
-            s->SetTexture(resources->getTexture(m->diffuseMapID));
-            s->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
+            /*set per object constants based on used shader and technique*/
+
+            switch (usedShader)
+            {
+                case UShader::Basic:
+                    switch (usedTechnique)
+                    {
+                        case UTech::Basic:
+                            Shaders::basicTextureShader->SetWorld(world);
+                            Shaders::basicTextureShader->SetWorldViewProj(wvp);
+                            Shaders::basicTextureShader->SetWorldInvTranspose(DXMath::InverseTranspose(world));
+                            Shaders::basicTextureShader->SetMaterial(m->material);
+                            Shaders::basicTextureShader->SetTexture(resources->getTexture(m->diffuseMapID));
+                            Shaders::basicTextureShader->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
+                            break;
+
+                        case UTech::BasicNormalMap:
+                            Shaders::basicTextureShader->SetWorld(world);
+                            Shaders::basicTextureShader->SetWorldViewProj(wvp);
+                            Shaders::basicTextureShader->SetWorldInvTranspose(DXMath::InverseTranspose(world));
+                            Shaders::basicTextureShader->SetMaterial(m->material);
+                            Shaders::basicTextureShader->SetTexture(resources->getTexture(m->diffuseMapID));
+                            Shaders::basicTextureShader->SetNormalMap(resources->getTexture(m->normalMapID));
+                            Shaders::basicTextureShader->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
+                            break;
+                    }
+            }
+
 
             /*apply and draw*/
             tech->GetPassByIndex(p)->Apply(0, deviceContext);

@@ -69,8 +69,12 @@ SkyboxShader::~SkyboxShader()
 BasicTextureShader::BasicTextureShader(ID3D11Device* device, const std::wstring& filename) : Shader(device, filename)
 {
     BasicTextureTechnique = effect->GetTechniqueByName("BasicTextureTech");
+    BasicTextureNormalTechnique = effect->GetTechniqueByName("BasicTextureNormalMapTech");
+
+
     WorldViewProj = effect->GetVariableByName("gWorldViewProj")->AsMatrix();
     DiffuseMap = effect->GetVariableByName("diffuseMap")->AsShaderResource();
+    NormalMap = effect->GetVariableByName("gNormalMap")->AsShaderResource();
     TexTransform = effect->GetVariableByName("gTexTransform")->AsMatrix();
     World = effect->GetVariableByName("gWorld")->AsMatrix();
     WorldInvTranspose = effect->GetVariableByName("gWorldInvTranspose")->AsMatrix();
@@ -82,8 +86,10 @@ BasicTextureShader::BasicTextureShader(ID3D11Device* device, const std::wstring&
 BasicTextureShader::~BasicTextureShader()
 {
     DXRelease(BasicTextureTechnique);
+    DXRelease(BasicTextureNormalTechnique);
     DXRelease(WorldViewProj);
     DXRelease(DiffuseMap);
+    DXRelease(NormalMap);
     DXRelease(TexTransform);
     DXRelease(World);
     DXRelease(WorldInvTranspose);

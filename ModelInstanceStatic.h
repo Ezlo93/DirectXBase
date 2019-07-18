@@ -24,11 +24,13 @@ public:
         return World;
     }
 
-    void Draw(Camera *c, BasicTextureShader *s);
+    void Draw(Camera *c);
 
+    /*public properties*/
     XMFLOAT3 Translation, Rotation, Scale;
-    
     XMFLOAT4X4 TextureTransform;
+    UShader::UsedShader usedShader;
+    UTech::UsedTechnique usedTechnique;
 private:
     XMFLOAT4X4 World;
     ID3D11Device* device = 0;

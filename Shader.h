@@ -4,6 +4,21 @@
 #include "d3dx11effect.h"
 #include "Model.h"
 
+namespace UShader {
+    enum UsedShader
+    {
+        Basic
+    };
+}
+
+namespace UTech {
+    enum UsedTechnique
+    {
+        Basic,
+        BasicNormalMap
+    };
+}
+
 class Shader
 {
 public:
@@ -45,6 +60,7 @@ public:
     ~BasicTextureShader();
 
     ID3DX11EffectTechnique* BasicTextureTechnique;
+    ID3DX11EffectTechnique* BasicTextureNormalTechnique;
 
     ID3DX11EffectMatrixVariable* WorldViewProj;
     ID3DX11EffectMatrixVariable* World;
@@ -52,6 +68,7 @@ public:
     ID3DX11EffectVectorVariable* EyePosW;
     ID3DX11EffectMatrixVariable* TexTransform;
     ID3DX11EffectShaderResourceVariable* DiffuseMap;
+    ID3DX11EffectShaderResourceVariable* NormalMap;
     ID3DX11EffectVariable* Mat;
     ID3DX11EffectVariable* DirLights;
 
@@ -63,6 +80,7 @@ public:
     void SetEyePosW(const XMFLOAT3& v) { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
     void SetMaterial(const Material::Standard& mat) { Mat->SetRawValue(&mat, 0, sizeof(Material::Standard)); }
     void SetDirLights(const DirectionalLight* lights) { DirLights->SetRawValue(lights, 0, 3 * sizeof(DirectionalLight)); }
+    void SetNormalMap(ID3D11ShaderResourceView* normal) { NormalMap->SetResource(normal); }
 
 
 };

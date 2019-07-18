@@ -68,7 +68,7 @@ VertexOut VS(VertexIn vin)
 	return vout;
 }
  
-float4 PS(VertexOut pin) : SV_Target
+float4 PS(VertexOut pin, uniform bool gNormalMapping) : SV_Target
 {
 	int gLightCount = 3;
 
@@ -93,9 +93,12 @@ float4 PS(VertexOut pin) : SV_Target
 	
 	//normal mapping
 	
-	//float3 normalMapSample = gNormalMap.Sample(samLinear, pin.Tex).rgb;
-	//float3 bumpedNormalW = NormalSampleToWorldSpace(normalMapSample, pin.NormalW, pin.TangentW);
+	float3 bumpedNormalW = pin.NormalW;
 
+	if(gNormalMapping){
+		float3 normalMapSample = gNormalMap.Sample(samLinear, pin.Tex).rgb;
+		bumpedNormalW = NormalSampleToWorldSpace(normalMapSample, pin.NormalW, pin.TangentW);
+	}
 
 	// Lighting.
 	//
@@ -112,11 +115,8 @@ float4 PS(VertexOut pin) : SV_Target
 		for(int i = 0; i < gLightCount; ++i)
 		{
 			float4 A, D, S;
-			ComputeDirectionalLight(gMaterial, gDirLights[i], pin.NormalW, toEye, 
+			ComputeDirectionalLight(gMaterial, gDirLights[i], bumpedNormalW, toEye, 
 				A, D, S);
-
-			//ComputeDirectionalLight(gMaterial, gDirLights[i], bumpedNormalW, toEye, 
-			//	A, D, S);
 
 			ambient += A;
 			diffuse += D;
@@ -131,10 +131,6 @@ float4 PS(VertexOut pin) : SV_Target
 	litColor.a = gMaterial.Diffuse.a * texColor.a;
 
     return litColor;
-
-
-
-
 
 /*
 	float4 texColor = float4(1, 1, 1, 1);
@@ -152,6 +148,16 @@ technique11 BasicTextureTech
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS() ) );
+        SetPixelShader( CompileShader( ps_5_0, PS(0) ) );
     }
+}
+
+technique11 BasicTextureNormalMapTech
+{
+	pass P0 
+	{
+        SetVertexShader( CompileShader( vs_5_0, VS() ) );
+		SetGeometryShader( NULL );
+        SetPixelShader( CompileShader( ps_5_0, PS(1) ) );	
+	}
 }

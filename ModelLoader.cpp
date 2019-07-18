@@ -43,6 +43,11 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
         aiColor4D ambient, diffuse, specular;
         float shine;
 
+        aiString name;
+        material->Get(AI_MATKEY_NAME, name);
+
+        DBOUT("Material: " << name.data << endl);
+
         aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &ambient);
         aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
         aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specular);

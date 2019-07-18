@@ -119,16 +119,19 @@ bool DXTest::Initialisation()
     RenderStates::Init(device);
 
 
-    //skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 100.f);
+    /*create 100 unit radius sized skysphere*/
     skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 100.f);
 
     /*add static models for testing*/
-    ModelInstanceStatic *mis = new ModelInstanceStatic(device, deviceContext, res, "defaultSphere");
+    ModelInstanceStatic *mis = new ModelInstanceStatic(device, deviceContext, res, "plant");
     mis->Translation.x = 5.f;
+    mis->Rotation.x = XMConvertToRadians(90);
+    mis->usedTechnique = UTech::BasicNormalMap ;
 
     modelsStatic.push_back(mis);
-    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "plant"));
+    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "dx11test"));
     modelsStatic[1]->Rotation.x = XMConvertToRadians(90);
+    modelsStatic[1]->usedTechnique = UTech::Basic;
 
     //ASSERT(modelsStatic.size() == 3);
 
@@ -139,7 +142,7 @@ bool DXTest::Initialisation()
     gDirLights[0].Direction = XMFLOAT3(0.707f, -0.707f, 0.0f);
 
     gDirLights[1].Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-    gDirLights[1].Diffuse = XMFLOAT4(1.4f, 1.4f, 1.4f, 1.0f);
+    gDirLights[1].Diffuse = XMFLOAT4(.4f, .4f, .4f, 1.0f);
     gDirLights[1].Specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 16.0f);
     gDirLights[1].Direction = XMFLOAT3(-0.307f, 0.5f, 0.707f);
 
@@ -288,7 +291,6 @@ void DXTest::Draw()
     gCamera.UpdateViewMatrix();
 
     deviceContext->RSSetState(0);
-    //deviceContext->RSSetState(RenderStates::noCullRS);
     deviceContext->IASetInputLayout(InputLayouts::PosTexNormalTan);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -299,7 +301,7 @@ void DXTest::Draw()
     /*draw static models*/
     for (auto& m : modelsStatic)
     {
-        m->Draw(&gCamera, Shaders::basicTextureShader);
+        m->Draw(&gCamera);
     }
 
     //render sky box last
