@@ -16,8 +16,11 @@ using namespace std;
 
 /*often used macros and functions*/
 
+/*release Dx11 COMs*/
 #define DXRelease(x) { if(x){x->Release(); x = 0; }}
 
+
+/*print to vs output, only in debug mode*/
 #ifdef _DEBUG
 #define DBOUT( s )           \
 {                            \
@@ -27,6 +30,23 @@ using namespace std;
 }
 #else
 #define DBOUT(s)
+#endif
+
+/*assertion, only debug mode*/
+
+#ifdef _DEBUG
+
+#define ASSERT(expr) \
+    if(expr) { }\
+    else\
+    {\
+        std::wostringstream os_;\
+        os_ << "Assertion failed: " << #expr << " in " << __FILEW__ << " at line: " << __LINE__ <<endl;\
+        OutputDebugString( os_.str().c_str() );\
+        DebugBreak();\
+    }
+#else 
+#define ASSERT(expr) //nothing
 #endif
 
 class DXMath

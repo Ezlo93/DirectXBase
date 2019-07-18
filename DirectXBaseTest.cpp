@@ -130,6 +130,8 @@ bool DXTest::Initialisation()
     modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "plant"));
     modelsStatic[1]->Rotation.x = XMConvertToRadians(90);
 
+    //ASSERT(modelsStatic.size() == 3);
+
     /*test light values*/
     gDirLights[0].Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
     gDirLights[0].Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
