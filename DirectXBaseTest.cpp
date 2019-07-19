@@ -59,11 +59,7 @@ DXTest::~DXTest()
     delete input; input = 0;
     delete skybox; skybox = 0;
     delete res; res = 0;
-
-    for (auto& m : modelsStatic)
-        delete m;
-
-    modelsStatic.clear();
+    delete testLevel;
 
     DXRelease(effect);
 
@@ -127,29 +123,8 @@ bool DXTest::Initialisation()
 
 
     /*add static models for testing*/
-    ModelInstanceStatic* mis = new ModelInstanceStatic(device, deviceContext, res, "plant");
-    mis->Translation.x = 5.f;
-    mis->Rotation.x = XMConvertToRadians(90);
-    mis->usedTechnique = UTech::BasicNormalMap;
-    modelsStatic.push_back(mis);
-
-    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "defaultSphere"));
-    modelsStatic[1]->Rotation.x = XMConvertToRadians(90);
-    modelsStatic[1]->usedTechnique = UTech::Basic;
-
-    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "simpleman"));
-    modelsStatic[2]->Rotation.x = XMConvertToRadians(90);
-    modelsStatic[2]->usedTechnique = UTech::Basic;
-    modelsStatic[2]->Translation.y = 6.f;
-    modelsStatic[2]->Scale = XMFLOAT3(2.f, 2.f, 2.f);
-
-    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "defaultPlane"));
-    modelsStatic[3]->Scale = XMFLOAT3(10.f, 1.f, 10.f);
-    modelsStatic[3]->usedTechnique = UTech::BasicNormalMap;
-    modelsStatic[3]->Translation.y -= 3.f;
-    modelsStatic[3]->OverwriteDiffuseMap("floor");
-    modelsStatic[3]->OverwriteNormalMap("floor_nmap");
-    XMStoreFloat4x4(&modelsStatic[3]->TextureTransform, XMMatrixScaling(20.f, 20.f, 20.f));
+    testLevel = new Level(res);
+    testLevel->LoadLevel("interior.lvl");
 
     //ASSERT(modelsStatic.size() == 3);
 
@@ -243,6 +218,7 @@ void DXTest::Update(float deltaTime)
 
     /*basic movement and camera*/
 
+    /*wait for input device*/
     if (controllingInput == -1)
     {
         for (int i = 0; i < INPUT_MAX; i++)
@@ -263,8 +239,9 @@ void DXTest::Update(float deltaTime)
 
     }
 
-
+    //handle input
     InputData* in = input->getInput(controllingInput);
+    InputData* prevIn = input->getPrevInput(controllingInput);
 
     float tlX = in->trigger[THUMB_LX];
     float tlY = in->trigger[THUMB_LY];
@@ -292,10 +269,8 @@ void DXTest::Update(float deltaTime)
        
     }*/
 
-    modelsStatic[0]->Rotation.z += XMConvertToRadians(5.f * deltaTime);
 
-
-    if (!in->buttons[START] && input->getPrevInput(controllingInput)->buttons[START])
+    if (!in->buttons[START] && prevIn->buttons[START])
     {
         renderWireFrame = !renderWireFrame;
     }
@@ -333,9 +308,10 @@ void DXTest::Draw()
     Shaders::basicTextureShader->SetDirLights(gDirLights);
 
     /*draw static models*/
-    for (auto& m : modelsStatic)
-    {
-        m->Draw(&gCamera);
+    std::map<std::string, ModelInstanceStatic*>::iterator it = testLevel->modelsStatic.begin();
+    while(it != testLevel->modelsStatic.end()){
+        it->second->Draw(device, deviceContext, &gCamera);
+        it++;
     }
 
     //render sky box last

@@ -1,10 +1,8 @@
 #include "ModelInstanceStatic.h"
 
 
-ModelInstanceStatic::ModelInstanceStatic(ID3D11Device* d, ID3D11DeviceContext* c, ResourceManager* r, std::string id)
+ModelInstanceStatic::ModelInstanceStatic(ResourceManager* r, std::string id)
 {
-    device = d;
-    deviceContext = c;
     XMMATRIX I = XMMatrixIdentity();
     XMStoreFloat4x4(&World, I);
     XMStoreFloat4x4(&TextureTransform, I);
@@ -25,7 +23,7 @@ ModelInstanceStatic::~ModelInstanceStatic()
 {
 }
 
-void ModelInstanceStatic::Draw(Camera* c)
+void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c)
 {
     XMMATRIX _r = XMMatrixRotationRollPitchYaw(Rotation.x, Rotation.y, Rotation.z);
     XMMATRIX _t = XMMatrixTranslation(Translation.x, Translation.y, Translation.z);

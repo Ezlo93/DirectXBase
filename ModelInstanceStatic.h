@@ -7,7 +7,7 @@
 class ModelInstanceStatic
 {
 public:
-    ModelInstanceStatic(ID3D11Device* d, ID3D11DeviceContext* c, ResourceManager* r, std::string id);
+    ModelInstanceStatic(ResourceManager* r, std::string id);
     ~ModelInstanceStatic();
 
     void SetModelID(std::string id)
@@ -24,7 +24,7 @@ public:
         return World;
     }
 
-    void Draw(Camera *c);
+    void Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera *c);
     void OverwriteDiffuseMap(std::string id);
     void OverwriteNormalMap(std::string id);
 
@@ -42,8 +42,6 @@ private:
     std::string ovrwrNrm;
 
     XMFLOAT4X4 World;
-    ID3D11Device* device = 0;
-    ID3D11DeviceContext* deviceContext = 0;
     ResourceManager* resources = 0;
 
     std::string modelID;

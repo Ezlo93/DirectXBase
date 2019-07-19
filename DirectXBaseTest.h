@@ -12,7 +12,7 @@
 #include "ResourceManager.h"
 #include <chrono>
 #include "ModelInstanceStatic.h"
-
+#include "Level.h"
 
 #define MODEL_PATH "data/models"
 #define TEXTURE_PATH "data/textures"
@@ -35,7 +35,7 @@ private:
     int controllingInput = -1;
 
     ResourceManager* res;
-    std::vector<ModelInstanceStatic*> modelsStatic;
+    Level* testLevel;
     DirectionalLight gDirLights[3];
 
     float clearColor[4];

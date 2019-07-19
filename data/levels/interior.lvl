@@ -1,0 +1,6 @@
+[static]
+4
+floor defaultPlane 0 0 0 12 1 6 0 0 0 floor floor_nmap
+plant1 plant 5 0 -4 1 1 1 90 0 0 none none
+plant2 plant -3 0 4 1 1 1 90 0 0 none none
+man simpleman 6 3 0 3 3 3 90 0 30 none none

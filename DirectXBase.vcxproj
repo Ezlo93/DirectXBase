@@ -146,6 +146,7 @@
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="InputLayout.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelInstanceStatic.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -169,6 +170,7 @@
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="InputLayout.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelInstanceStatic.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
