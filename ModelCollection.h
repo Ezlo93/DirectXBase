@@ -18,6 +18,7 @@ public:
 
     Model* CreateCubeModel(float width, float height, float depth);
     Model* CreateSphereModel(float radius, int slices, int stacks);
+    Model* CreatePlaneModel(float width, float height);
 
 private:
     ModelLoader* loader;

@@ -95,6 +95,7 @@ bool DXTest::Initialisation()
     res = new ResourceManager(device, deviceContext);
 
     /*create default cube*/
+    res->getModelCollection()->AddModel("defaultPlane", res->getModelCollection()->CreatePlaneModel(4.f, 4.f));
     res->getModelCollection()->AddModel("defaultCube", res->getModelCollection()->CreateCubeModel(2.f, 2.f, 2.f));
     res->getModelCollection()->AddModel("defaultSphere", res->getModelCollection()->CreateSphereModel(2.f, 32, 32));
 
@@ -142,10 +143,10 @@ bool DXTest::Initialisation()
     modelsStatic[2]->Translation.y = 6.f;
     modelsStatic[2]->Scale = XMFLOAT3(2.f, 2.f, 2.f);
 
-    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "defaultCube"));
-    modelsStatic[3]->Scale = XMFLOAT3(35.f, 1.f, 35.f);
+    modelsStatic.push_back(new ModelInstanceStatic(device, deviceContext, res, "defaultPlane"));
+    modelsStatic[3]->Scale = XMFLOAT3(10.f, 1.f, 10.f);
     modelsStatic[3]->usedTechnique = UTech::BasicNormalMap;
-    modelsStatic[3]->Translation.y -= 1.f;
+    modelsStatic[3]->Translation.y -= 3.f;
     modelsStatic[3]->OverwriteDiffuseMap("floor");
     modelsStatic[3]->OverwriteNormalMap("floor_nmap");
     XMStoreFloat4x4(&modelsStatic[3]->TextureTransform, XMMatrixScaling(20.f, 20.f, 20.f));
@@ -294,6 +295,11 @@ void DXTest::Update(float deltaTime)
     modelsStatic[0]->Rotation.z += XMConvertToRadians(5.f * deltaTime);
 
 
+    if (!in->buttons[START] && input->getPrevInput(controllingInput)->buttons[START])
+    {
+        renderWireFrame = !renderWireFrame;
+    }
+
     if (in->buttons[BACK])
     {
         exit(0);
@@ -310,7 +316,15 @@ void DXTest::Draw()
 
     gCamera.UpdateViewMatrix();
 
-    deviceContext->RSSetState(0);
+    if (!renderWireFrame)
+    {
+        deviceContext->RSSetState(0);
+    }
+    else
+    {
+        deviceContext->RSSetState(RenderStates::wireFrame);
+    }
+    
     deviceContext->IASetInputLayout(InputLayouts::PosTexNormalTan);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

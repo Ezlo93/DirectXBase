@@ -43,4 +43,6 @@ private:
     Skybox *skybox;
 
     ID3DX11Effect* effect;
+
+    bool renderWireFrame = false;
 };

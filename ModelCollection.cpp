@@ -94,7 +94,7 @@ Model* ModelCollection::Get(std::string id)
 
 }
 
-
+/*set default model which is used when a model is not found in the collection*/
 bool ModelCollection::SetDefaultModel(std::string id)
 {
     if (collection.find(id) == collection.end())
@@ -107,6 +107,7 @@ bool ModelCollection::SetDefaultModel(std::string id)
     return true;
 }
 
+/*create a basic cube*/
 Model* ModelCollection::CreateCubeModel(float width, float height, float depth)
 {
     Model* model = new Model(device);
@@ -189,6 +190,7 @@ Model* ModelCollection::CreateCubeModel(float width, float height, float depth)
     return model;
 }
 
+/*create a basic sphere*/
 Model* ModelCollection::CreateSphereModel(float radius, int slices, int stacks)
 {
     Model* model = new Model(device);
@@ -278,6 +280,67 @@ Model* ModelCollection::CreateSphereModel(float radius, int slices, int stacks)
 
     /*material*/
 
+    mat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+    mat.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    mat.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
+
+    mesh->material = mat;
+
+    mesh->diffuseMapID = "default";
+
+    model->meshes.clear();
+    model->meshes.push_back(mesh);
+
+    return model;
+}
+
+/*create a basic 4 vertices plane which is visible on both sides*/
+Model* ModelCollection::CreatePlaneModel(float width, float height)
+{
+    Model* model = new Model(device);
+    Mesh* mesh = new Mesh();
+    Material::Standard mat;
+
+    float w = width / 2;
+    float h = height / 2;
+
+    /*4 vertices*/
+
+    mesh->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(-w, 0.f, -h),       //pos
+                             XMFLOAT2(0.f, 1.f),    //u v coord
+                             XMFLOAT3(0.f, 1.f, 0.f),   //normal
+                             XMFLOAT3(1.f, 0.f, 0.f))); //tangent
+    mesh->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(-w, 0.f, h),       //pos
+                             XMFLOAT2(0.f, 0.f),    //u v coord
+                             XMFLOAT3(0.f, 1.f, 0.f),   //normal
+                             XMFLOAT3(1.f, 0.f, 0.f))); //tangent
+    mesh->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(w, 0.f, h),       //pos
+                             XMFLOAT2(1.f, 0.f),    //u v coord
+                             XMFLOAT3(0.f, 1.f, 0.f),   //normal
+                             XMFLOAT3(1.f, 0.f, 0.f))); //tangent
+    mesh->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(w, 0.f, -h),       //pos
+                             XMFLOAT2(1.f, 1.f),    //u v coord
+                             XMFLOAT3(0.f, 1.f, 0.f),   //normal
+                             XMFLOAT3(1.f, 0.f, 0.f))); //tangent
+
+    /*indices, plane is visible on both sides*/
+    mesh->indices.push_back(0);
+    mesh->indices.push_back(1);
+    mesh->indices.push_back(2);
+
+    mesh->indices.push_back(0);
+    mesh->indices.push_back(2);
+    mesh->indices.push_back(3);
+
+    mesh->indices.push_back(0);
+    mesh->indices.push_back(2);
+    mesh->indices.push_back(1);
+
+    mesh->indices.push_back(0);
+    mesh->indices.push_back(3);
+    mesh->indices.push_back(2);
+
+    /*material*/
     mat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
     mat.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
     mat.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
