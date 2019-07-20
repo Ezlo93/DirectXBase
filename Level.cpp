@@ -45,7 +45,7 @@ bool Level::LoadLevel(std::string fileName)
 void Level::ReadStaticModels(std::ifstream& fin)
 {
     int objCount;
-    std::string objID, mID, diff, norm;
+    std::string objID, mID, diff, norm, effectID;
 
     fin >> objCount;
 
@@ -54,10 +54,33 @@ void Level::ReadStaticModels(std::ifstream& fin)
 
     for (int i = 0; i < objCount; i++)
     {
+        objID.clear(); mID.clear(); effectID.clear();
         fin >> objID;
         fin >> mID; //modelID
 
         ModelInstanceStatic* mis = new ModelInstanceStatic(res, mID);
+
+        fin >> effectID;
+
+        if (effectID == "basictexture")
+        {
+            mis->usedShader = UShader::Basic;
+            mis->usedTechnique = UTech::Basic;
+        }
+        else if (effectID == "basicnormal")
+        {
+            mis->usedShader = UShader::Basic;
+            mis->usedTechnique = UTech::BasicNormalMap;
+        }
+        else if (effectID == "basicnotexture")
+        {
+            mis->usedShader = UShader::Basic;
+            mis->usedTechnique = UTech::BasicNoTexture;
+        }
+        else
+        {
+            throw std::exception("unknwon shader type");
+        }
 
         /*transformation*/
         float rx, ry, rz;

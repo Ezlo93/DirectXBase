@@ -12,7 +12,7 @@ ModelInstanceStatic::ModelInstanceStatic(ResourceManager* r, std::string id)
     modelID = id;
     resources = r;
     usedShader = UShader::Basic;
-    usedTechnique = UTech::Basic;
+    usedTechnique = UTech::BasicNoTexture;
     ovrwrTex = "";
     ovrwrNrm = "";
     useOverwriteDiffuse = false;
@@ -51,6 +51,9 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
             {
                 case UTech::Basic: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
                 case UTech::BasicNormalMap: tech = Shaders::basicTextureShader->BasicTextureNormalTechnique; break;
+                case UTech::BasicNoTexture: tech = Shaders::basicTextureShader->BasicNoTextureTechnique; break;
+
+                default: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
             }
             break;
     }
@@ -117,6 +120,13 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                             }
 
                             Shaders::basicTextureShader->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
+                            break;
+
+                        case UTech::BasicNoTexture:
+                            Shaders::basicTextureShader->SetWorld(world);
+                            Shaders::basicTextureShader->SetWorldViewProj(wvp);
+                            Shaders::basicTextureShader->SetWorldInvTranspose(DXMath::InverseTranspose(world));
+                            Shaders::basicTextureShader->SetMaterial(m->material);
                             break;
                     }
                     break;

@@ -15,7 +15,8 @@ namespace UTech {
     enum UsedTechnique
     {
         Basic,
-        BasicNormalMap
+        BasicNormalMap,
+        BasicNoTexture
     };
 }
 
@@ -61,6 +62,7 @@ public:
 
     ID3DX11EffectTechnique* BasicTextureTechnique;
     ID3DX11EffectTechnique* BasicTextureNormalTechnique;
+    ID3DX11EffectTechnique* BasicNoTextureTechnique;
 
     ID3DX11EffectMatrixVariable* WorldViewProj;
     ID3DX11EffectMatrixVariable* World;

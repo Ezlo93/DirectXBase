@@ -68,7 +68,7 @@ VertexOut VS(VertexIn vin)
 	return vout;
 }
  
-float4 PS(VertexOut pin, uniform bool gNormalMapping) : SV_Target
+float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gNormalMapping) : SV_Target
 {
 	int gLightCount = 3;
 
@@ -88,9 +88,11 @@ float4 PS(VertexOut pin, uniform bool gNormalMapping) : SV_Target
     float4 texColor = float4(1, 1, 1, 1);
 
   // Sample texture.
+   if(gUseTexture){
 		texColor = diffuseMap.Sample( samAnisotropic, pin.Tex ); // * gMultiTex.Sample(samAnisotropic, pin.Tex);
 		clip(texColor.a - 0.1f); //alpha clipping
-	
+   }
+
 	//normal mapping
 	
 	float3 bumpedNormalW = pin.NormalW;
@@ -148,7 +150,7 @@ technique11 BasicTextureTech
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(0) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS(true, false) ) );
     }
 }
 
@@ -158,6 +160,16 @@ technique11 BasicTextureNormalMapTech
 	{
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(1) ) );	
+        SetPixelShader( CompileShader( ps_5_0, PS(true, true) ) );	
+	}
+}
+
+technique11 BasicNoTextureTech
+{
+	pass P0 
+	{
+        SetVertexShader( CompileShader( vs_5_0, VS() ) );
+		SetGeometryShader( NULL );
+        SetPixelShader( CompileShader( ps_5_0, PS(false, false) ) );	
 	}
 }

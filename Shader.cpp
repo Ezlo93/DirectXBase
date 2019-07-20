@@ -70,7 +70,7 @@ BasicTextureShader::BasicTextureShader(ID3D11Device* device, const std::wstring&
 {
     BasicTextureTechnique = effect->GetTechniqueByName("BasicTextureTech");
     BasicTextureNormalTechnique = effect->GetTechniqueByName("BasicTextureNormalMapTech");
-
+    BasicNoTextureTechnique = effect->GetTechniqueByName("BasicNoTextureTech");
 
     WorldViewProj = effect->GetVariableByName("gWorldViewProj")->AsMatrix();
     DiffuseMap = effect->GetVariableByName("diffuseMap")->AsShaderResource();
@@ -87,6 +87,7 @@ BasicTextureShader::~BasicTextureShader()
 {
     DXRelease(BasicTextureTechnique);
     DXRelease(BasicTextureNormalTechnique);
+    DXRelease(BasicNoTextureTechnique);
     DXRelease(WorldViewProj);
     DXRelease(DiffuseMap);
     DXRelease(NormalMap);
