@@ -4,6 +4,10 @@
 #include "ResourceManager.h"
 #include "Shader.h"
 
+#define DEFAULT_PLANE "defaultPlane"
+#define DEFAULT_SPHERE "defaultSphere"
+#define DEFAULT_CUBE "defaultCube"
+
 class ModelInstanceStatic
 {
 public:

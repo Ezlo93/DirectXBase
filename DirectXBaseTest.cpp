@@ -91,9 +91,9 @@ bool DXTest::Initialisation()
     res = new ResourceManager(device, deviceContext);
 
     /*create default cube*/
-    res->getModelCollection()->AddModel("defaultPlane", res->getModelCollection()->CreatePlaneModel(4.f, 4.f));
-    res->getModelCollection()->AddModel("defaultCube", res->getModelCollection()->CreateCubeModel(2.f, 2.f, 2.f));
-    res->getModelCollection()->AddModel("defaultSphere", res->getModelCollection()->CreateSphereModel(2.f, 32, 32));
+    res->getModelCollection()->AddModel(DEFAULT_PLANE, res->getModelCollection()->CreatePlaneModel(1.f, 1.f));
+    res->getModelCollection()->AddModel(DEFAULT_CUBE, res->getModelCollection()->CreateCubeModel(1.f, 1.f, 1.f));
+    res->getModelCollection()->AddModel(DEFAULT_SPHERE, res->getModelCollection()->CreateSphereModel(.5f, 16, 16));
 
 
     /*load all models*/

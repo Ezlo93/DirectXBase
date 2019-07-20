@@ -79,9 +79,9 @@ void Level::ReadStaticModels(std::ifstream& fin)
         }
         else
         {
-            throw std::exception("unknwon shader type");
+            throw std::exception("unknown shader type");
         }
-
+        
         /*transformation*/
         float rx, ry, rz;
         fin >> mis->Translation.x >> mis->Translation.y >> mis->Translation.z;
@@ -106,6 +106,17 @@ void Level::ReadStaticModels(std::ifstream& fin)
         if (norm != "none")
         {
             mis->OverwriteNormalMap(norm);
+        }
+
+        /*auto tex transform for plane, cube*/
+        /*error:  x y z depending on rotation?*/
+        /*probably delete later*/
+        if (mis->GetModelID() == DEFAULT_PLANE || mis->GetModelID() == DEFAULT_CUBE)
+        {
+            XMMATRIX _r = XMMatrixRotationRollPitchYaw(0, 0, 0);
+            XMMATRIX _t = XMMatrixTranslation(0, 0, 0);
+            XMMATRIX _s = XMMatrixScaling(mis->Scale.x, mis->Scale.z, 1.f);
+            XMStoreFloat4x4(&mis->TextureTransform, _r * _s * _t);
         }
 
         modelsStatic.insert(std::make_pair(objID, mis));
