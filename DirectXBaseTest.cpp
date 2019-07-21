@@ -132,21 +132,20 @@ bool DXTest::Initialisation()
 
 
     /*test light values*/
-    gDirLights[0].Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-    gDirLights[0].Diffuse = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
-    gDirLights[0].Specular = XMFLOAT4(0.8f, 0.8f, 0.7f, 1.0f);
-    gDirLights[0].Direction = XMFLOAT3(0.707f, 0.0f, 0.707f);
+    gDirLights[0].Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+    gDirLights[0].Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+    gDirLights[0].Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
+    gDirLights[0].Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
 
-    gDirLights[1].Ambient = XMFLOAT4(0.f, 0.f, 0.f, 1.0f);
+    gDirLights[1].Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
     gDirLights[1].Diffuse = XMFLOAT4(.4f, .4f, .4f, 1.0f);
-    gDirLights[1].Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-    gDirLights[1].Direction = XMFLOAT3(0.0f, -0.707f, 0.707f);
-
+    gDirLights[1].Specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 16.0f);
+    gDirLights[1].Direction = XMFLOAT3(-0.57735f, -0.57735f, 0.57735f);
 
     gDirLights[2].Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
     gDirLights[2].Diffuse = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-    gDirLights[2].Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-    gDirLights[2].Direction = XMFLOAT3(-0.57735f, -0.57735f, -0.57735f);
+    gDirLights[2].Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+    gDirLights[2].Direction = XMFLOAT3(0.0f, -0.707f, -0.707f);
 
     //goFullscreen(true);
 

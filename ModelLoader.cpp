@@ -208,9 +208,9 @@ bool ModelLoader::LoadBas(const std::string fileName, Model* m)
     }
 
     Material::Standard mat;
-    mat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-    mat.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-    mat.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
+    mat.Ambient = XMFLOAT4(0.1f, 0.2f, 0.3f, 1.0f);
+    mat.Diffuse = XMFLOAT4(0.2f, 0.4f, 0.6f, 1.0f);
+    mat.Specular = XMFLOAT4(0.9f, 0.9f, 0.9f, 16.0f);
 
     m->meshes[0]->material = mat;
  
