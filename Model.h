@@ -172,9 +172,9 @@ public:
 
     void CreateBuffers();
 
-    //Shader* shader;
-    //ID3DX11EffectTechnique* tech;
+    XMMATRIX axisRot;
 private:
     ID3D11Device* device;
+    
 
 };

@@ -4,6 +4,7 @@
 Model::Model(ID3D11Device* dev)
 {
     device = dev;
+    axisRot = XMMatrixRotationRollPitchYaw(XMConvertToRadians(90), 0.f, 0.f);
 }
 
 Model::~Model()

@@ -35,7 +35,7 @@ bool ModelCollection::Add(std::string file)
     char ext[12];
     _splitpath_s(file.c_str(), NULL, 0, NULL, 0, id, 128, ext, 12);
 
-    if (strcmp(ext, ".mtl") == 0)
+    if (strcmp(ext, ".bas") == 0)
     {
         return true;
     }
@@ -186,6 +186,7 @@ Model* ModelCollection::CreateCubeModel(float width, float height, float depth)
     /*mesh in model*/
     model->meshes.clear();
     model->meshes.push_back(mesh);
+    model->axisRot = XMMatrixIdentity();
 
     return model;
 }
@@ -290,6 +291,7 @@ Model* ModelCollection::CreateSphereModel(float radius, int slices, int stacks)
 
     model->meshes.clear();
     model->meshes.push_back(mesh);
+    model->axisRot = XMMatrixIdentity();
 
     return model;
 }
@@ -349,8 +351,10 @@ Model* ModelCollection::CreatePlaneModel(float width, float height)
 
     mesh->diffuseMapID = "default";
 
+
     model->meshes.clear();
     model->meshes.push_back(mesh);
+    model->axisRot = XMMatrixIdentity();
 
     return model;
 }

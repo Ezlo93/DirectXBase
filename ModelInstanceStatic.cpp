@@ -25,11 +25,13 @@ ModelInstanceStatic::~ModelInstanceStatic()
 
 void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c)
 {
+    Model* model = resources->getModel(modelID);
+
     XMMATRIX _r = XMMatrixRotationRollPitchYaw(Rotation.x, Rotation.y, Rotation.z);
     XMMATRIX _t = XMMatrixTranslation(Translation.x, Translation.y, Translation.z);
     XMMATRIX _s = XMMatrixScaling(Scale.x, Scale.y, Scale.z);
 
-    XMStoreFloat4x4(&World, _s * _r * _t);
+    XMStoreFloat4x4(&World, _s * model->axisRot * _r  * _t);
 
     XMMATRIX view = c->getView();
     XMMATRIX proj = c->getProj();
@@ -60,8 +62,6 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
 
     D3DX11_TECHNIQUE_DESC techDesc;
     tech->GetDesc(&techDesc);
-    
-    Model* model = resources->getModel(modelID);
 
     for (auto& m : model->meshes)
     {
