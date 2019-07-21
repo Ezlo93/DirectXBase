@@ -115,7 +115,7 @@ void Level::ReadStaticModels(std::ifstream& fin)
         {
             XMMATRIX _r = XMMatrixRotationRollPitchYaw(0, 0, 0);
             XMMATRIX _t = XMMatrixTranslation(0, 0, 0);
-            XMMATRIX _s = XMMatrixScaling(mis->Scale.x, mis->Scale.z, 1.f);
+            XMMATRIX _s = XMMatrixScaling(mis->Scale.x/4, mis->Scale.z/4, 1.f);
             XMStoreFloat4x4(&mis->TextureTransform, _r * _s * _t);
         }
 

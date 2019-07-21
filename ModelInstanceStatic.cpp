@@ -29,7 +29,7 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
     XMMATRIX _t = XMMatrixTranslation(Translation.x, Translation.y, Translation.z);
     XMMATRIX _s = XMMatrixScaling(Scale.x, Scale.y, Scale.z);
 
-    XMStoreFloat4x4(&World, _r * _s * _t);
+    XMStoreFloat4x4(&World, _s * _r * _t);
 
     XMMATRIX view = c->getView();
     XMMATRIX proj = c->getProj();
