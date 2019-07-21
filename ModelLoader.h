@@ -14,7 +14,8 @@ public:
     ModelLoader();
     ~ModelLoader();
 
-    bool Load(const std::string fileName, Model* m);
+    bool Load(const std::string fileName, Model* m); 
+    bool LoadBas(const std::string fileName, Model* m);
 
 private:
 

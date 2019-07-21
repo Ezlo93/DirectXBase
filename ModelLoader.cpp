@@ -1,5 +1,6 @@
 #include "ModelLoader.h"
 #include <iostream>
+#include <fstream>
 
 ModelLoader::ModelLoader()
 {
@@ -166,4 +167,54 @@ bool ModelLoader::Load(const std::string fileName, Model* m)
     }
 
     return true;
+}
+
+bool ModelLoader::LoadBas(const std::string fileName, Model* m)
+{
+    std::ifstream fin(fileName);
+
+    if (!fin)
+    {
+        return false;
+    }
+
+    UINT vcount = 0;
+    UINT tcount = 0;
+    std::string ignore;
+
+    fin >> ignore >> vcount;
+    fin >> ignore >> tcount;
+    fin >> ignore >> ignore >> ignore >> ignore;
+
+    m->meshes.push_back(new Mesh());
+    m->meshes[0]->vertices.resize(vcount);
+
+    for (UINT i = 0; i < vcount; ++i)
+    {
+        fin >> m->meshes[0]->vertices[i].Pos.x >> m->meshes[0]->vertices[i].Pos.y >> m->meshes[0]->vertices[i].Pos.z;
+        fin >> m->meshes[0]->vertices[i].Normal.x >> m->meshes[0]->vertices[i].Normal.y >> m->meshes[0]->vertices[i].Normal.z;
+    }
+
+    fin >> ignore;
+    fin >> ignore;
+    fin >> ignore;
+
+    int indexCount = 3 * tcount;
+    m->meshes[0]->indices.resize(indexCount);
+
+    for (int i = 0; i < tcount; ++i)
+    {
+        fin >> m->meshes[0]->indices[i * 3 + 0] >> m->meshes[0]->indices[i * 3 + 1] >> m->meshes[0]->indices[i * 3 + 2];
+    }
+
+    Material::Standard mat;
+    mat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+    mat.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    mat.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
+
+    m->meshes[0]->material = mat;
+ 
+   fin.close();
+
+   return true;
 }

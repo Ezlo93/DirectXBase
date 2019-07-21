@@ -35,11 +35,6 @@ bool ModelCollection::Add(std::string file)
     char ext[12];
     _splitpath_s(file.c_str(), NULL, 0, NULL, 0, id, 128, ext, 12);
 
-    if (strcmp(ext, ".bas") == 0)
-    {
-        return true;
-    }
-
     /*check if already exists*/
     if (collection.find(id) != collection.end())
     {
@@ -49,7 +44,15 @@ bool ModelCollection::Add(std::string file)
     /*load*/
     m = new Model(device);
 
-    if (!loader->Load(file, m))
+    if (strcmp(ext, ".bas") == 0)
+    {
+        if (!loader->LoadBas(file, m))
+        {
+            throw std::exception("failed to load model");
+            return false;
+        }
+
+    }else if (!loader->Load(file, m))
     {
         throw std::exception("failed to load model");
         return false;

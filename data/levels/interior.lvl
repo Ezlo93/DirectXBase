@@ -10,4 +10,4 @@ plant4 plant basicnotexture -17 0 4 .5 .5 .5 0 0 0 none none
 plant5 plant basictexture -20 .3 4 1 1 1 35 25 25 none none
 man simpleman basictexture 6 3.2 0 1.5 1.5 1.5 0 0 0 none none
 cube1 defaultCube basictexture 0 3 0 3 3 3 0 0 0 none none
-sphere1 defaultSphere basicnotexture 5 8 -3 2 1 4 0 0 0 floor floor_nmap
+skull1 skull basicnotexture 5 8 -3 1 1 1 -90 0 0 none none
