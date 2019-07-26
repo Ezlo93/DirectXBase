@@ -47,18 +47,11 @@ void InputLayouts::Init(ID3D11Device* device)
 {
     D3DX11_PASS_DESC passDesc;
 
-    //
-    // Pos
-    //
 
     Shaders::skyShader->SkyTech->GetPassByIndex(0)->GetDesc(&passDesc);
     device->CreateInputLayout(InputLayoutDesc::Pos, 1, passDesc.pIAInputSignature,
        passDesc.IAInputSignatureSize, &Pos);
 
-    
-    //
-    // Basic32
-    //
 
     Shaders::basicTextureShader->BasicTextureTechnique->GetPassByIndex(0)->GetDesc(&passDesc);
     device->CreateInputLayout(InputLayoutDesc::PosTexNormalTan, 4, passDesc.pIAInputSignature,

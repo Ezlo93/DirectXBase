@@ -59,6 +59,8 @@ public:
     InputData* getInput(int index);
     InputData* getPrevInput(int index);
     
+    bool ButtonPressed(int index, int button);
+    bool ButtonReleased(int index, int button);
 
 private:
     ControllerInput* controller;

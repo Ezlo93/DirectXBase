@@ -260,21 +260,27 @@ void DXTest::Update(float deltaTime)
     gCamera.yaw(yaw);
     gCamera.pitch(pitch);
 
-    /*if (in->buttons[BUTTON_A])
+    if (in->buttons[BUTTON_A])
     {
-       // modelsStatic[1]->Scale.x += 1.1f * deltaTime;
-        modelsStatic[1]->Rotation.x = 90;
-        modelsStatic[1]->Translation.z += 1.f * deltaTime;
-       
-    }*/
+        testLevel->modelsStatic["skull1"]->Translation.x += 2 * deltaTime;       
+    }
 
+    if (in->buttons[BUTTON_X])
+    {
+        testLevel->modelsStatic["skull1"]->Translation.y += 2 * deltaTime;
+    }
 
-    if (!in->buttons[START] && prevIn->buttons[START])
+    if (in->buttons[BUTTON_Y])
+    {
+        testLevel->modelsStatic["skull1"]->Translation.z += 2 * deltaTime;
+    }
+
+    if (input->ButtonPressed(controllingInput, START))
     {
         renderWireFrame = !renderWireFrame;
     }
 
-    if (in->buttons[BACK])
+    if (input->ButtonReleased(controllingInput, BACK))
     {
         exit(0);
     }

@@ -194,6 +194,18 @@ InputData* InputManager::getPrevInput(int index)
     return &prevData[index];
 }
 
+bool InputManager::ButtonPressed(int index, int button)
+{
+    return data[index].buttons[button] && !prevData[index].buttons[button];
+}
+
+bool InputManager::ButtonReleased(int index, int button)
+{
+    return !data[index].buttons[button] && prevData[index].buttons[button];
+}
+
+
+
 int InputManager::charToVKey(char c)
 {
     int k = (int)c - 32;
