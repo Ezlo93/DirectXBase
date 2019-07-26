@@ -135,7 +135,7 @@ bool DXTest::Initialisation()
     gDirLights[0].Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
     gDirLights[0].Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
     gDirLights[0].Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
-    gDirLights[0].Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
+    gDirLights[0].Direction = XMFLOAT3(0.57735f, 0.57735f, 0.57735f);
 
     gDirLights[1].Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
     gDirLights[1].Diffuse = XMFLOAT4(.4f, .4f, .4f, 1.0f);
@@ -262,17 +262,17 @@ void DXTest::Update(float deltaTime)
 
     if (in->buttons[BUTTON_A])
     {
-        testLevel->modelsStatic["skull1"]->Translation.x += 2 * deltaTime;       
+        testLevel->modelsStatic[10011]->Translation.x += 2 * deltaTime;       
     }
 
     if (in->buttons[BUTTON_X])
     {
-        testLevel->modelsStatic["skull1"]->Translation.y += 2 * deltaTime;
+        testLevel->modelsStatic[10011]->Translation.y += 2 * deltaTime;
     }
 
     if (in->buttons[BUTTON_Y])
     {
-        testLevel->modelsStatic["skull1"]->Translation.z += 2 * deltaTime;
+        testLevel->modelsStatic[10011]->Translation.z += 2 * deltaTime;
     }
 
     if (input->ButtonPressed(controllingInput, START))
@@ -313,9 +313,9 @@ void DXTest::Draw()
     Shaders::basicTextureShader->SetDirLights(gDirLights);
 
     /*draw static models*/
-    std::map<std::string, ModelInstanceStatic*>::iterator it = testLevel->modelsStatic.begin();
+    std::map<int, ModelInstanceStatic*>::iterator it = testLevel->modelsStatic.begin();
     while(it != testLevel->modelsStatic.end()){
-        it->second->Draw(device, deviceContext, &gCamera);
+         it->second->Draw(device, deviceContext, &gCamera);
         it++;
     }
 

@@ -14,7 +14,7 @@ public:
 
     bool LoadLevel(std::string fileName);
 
-    std::map<std::string, ModelInstanceStatic*> modelsStatic;
+    std::map<int, ModelInstanceStatic*> modelsStatic;
 
 private:
     void ReadStaticModels(std::ifstream& fin);
