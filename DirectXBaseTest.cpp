@@ -124,7 +124,7 @@ bool DXTest::Initialisation()
 
     /*add static models for testing*/
     testLevel = new Level(res);
-    testLevel->LoadLevel("interior.lvl");
+    testLevel->LoadLevel("test.lvl");
 
     //ASSERT(modelsStatic.size() == 3);
 
@@ -260,6 +260,7 @@ void DXTest::Update(float deltaTime)
     gCamera.yaw(yaw);
     gCamera.pitch(pitch);
 
+    /*
     if (in->buttons[BUTTON_A])
     {
         testLevel->modelsStatic[10011]->Translation.x += 2 * deltaTime;       
@@ -274,6 +275,8 @@ void DXTest::Update(float deltaTime)
     {
         testLevel->modelsStatic[10011]->Translation.z += 2 * deltaTime;
     }
+    */
+
 
     if (input->ButtonPressed(controllingInput, START))
     {
