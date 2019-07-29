@@ -10,7 +10,7 @@
 10008 defaultCube basicnormal 2.5 1.01 0 2 2 2 0 0 0 bricks bricks_nmap
 10009 plant basicnormal 0 1.76 .65 1 1 1 0 25 0 none none
 10010 simpleman basictexture 4 3.2 2 1.5 1.5 1.5 15 0 0 none none
-10011 defaultCube basictexture 0 14 0 3 3 3 0 0 0 none none
+10011 defaultCube basicnotexture 0 14 0 3 3 3 0 0 0 none none
 10012 skull basicnotexture 2.5 2.01 0 .2 .2 .2 -90 25 0 none none
 10013 defaultSphere basicnotexture -4 .61 -2.5 1.2 1.2 1.2 0 0 0 bricks bricks_nmap
 10014 defaultSphere basicnotexture -2. .76 -2.5 1.5 1.5 1.5 0 0 0 bricks bricks_nmap
