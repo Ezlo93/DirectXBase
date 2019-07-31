@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 
+#pragma warning( disable : 26451)
+
 ModelLoader::ModelLoader()
 {
 
@@ -15,156 +17,137 @@ ModelLoader::~ModelLoader()
 
 }
 
-/*load fbx file to model data structure*/
-bool ModelLoader::Load(const std::string fileName, Model* m)
+
+
+bool ModelLoader::LoadB3D(const std::string& fileName, Model* m)
 {
-    Assimp::Importer fbxImport;
+    /*open file*/
+    streampos fileSize;
+    ifstream file(fileName, std::ios::binary);
 
-    DBOUT("Loading model " << fileName.c_str() << endl);
+    /*get file size*/
+    file.seekg(0, ios::end);
+    fileSize = file.tellg();
+    file.seekg(0, ios::beg);
 
-    const aiScene* loadedScene = fbxImport.ReadFile(fileName, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_ConvertToLeftHanded);
-                                                    
-    if (!loadedScene)
+    /*check header*/
+    bool header = true;
+    char headerBuffer[4] = { 'b','3','d','f' };
+
+    for (int i = 0; i < 4; i++)
     {
-        std::cerr << "Unable to load file " << fileName << ": " << fbxImport.GetErrorString() << std::endl;
+        char temp;
+        file.read(&temp, sizeof(temp));
+
+        if (temp != headerBuffer[i])
+        {
+            header = false;
+            break;
+        }
+    }
+
+    if (header == false)
+    {
+        DBOUT("b3d header incorrect");
         return false;
     }
 
-    /*reserve memory for meshes*/
-    m->meshes.reserve(loadedScene->mNumMeshes);
+    /*number of meshes*/
+    char numMeshes = 0;
+    file.read(&numMeshes, sizeof(numMeshes));
 
-    for (UINT i = 0; i < loadedScene->mNumMeshes; i++)
+    m->meshes.reserve((size_t)numMeshes);
+
+
+    for (char i = 0; i < numMeshes; i++)
     {
-        aiMesh* mesh = loadedScene->mMeshes[i];
-
-        /*reserve memory for vertices*/
         m->meshes.push_back(new Mesh());
-        m->meshes[i]->vertices.reserve(mesh->mNumVertices);
 
-        DBOUT("Mesh " << i << " (" << mesh->mName.C_Str() << ") with " << mesh->mNumVertices << " vertices" << endl;);
+        /*read material*/
 
-        /*get material from index*/
-        aiMaterial* material = loadedScene->mMaterials[mesh->mMaterialIndex];
+        file.read((char*)(&m->meshes[i]->material.Ambient.x), sizeof(float));
+        file.read((char*)(&m->meshes[i]->material.Ambient.y), sizeof(float));
+        file.read((char*)(&m->meshes[i]->material.Ambient.z), sizeof(float));
+        m->meshes[i]->material.Ambient.w = 1.f;
 
-        //aiColor4D ambient, diffuse, specular;
-        aiColor4D ambient, diffuse, specular;
-        float shine;
+        file.read((char*)(&m->meshes[i]->material.Diffuse.x), sizeof(float));
+        file.read((char*)(&m->meshes[i]->material.Diffuse.y), sizeof(float));
+        file.read((char*)(&m->meshes[i]->material.Diffuse.z), sizeof(float));
+        m->meshes[i]->material.Diffuse.w = 1.f;
 
-        aiString name;
-        material->Get(AI_MATKEY_NAME, name);
+        file.read((char*)(&m->meshes[i]->material.Specular.x), sizeof(float));
+        file.read((char*)(&m->meshes[i]->material.Specular.y), sizeof(float));
+        file.read((char*)(&m->meshes[i]->material.Specular.z), sizeof(float));
 
-        DBOUT("Material: " << name.data << endl);
+        file.read((char*)(&m->meshes[i]->material.Specular.w), sizeof(float));
 
+        /*read map strings*/
 
-        aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &ambient);
-        aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
-        aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specular);
-        aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shine);
+        short slen = 0;
+        file.read((char*)(&slen), sizeof(short));
 
-        /*
-        m->meshes[i]->material = Material::Standard();
-        m->meshes[i]->material.Ambient = XMFLOAT4(ambient.r, ambient.g, ambient.b, 0.f);
-        m->meshes[i]->material.Diffuse = XMFLOAT4(diffuse.r, diffuse.g, diffuse.b, 0.f);
-        m->meshes[i]->material.Specular = XMFLOAT4(specular.r, specular.g, specular.b, shine);
-        */
+        char* dmap = new char[ (int)(slen) + 1];
+        file.read(dmap, slen);
+        dmap[slen] = '\0';
 
-        m->meshes[i]->material.Ambient = XMFLOAT4(1.f, 1.f, 1.f, 0.f);
-        m->meshes[i]->material.Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 0.f);
-        m->meshes[i]->material.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, shine);
+        slen = 0;
+        file.read((char*)(&slen), sizeof(short));
 
-        DBOUT("Ambient: " << m->meshes[i]->material.Ambient.x << " " << m->meshes[i]->material.Ambient.y << " " << m->meshes[i]->material.Ambient.z << endl);
-        DBOUT("Diffuse: " << m->meshes[i]->material.Diffuse.x << " " << m->meshes[i]->material.Diffuse.y << " " << m->meshes[i]->material.Diffuse.z << endl);
-        DBOUT("Specular: " << m->meshes[i]->material.Specular.x << " " << m->meshes[i]->material.Specular.y << " " << m->meshes[i]->material.Specular.z << endl);
+        char* nmap = new char[(int)(slen)+ 1];
+        file.read(nmap, slen);
+        nmap[slen] = '\0';
 
-        m->meshes[i]->diffuseMapID = "none";
-        m->meshes[i]->normalMapID = "none";
-        m->meshes[i]->bumpMapID = "none";
+        slen = 0;
+        file.read((char*)(&slen), sizeof(short));
 
-        if ( material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+        char* bmap = new char[(int)(slen)+ 1];
+        file.read(bmap, slen);
+        bmap[slen] = '\0';
+
+        m->meshes[i]->diffuseMapID = dmap;
+        m->meshes[i]->normalMapID = nmap;
+        m->meshes[i]->bumpMapID = bmap;
+
+        delete[] dmap; delete[] nmap; delete[] bmap;
+
+        /*read number of vertices*/
+        int vertCount = 0;
+        file.read((char*)(&vertCount), sizeof(vertCount));
+
+        m->meshes[i]->vertices.resize(vertCount);
+
+        /*vertex properties*/
+        for (int j = 0; j < vertCount; j++)
         {
-            aiString Path;
+            file.read((char*)(&m->meshes[i]->vertices[j].Pos.x), sizeof(float));
+            file.read((char*)(&m->meshes[i]->vertices[j].Pos.y), sizeof(float));
+            file.read((char*)(&m->meshes[i]->vertices[j].Pos.z), sizeof(float));
 
-            if (material->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS)
-            {
-                char id[1024];
-                _splitpath_s(Path.data, NULL, 0, NULL, 0, id, 1024, NULL, 0);
-                m->meshes[i]->diffuseMapID = id;
-                DBOUT("Diffuse Map: " << id << endl);
-            }
+            file.read((char*)(&m->meshes[i]->vertices[j].Tex.x), sizeof(float));
+            file.read((char*)(&m->meshes[i]->vertices[j].Tex.y), sizeof(float));
+
+            file.read((char*)(&m->meshes[i]->vertices[j].Normal.x), sizeof(float));
+            file.read((char*)(&m->meshes[i]->vertices[j].Normal.y), sizeof(float));
+            file.read((char*)(&m->meshes[i]->vertices[j].Normal.z), sizeof(float));
+
+            file.read((char*)(&m->meshes[i]->vertices[j].TangentU.x), sizeof(float));
+            file.read((char*)(&m->meshes[i]->vertices[j].TangentU.y), sizeof(float));
+            file.read((char*)(&m->meshes[i]->vertices[j].TangentU.z), sizeof(float));
         }
 
-        if (material->GetTextureCount(aiTextureType_NORMALS) > 0)
+        /*number of indices*/
+
+        int vInd = 0;
+        file.read((char*)(&vInd), sizeof(vInd));
+        m->meshes[i]->indices.resize(vInd);
+
+        for (int j = 0; j < vInd; j++)
         {
-            aiString Path;
-
-            if (material->GetTexture(aiTextureType_NORMALS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS)
-            {
-                char id[1024];
-                _splitpath_s(Path.data, NULL, 0, NULL, 0, id, 1024, NULL, 0);
-                m->meshes[i]->normalMapID = id;
-                DBOUT("Normal Map: " << id << endl);
-            }
-
+            file.read((char*)(&m->meshes[i]->indices[j]), sizeof(int));
         }
-
-        if (material->GetTextureCount(aiTextureType_DISPLACEMENT) > 0)
-        {
-            aiString Path;
-
-            if (material->GetTexture(aiTextureType_DISPLACEMENT, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS)
-            {
-                char id[1024];
-                _splitpath_s(Path.data, NULL, 0, NULL, 0, id, 1024, NULL, 0);
-                m->meshes[i]->bumpMapID = id;
-                DBOUT("Bump Map: " << id << endl);
-            }
-
-        }
-
-        /*get vertices: positions normals tex coords and tangentu */
-
-
-        m->meshes[i]->hasTangentu = mesh->HasTangentsAndBitangents();
-        m->meshes[i]->hasTextureCoordinates = mesh->HasTextureCoords(0);
-
-        for (UINT v = 0; v < mesh->mNumVertices; v++)
-        {
-
-            aiVector3D tex(0);
-            aiVector3D tangU(0);
-            aiVector3D pos = mesh->mVertices[v];
-            aiVector3D norm = mesh->mNormals[v];
-
-            if (m->meshes[i]->hasTangentu)
-            {
-                tangU = mesh->mTangents[v];
-            }
-            if (m->meshes[i]->hasTextureCoordinates)
-            {
-                tex = mesh->mTextureCoords[0][v];
-            }
-
-            /*convert to vertex data format*/
-            m->meshes[i]->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(pos.x, pos.y, pos.z),
-                                            XMFLOAT2(tex.x , tex.y),
-                                            XMFLOAT3(norm.x, norm.y, norm.z),
-                                            XMFLOAT3(tangU.x , tangU.y, tangU.z)
-            ));
-
-        }
-
-        /*get indices*/
-        m->meshes[i]->indices.reserve((__int64)(mesh->mNumFaces) * 3);
-
-        for (UINT j = 0; j < mesh->mNumFaces; j++)
-        {
-            m->meshes[i]->indices.push_back(mesh->mFaces[j].mIndices[0]);
-            m->meshes[i]->indices.push_back(mesh->mFaces[j].mIndices[1]);
-            m->meshes[i]->indices.push_back(mesh->mFaces[j].mIndices[2]);
-        }
-
 
     }
+
 
     return true;
 }
@@ -202,7 +185,7 @@ bool ModelLoader::LoadBas(const std::string fileName, Model* m)
     int indexCount = 3 * tcount;
     m->meshes[0]->indices.resize(indexCount);
 
-    for (int i = 0; i < tcount; ++i)
+    for (UINT i = 0; i < tcount; ++i)
     {
         fin >> m->meshes[0]->indices[i * 3 + 0] >> m->meshes[0]->indices[i * 3 + 1] >> m->meshes[0]->indices[i * 3 + 2];
     }

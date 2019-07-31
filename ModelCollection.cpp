@@ -52,7 +52,7 @@ bool ModelCollection::Add(std::string file)
             return false;
         }
 
-    }else if (!loader->Load(file, m))
+    }else if (!loader->LoadB3D(file, m))
     {
         throw std::exception("failed to load model");
         return false;
