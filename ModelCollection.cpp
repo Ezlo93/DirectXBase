@@ -44,13 +44,10 @@ bool ModelCollection::Add(std::string file)
     /*load*/
     m = new Model(device);
 
-    if (strcmp(ext, ".bas") == 0)
+    if (strcmp(ext, ".b3d") != 0)
     {
-        if (!loader->LoadBas(file, m))
-        {
-            throw std::exception("failed to load model");
-            return false;
-        }
+        throw std::exception("wrong model format");
+        return false;
 
     }else if (!loader->LoadB3D(file, m))
     {
