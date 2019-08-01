@@ -36,7 +36,7 @@ private:
 
     ResourceManager* res;
     Level* testLevel;
-    DirectionalLight gDirLights[3];
+    DirectionalLight gDirLights;
 
     float clearColor[4];
 

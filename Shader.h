@@ -81,7 +81,7 @@ public:
     void SetTexTransform(DirectX::CXMMATRIX M) { TexTransform->SetMatrix(reinterpret_cast<const float*>(&M)); }
     void SetEyePosW(const XMFLOAT3& v) { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
     void SetMaterial(const Material::Standard& mat) { Mat->SetRawValue(&mat, 0, sizeof(Material::Standard)); }
-    void SetDirLights(const DirectionalLight* lights) { DirLights->SetRawValue(lights, 0, 3 * sizeof(DirectionalLight)); }
+    void SetDirLights(const DirectionalLight lights) { DirLights->SetRawValue(&lights, 0, sizeof(DirectionalLight)); }
     void SetNormalMap(ID3D11ShaderResourceView* normal) { NormalMap->SetResource(normal); }
 
 

@@ -1,7 +1,7 @@
 #include "light.fx"
 
 cbuffer cbPerFrame{
-	DirectionalLight gDirLights[3];
+	DirectionalLight gDirLights;
 	float3 gEyePosW;
 }
 
@@ -113,17 +113,14 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gNormalMapping) 
 		float4 spec    = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 		// Sum the light contribution from each light source.  
-		[unroll]
-		for(int i = 0; i < gLightCount; ++i)
-		{
+
 			float4 A, D, S;
-			ComputeDirectionalLight(gMaterial, gDirLights[i], bumpedNormalW, toEye, 
+			ComputeDirectionalLight(gMaterial, gDirLights, bumpedNormalW, toEye, 
 				A, D, S);
 
 			ambient += A;
 			diffuse += D;
 			spec    += S;
-		}
 
 		// Modulate with late add.
 		litColor = texColor*(ambient + diffuse) + spec;
