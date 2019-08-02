@@ -77,7 +77,11 @@ void Level::ReadStaticModels(std::ifstream& fin)
             mis->usedShader = UShader::Basic;
             mis->usedTechnique = UTech::BasicNoTexture;
         }
-        else
+        else if (effectID == "basicnolighting")
+        {
+            mis->usedShader = UShader::Basic;
+            mis->usedTechnique = UTech::BasicNoLighting;
+        }else
         {
             throw std::exception("unknown shader type");
         }

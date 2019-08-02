@@ -54,12 +54,12 @@ bool ModelLoader::LoadB3D(const std::string& fileName, Model* m)
         file.read((char*)(&m->meshes[i]->material.Ambient.x), sizeof(float));
         file.read((char*)(&m->meshes[i]->material.Ambient.y), sizeof(float));
         file.read((char*)(&m->meshes[i]->material.Ambient.z), sizeof(float));
-        m->meshes[i]->material.Ambient.w = 1.f;
+        m->meshes[i]->material.Ambient.w = 0.f;
 
         file.read((char*)(&m->meshes[i]->material.Diffuse.x), sizeof(float));
         file.read((char*)(&m->meshes[i]->material.Diffuse.y), sizeof(float));
         file.read((char*)(&m->meshes[i]->material.Diffuse.z), sizeof(float));
-        m->meshes[i]->material.Diffuse.w = 1.f;
+        m->meshes[i]->material.Diffuse.w = 0.f;
 
         file.read((char*)(&m->meshes[i]->material.Specular.x), sizeof(float));
         file.read((char*)(&m->meshes[i]->material.Specular.y), sizeof(float));

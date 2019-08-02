@@ -68,9 +68,8 @@ VertexOut VS(VertexIn vin)
 	return vout;
 }
  
-float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gNormalMapping) : SV_Target
+float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gNormalMapping, uniform bool gUseLighting) : SV_Target
 {
-	int gLightCount = 3;
 
 	// Interpolating normal can unnormalize it, so normalize it.
     pin.NormalW = normalize(pin.NormalW);
@@ -93,6 +92,10 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gNormalMapping) 
 		clip(texColor.a - 0.1f); //alpha clipping
    }
 
+	if(!gUseLighting){
+		return texColor;
+	}
+
 	//normal mapping
 	
 	float3 bumpedNormalW = pin.NormalW;
@@ -107,24 +110,25 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gNormalMapping) 
 
 	float4 litColor = texColor;
 
-		// Start with a sum of zero. 
-		float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
-		float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
-		float4 spec    = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	// Start with a sum of zero. 
+	float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	float4 spec    = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-		// Sum the light contribution from each light source.  
+	// Sum the light contribution from each light source.  
 
-			float4 A, D, S;
-			ComputeDirectionalLight(gMaterial, gDirLights, bumpedNormalW, toEye, 
-				A, D, S);
+		float4 A, D, S;
+		ComputeDirectionalLight(gMaterial, gDirLights, bumpedNormalW, toEye, 
+			A, D, S);
 
-			ambient += A;
-			diffuse += D;
-			spec    += S;
+		ambient += A;
+		diffuse += D;
+		spec    += S;
 
-		// Modulate with late add.
-		litColor = texColor*(ambient + diffuse) + spec;
+	// Modulate with late add.
+	litColor = texColor*(ambient + diffuse) + spec;
 	
+	//litColor = diffuseMap.Sample(samAnisotropic, pin.Tex);
 
 	// Common to take alpha from diffuse material and texture.
 	litColor.a = gMaterial.Diffuse.a * texColor.a;
@@ -147,7 +151,7 @@ technique11 BasicTextureTech
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(true, false) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS(true, false, true) ) );
     }
 }
 
@@ -157,7 +161,7 @@ technique11 BasicTextureNormalMapTech
 	{
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(true, true) ) );	
+        SetPixelShader( CompileShader( ps_5_0, PS(true, true, true) ) );	
 	}
 }
 
@@ -167,6 +171,16 @@ technique11 BasicNoTextureTech
 	{
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(false, false) ) );	
+        SetPixelShader( CompileShader( ps_5_0, PS(false, false, true) ) );	
+	}
+}
+
+technique11 BasicTextureNoLighting
+{
+	pass P0 
+	{
+        SetVertexShader( CompileShader( vs_5_0, VS() ) );
+		SetGeometryShader( NULL );
+        SetPixelShader( CompileShader( ps_5_0, PS(true, false, false) ) );	
 	}
 }
