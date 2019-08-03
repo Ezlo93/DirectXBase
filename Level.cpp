@@ -67,11 +67,6 @@ void Level::ReadStaticModels(std::ifstream& fin)
             mis->usedShader = UShader::Basic;
             mis->usedTechnique = UTech::Basic;
         }
-        else if (effectID == "basicnormal")
-        {
-            mis->usedShader = UShader::Basic;
-            mis->usedTechnique = UTech::BasicNormalMap;
-        }
         else if (effectID == "basicnotexture")
         {
             mis->usedShader = UShader::Basic;

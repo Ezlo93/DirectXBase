@@ -15,7 +15,6 @@ namespace UTech {
     enum UsedTechnique
     {
         Basic,
-        BasicNormalMap,
         BasicNoTexture,
         BasicNoLighting
     };
@@ -62,7 +61,6 @@ public:
     ~BasicTextureShader();
 
     ID3DX11EffectTechnique* BasicTextureTechnique;
-    ID3DX11EffectTechnique* BasicTextureNormalTechnique;
     ID3DX11EffectTechnique* BasicNoTextureTechnique;
     ID3DX11EffectTechnique* BasicTextureNoLighting;
 
@@ -72,7 +70,6 @@ public:
     ID3DX11EffectVectorVariable* EyePosW;
     ID3DX11EffectMatrixVariable* TexTransform;
     ID3DX11EffectShaderResourceVariable* DiffuseMap;
-    ID3DX11EffectShaderResourceVariable* NormalMap;
     ID3DX11EffectVariable* Mat;
     ID3DX11EffectVariable* DirLights;
 
@@ -84,8 +81,6 @@ public:
     void SetEyePosW(const XMFLOAT3& v) { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
     void SetMaterial(const Material::Standard& mat) { Mat->SetRawValue(&mat, 0, sizeof(Material::Standard)); }
     void SetDirLights(const DirectionalLight lights) { DirLights->SetRawValue(&lights, 0, sizeof(DirectionalLight)); }
-    void SetNormalMap(ID3D11ShaderResourceView* normal) { NormalMap->SetResource(normal); }
-
 
 };
 

@@ -40,6 +40,8 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
     XMMATRIX world = XMLoadFloat4x4(&World);
     XMMATRIX wvp = world * view * proj;
 
+    XMMATRIX wit = DXMath::InverseTranspose(world);
+
     UINT stride = sizeof(Vertex::PosTexNormalTan);
     UINT offset = 0;
 
@@ -52,7 +54,6 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
             switch (usedTechnique)
             {
                 case UTech::Basic: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
-                case UTech::BasicNormalMap: tech = Shaders::basicTextureShader->BasicTextureNormalTechnique; break;
                 case UTech::BasicNoTexture: tech = Shaders::basicTextureShader->BasicNoTextureTechnique; break;
                 case UTech::BasicNoLighting: tech = Shaders::basicTextureShader->BasicTextureNoLighting; break;
                 default: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
@@ -78,10 +79,10 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                     switch (usedTechnique)
                     {
                         case UTech::Basic:
-
+                            
                             Shaders::basicTextureShader->SetWorld(world);
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
-                            Shaders::basicTextureShader->SetWorldInvTranspose(DXMath::InverseTranspose(world));
+                            Shaders::basicTextureShader->SetWorldInvTranspose(wit);
                             Shaders::basicTextureShader->SetMaterial(m->material);
 
                             if (useOverwriteDiffuse)
@@ -100,7 +101,7 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
 
                             Shaders::basicTextureShader->SetWorld(world);
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
-                            Shaders::basicTextureShader->SetWorldInvTranspose(DXMath::InverseTranspose(world));
+                            Shaders::basicTextureShader->SetWorldInvTranspose(wit);
                             Shaders::basicTextureShader->SetMaterial(m->material);
 
                             if (useOverwriteDiffuse)
@@ -110,33 +111,6 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                             else
                             {
                                 Shaders::basicTextureShader->SetTexture(resources->getTexture(m->diffuseMapID));
-                            }
-
-                            Shaders::basicTextureShader->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
-                            break;
-
-                        case UTech::BasicNormalMap:
-                            Shaders::basicTextureShader->SetWorld(world);
-                            Shaders::basicTextureShader->SetWorldViewProj(wvp);
-                            Shaders::basicTextureShader->SetWorldInvTranspose(DXMath::InverseTranspose(world));
-                            Shaders::basicTextureShader->SetMaterial(m->material);
-
-                            if (useOverwriteDiffuse)
-                            {
-                                Shaders::basicTextureShader->SetTexture(resources->getTexture(ovrwrTex));
-                            }
-                            else
-                            {
-                                Shaders::basicTextureShader->SetTexture(resources->getTexture(m->diffuseMapID));
-                            }
-                            
-                            if (useOverwriteNormalMap)
-                            {
-                                 Shaders::basicTextureShader->SetNormalMap(resources->getTexture(ovrwrNrm));
-                            }
-                            else
-                            {
-                                Shaders::basicTextureShader->SetNormalMap(resources->getTexture(m->normalMapID));
                             }
 
                             Shaders::basicTextureShader->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
@@ -144,8 +118,8 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
 
                         case UTech::BasicNoTexture:
                             Shaders::basicTextureShader->SetWorld(world);
+                            Shaders::basicTextureShader->SetWorldInvTranspose(wit);
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
-                            Shaders::basicTextureShader->SetWorldInvTranspose(DXMath::InverseTranspose(world));
                             Shaders::basicTextureShader->SetMaterial(m->material);
                             break;
 

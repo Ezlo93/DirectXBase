@@ -1,4 +1,4 @@
-#include "LightHelper.fx"
+#include "light.fx"
 
 cbuffer cbPerFrame{
 	DirectionalLight gDirLights;
@@ -14,13 +14,13 @@ cbuffer cbPerObject
 	Material gMaterial;
 }; 
 
-Texture2D gDiffuseMap;
+Texture2D diffuseMap;
 Texture2D gNormalMap;
 
 SamplerState samAnisotropic
 {
 	Filter = ANISOTROPIC;
-	MaxAnisotropy = 4;
+	MaxAnisotropy = 16;
 
 	AddressU = WRAP;
 	AddressV = WRAP;
@@ -68,7 +68,7 @@ VertexOut VS(VertexIn vin)
 	return vout;
 }
  
-float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting) : SV_Target
+float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gNormalMapping, uniform bool gUseLighting) : SV_Target
 {
 
 	// Interpolating normal can unnormalize it, so normalize it.
@@ -88,12 +88,21 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting) : 
 
   // Sample texture.
    if(gUseTexture){
-		texColor = gDiffuseMap.Sample( samAnisotropic, pin.Tex ); // * gMultiTex.Sample(samAnisotropic, pin.Tex);
+		texColor = diffuseMap.Sample( samAnisotropic, pin.Tex ); // * gMultiTex.Sample(samAnisotropic, pin.Tex);
 		//clip(texColor.a - 0.1f); //alpha clipping
    }
 
 	if(!gUseLighting){
 		return texColor;
+	}
+
+	//normal mapping
+	
+	float3 bumpedNormalW = pin.NormalW;
+
+	if(gNormalMapping){
+		float3 normalMapSample = gNormalMap.Sample(samLinear, pin.Tex).rgb;
+		bumpedNormalW = NormalSampleToWorldSpace(normalMapSample, pin.NormalW, pin.TangentW);
 	}
 
 	// Lighting.
@@ -109,7 +118,7 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting) : 
 	// Sum the light contribution from each light source.  
 
 		float4 A, D, S;
-		ComputeDirectionalLight(gMaterial, gDirLights, pin.NormalW, toEye, 
+		ComputeDirectionalLight(gMaterial, gDirLights, bumpedNormalW, toEye, 
 			A, D, S);
 
 		ambient += A;
@@ -118,6 +127,8 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting) : 
 
 	// Modulate with late add.
 	litColor = texColor*(ambient + diffuse) + spec;
+	
+	//litColor = diffuseMap.Sample(samAnisotropic, pin.Tex);
 
 	// Common to take alpha from diffuse material and texture.
 	litColor.a = gMaterial.Diffuse.a * texColor.a;
@@ -140,8 +151,18 @@ technique11 BasicTextureTech
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(true,  true) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS(true, false, true) ) );
     }
+}
+
+technique11 BasicTextureNormalMapTech
+{
+	pass P0 
+	{
+        SetVertexShader( CompileShader( vs_5_0, VS() ) );
+		SetGeometryShader( NULL );
+        SetPixelShader( CompileShader( ps_5_0, PS(true, true, true) ) );	
+	}
 }
 
 technique11 BasicNoTextureTech
@@ -150,7 +171,7 @@ technique11 BasicNoTextureTech
 	{
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(false, true) ) );	
+        SetPixelShader( CompileShader( ps_5_0, PS(false, false, true) ) );	
 	}
 }
 
@@ -160,6 +181,6 @@ technique11 BasicTextureNoLighting
 	{
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(true, false) ) );	
+        SetPixelShader( CompileShader( ps_5_0, PS(true, false, false) ) );	
 	}
 }

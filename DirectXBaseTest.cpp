@@ -43,7 +43,7 @@ DXTest::DXTest(HINSTANCE hProgramID) : DirectXBase(hProgramID)
 {
     wndTitle = L"DirectXBaseTest";
 
-    gCamera.setPosition(0.f, 3.f, -20.f);
+    gCamera.setPosition(0.f, 2.f, -15.f);
 
     /*clear color to silver*/
     clearColor[0] = 0.75f;
@@ -135,7 +135,7 @@ bool DXTest::Initialisation()
     gDirLights.Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
     gDirLights.Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
     gDirLights.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
-    gDirLights.Direction = XMFLOAT3(0.57735f, 0.57735f, 0.57735f);
+    gDirLights.Direction = XMFLOAT3(.57735f, -0.57735f, .57735f);
 
     //goFullscreen(true);
 
@@ -203,7 +203,7 @@ void DXTest::Update(float deltaTime)
     }
 
     input->Update(deltaTime);
-
+    
 
     /*basic movement and camera*/
 

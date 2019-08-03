@@ -4,6 +4,7 @@
 
 #pragma warning( disable : 26451)
 
+#define CHECK_NORMALS
 
 bool ModelLoader::LoadB3D(const std::string& fileName, Model* m)
 {
@@ -115,6 +116,15 @@ bool ModelLoader::LoadB3D(const std::string& fileName, Model* m)
             file.read((char*)(&m->meshes[i]->vertices[j].Normal.x), sizeof(float));
             file.read((char*)(&m->meshes[i]->vertices[j].Normal.y), sizeof(float));
             file.read((char*)(&m->meshes[i]->vertices[j].Normal.z), sizeof(float));
+
+#ifdef CHECK_NORMALS
+            if (m->meshes[i]->vertices[j].Normal.x > 1 ||
+                m->meshes[i]->vertices[j].Normal.y > 1 ||
+                m->meshes[i]->vertices[j].Normal.z > 1)
+            {
+                throw std::exception("normal > 1");
+            }
+#endif
 
             file.read((char*)(&m->meshes[i]->vertices[j].TangentU.x), sizeof(float));
             file.read((char*)(&m->meshes[i]->vertices[j].TangentU.y), sizeof(float));
