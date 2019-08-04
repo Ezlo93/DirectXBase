@@ -11,10 +11,12 @@ cbuffer cbPerObject
 	float4x4 gWorldInvTranspose;
 	float4x4 gWorldViewProj;
 	float4x4 gTexTransform;
+        float4x4 gShadowTransform;
 	Material gMaterial;
 }; 
 
 Texture2D gDiffuseMap;
+Texture2D gShadowMap;
 
 SamplerState samAnisotropic
 {
@@ -24,6 +26,18 @@ SamplerState samAnisotropic
 	AddressU = WRAP;
 	AddressV = WRAP;
 };
+
+SamplerComparisonState samShadow
+{
+	Filter   = COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+	AddressU = BORDER;
+	AddressV = BORDER;
+	AddressW = BORDER;
+	BorderColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    ComparisonFunc = LESS;
+};
+ 
 
 struct VertexIn
 {
@@ -39,7 +53,8 @@ struct VertexOut
     float3 PosW    : POSITION;
     float3 NormalW : NORMAL;
 	float3 TangentW : TANGENT;
-	float2 Tex     : TEXCOORD;
+	float2 Tex     : TEXCOORD0;
+        float4 ShadowPosH : TEXCOORD1;
 };
 
 
@@ -56,7 +71,10 @@ VertexOut VS(VertexIn vin)
 	
 	// Output vertex attributes for interpolation across triangle.
 	vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gTexTransform).xy;
-	
+
+	// Generate projective tex-coords to project shadow map onto scene.
+	vout.ShadowPosH = mul(float4(vin.PosL, 1.0f), gShadowTransform);	
+
 	return vout;
 }
  
@@ -98,6 +116,10 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting) : 
 	float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	float4 spec    = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
+	//shadow
+	float3 shadow = float3(1.0f, 1.0f, 1.0f);
+	shadow[0] = CalcShadowFactor(samShadow, gShadowMap, pin.ShadowPosH);
+
 	// Sum the light contribution from each light source.  
 
 		float4 A, D, S;
@@ -105,8 +127,8 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting) : 
 			A, D, S);
 
 		ambient += A;
-		diffuse += D;
-		spec    += S;
+		diffuse += shadow[0]*D;
+		spec    += shadow[0]*S;
 
 	// Modulate with late add.
 	litColor = texColor*(ambient + diffuse) + spec;

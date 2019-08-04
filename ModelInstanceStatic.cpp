@@ -23,7 +23,7 @@ ModelInstanceStatic::~ModelInstanceStatic()
 {
 }
 
-void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c)
+void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX shadowT)
 {
     Model* model = resources->getModel(modelID);
 
@@ -101,6 +101,7 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                             }
 
                             Shaders::basicTextureShader->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
+                            Shaders::basicTextureShader->SetShadowTransform(world * shadowT);
                             break;
 
                         case UTech::BasicNoLighting:
@@ -176,6 +177,66 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
 
 
 }
+
+
+
+void ModelInstanceStatic::ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c)
+{
+    Model* model = resources->getModel(modelID);
+
+    XMMATRIX _r = XMMatrixRotationRollPitchYaw(Rotation.x, Rotation.y, Rotation.z);
+    XMMATRIX _t = XMMatrixTranslation(Translation.x, Translation.y, Translation.z);
+    XMMATRIX _s = XMMatrixScaling(Scale.x, Scale.y, Scale.z);
+
+    XMStoreFloat4x4(&World, _s * model->axisRot * _r * _t);
+
+    XMMATRIX view = c->getView();
+    XMMATRIX proj = c->getProj();
+    XMMATRIX viewProj = c->getViewProj();
+
+    XMMATRIX world = XMLoadFloat4x4(&World);
+    XMMATRIX wvp = world * view * proj;
+
+    XMMATRIX wit = DXMath::InverseTranspose(world);
+
+    UINT stride = sizeof(Vertex::Standard);
+    UINT offset = 0;
+
+    /*select tech*/
+    ID3DX11EffectTechnique* tech = 0;
+
+    tech = Shaders::shadowMapShader->ShadowMapTech;
+
+    D3DX11_TECHNIQUE_DESC techDesc;
+    tech->GetDesc(&techDesc);
+
+    for (auto& m : model->meshes)
+    {
+        for (UINT p = 0; p < techDesc.Passes; p++)
+        {
+            deviceContext->IASetVertexBuffers(0, 1, &m->vertex, &stride, &offset);
+            deviceContext->IASetIndexBuffer(m->index, DXGI_FORMAT_R32_UINT, 0);
+
+            /*set per object constants based on used shader and technique*/
+
+            Shaders::shadowMapShader->SetWorld(world);
+            Shaders::shadowMapShader->SetWorldInvTranspose(wit);
+            Shaders::shadowMapShader->SetWorldViewProj(wvp);
+
+            /*apply and draw*/
+            tech->GetPassByIndex(p)->Apply(0, deviceContext);
+            deviceContext->DrawIndexed((UINT)(m->indices.size()), 0, 0);
+        }
+
+
+
+    }
+
+
+}
+
+
+
 
 void ModelInstanceStatic::OverwriteDiffuseMap(std::string id)
 {

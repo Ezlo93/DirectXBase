@@ -43,6 +43,16 @@ private:
 
     Skybox *skybox;
 
+    /*shadow related*/
+    ShadowMap* shadowMap;
+
+    XMFLOAT4X4 lightView, lightProj, shadowTransform;
+    XMFLOAT3 originalLightDirection;
+
+    BoundingSphere sceneBounds;
+    void buildShadowTransform();
+
+
     ID3DX11Effect* effect;
 
     bool renderWireFrame = false;

@@ -49,6 +49,15 @@ using namespace std;
 #define ASSERT(expr) //nothing
 #endif
 
+
+struct BoundingSphere
+{
+    BoundingSphere() : Center(0.0f, 0.0f, 0.0f), Radius(0.0f) {}
+    XMFLOAT3 Center;
+    float Radius;
+};
+
+
 class DXMath
 {
 public:

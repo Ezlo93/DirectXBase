@@ -14,10 +14,6 @@ public:
     void BindDsvAndSetNullRenderTarget(ID3D11DeviceContext* dc);
 
 private:
-    ShadowMap(const ShadowMap& rhs);
-    ShadowMap& operator=(const ShadowMap& rhs);
-
-private:
     UINT mWidth;
     UINT mHeight;
 

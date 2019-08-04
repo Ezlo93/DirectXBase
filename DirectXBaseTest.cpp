@@ -14,6 +14,7 @@
 #include <filesystem>
 
 #pragma warning (disable : 28251)
+#pragma warning (disable : 6387)
 
 int WINAPI WinMain(HINSTANCE hInstance,
                    HINSTANCE hPrevInstance,
@@ -119,8 +120,11 @@ bool DXTest::Initialisation()
     /*create 100 unit radius sized skysphere*/
     skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 100.f);
 
+    /*create shadow map*/
+    shadowMap = new ShadowMap(device, 2048, 2048);
 
-
+    sceneBounds.Center = XMFLOAT3(0.f, 0.f, 0.f);
+    sceneBounds.Radius = sqrtf(200);
 
     /*add static models for testing*/
     testLevel = new Level(res);
@@ -170,6 +174,45 @@ bool DXTest::goFullscreen(bool s)
     
 
     return true;
+}
+
+
+void DXTest::buildShadowTransform()
+{
+    // Only the first "main" light casts a shadow.
+    XMVECTOR lightDir = XMLoadFloat3(&gDirLights.Direction);
+    XMVECTOR lightPos = -2.0f * sceneBounds.Radius * lightDir;
+    XMVECTOR targetPos = XMLoadFloat3(&sceneBounds.Center);
+    XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+    XMMATRIX V = XMMatrixLookAtLH(lightPos, targetPos, up);
+
+    // Transform bounding sphere to light space.
+    XMFLOAT3 sphereCenterLS;
+    XMStoreFloat3(&sphereCenterLS, XMVector3TransformCoord(targetPos, V));
+
+    // Ortho frustum in light space encloses scene.
+    float l = sphereCenterLS.x - sceneBounds.Radius;
+    float b = sphereCenterLS.y - sceneBounds.Radius;
+    float n = sphereCenterLS.z - sceneBounds.Radius;
+    float r = sphereCenterLS.x + sceneBounds.Radius;
+    float t = sphereCenterLS.y + sceneBounds.Radius;
+    float f = sphereCenterLS.z + sceneBounds.Radius;
+    XMMATRIX P = XMMatrixOrthographicOffCenterLH(l, r, b, t, n, f);
+
+    // Transform NDC space [-1,+1]^2 to texture space [0,1]^2
+    XMMATRIX T(
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, -0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f);
+
+    XMMATRIX S = V * P * T;
+
+    XMStoreFloat4x4(&lightView, V);
+    XMStoreFloat4x4(&lightProj, P);
+    XMStoreFloat4x4(&shadowTransform, S);
+
 }
 
 
@@ -228,72 +271,103 @@ void DXTest::Update(float deltaTime)
 
             if (i == INPUT_MAX-1)
             {
+                gCamera.UpdateViewMatrix();
                 return;
             }
         }
 
     }
 
-    //handle input
-    InputData* in = input->getInput(controllingInput);
-    InputData* prevIn = input->getPrevInput(controllingInput);
+        //handle input
+        InputData* in = input->getInput(controllingInput);
+        InputData* prevIn = input->getPrevInput(controllingInput);
 
-    float tlX = in->trigger[THUMB_LX];
-    float tlY = in->trigger[THUMB_LY];
+        float tlX = in->trigger[THUMB_LX];
+        float tlY = in->trigger[THUMB_LY];
 
-    float trX = in->trigger[THUMB_RX];
-    float trY = in->trigger[THUMB_RY] * -1;
+        float trX = in->trigger[THUMB_RX];
+        float trY = in->trigger[THUMB_RY] * -1;
 
-    float ws = tlY * 10.f * deltaTime;
-    float ss = tlX * 10.f * deltaTime;
+        float ws = tlY * 10.f * deltaTime;
+        float ss = tlX * 10.f * deltaTime;
 
-    gCamera.walk(ws);
-    gCamera.strafe(ss);
+        gCamera.walk(ws);
+        gCamera.strafe(ss);
 
-    float yaw = 1.5f * deltaTime * trX;
-    float pitch = 1.5f * deltaTime * trY;
+        float yaw = 1.5f * deltaTime * trX;
+        float pitch = 1.5f * deltaTime * trY;
 
-    gCamera.yaw(yaw);
-    gCamera.pitch(pitch);
+        gCamera.yaw(yaw);
+        gCamera.pitch(pitch);
 
-    /*
-    if (in->buttons[BUTTON_A])
-    {
-        testLevel->modelsStatic[10011]->Translation.x += 2 * deltaTime;       
-    }
+        /*
+        if (in->buttons[BUTTON_A])
+        {
+            testLevel->modelsStatic[10011]->Translation.x += 2 * deltaTime;
+        }
 
-    if (in->buttons[BUTTON_X])
-    {
-        testLevel->modelsStatic[10011]->Translation.y += 2 * deltaTime;
-    }
+        if (in->buttons[BUTTON_X])
+        {
+            testLevel->modelsStatic[10011]->Translation.y += 2 * deltaTime;
+        }
 
-    if (in->buttons[BUTTON_Y])
-    {
-        testLevel->modelsStatic[10011]->Translation.z += 2 * deltaTime;
-    }
-    */
+        if (in->buttons[BUTTON_Y])
+        {
+            testLevel->modelsStatic[10011]->Translation.z += 2 * deltaTime;
+        }
+        */
 
 
-    if (input->ButtonPressed(controllingInput, START))
-    {
-        renderWireFrame = !renderWireFrame;
-    }
+        if (input->ButtonPressed(controllingInput, START))
+        {
+            renderWireFrame = !renderWireFrame;
+        }
 
-    if (input->ButtonReleased(controllingInput, BACK))
-    {
-        exit(0);
-    }
+        if (input->ButtonReleased(controllingInput, BACK))
+        {
+            exit(0);
+        }
 
+    buildShadowTransform();
+    gCamera.UpdateViewMatrix();
 }
 
 
 void DXTest::Draw()
 {
+
+    /*draw to shadow map*/
+    shadowMap->BindDsvAndSetNullRenderTarget(deviceContext);
+
+    XMMATRIX lview = XMLoadFloat4x4(&lightView);
+    XMMATRIX lproj = XMLoadFloat4x4(&lightProj);
+    XMMATRIX lviewproj = XMMatrixMultiply(lview, lproj);
+
+    Shaders::shadowMapShader->SetEyePosW(gCamera.getPosition());
+    Shaders::shadowMapShader->SetViewProj(lviewproj);
+    
+    Shaders::basicTextureShader->SetShadowMap(shadowMap->DepthMapSRV());
+
+    /*draw shadow of static models*/
+    std::map<int, ModelInstanceStatic*>::iterator it = testLevel->modelsStatic.begin();
+    while (it != testLevel->modelsStatic.end())
+    {
+        it->second->ShadowDraw(device, deviceContext, &gCamera);
+        it++;
+    }
+
+
+    /*reset to normal rendertarget*/
+    deviceContext->RSSetState(0);
+
+    ID3D11RenderTargetView* renderTargets[1] = { renderTargetView };
+    deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
+    deviceContext->RSSetViewports(1, &mainViewport);
+
+    /*clear buffers*/
     deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
     deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-
-    gCamera.UpdateViewMatrix();
 
     if (!renderWireFrame)
     {
@@ -315,9 +389,11 @@ void DXTest::Draw()
     Shaders::normalMapShader->SetDirLights(gDirLights);
 
     /*draw static models*/
-    std::map<int, ModelInstanceStatic*>::iterator it = testLevel->modelsStatic.begin();
+    XMMATRIX st = XMLoadFloat4x4(&shadowTransform);
+
+    it = testLevel->modelsStatic.begin();
     while(it != testLevel->modelsStatic.end()){
-         it->second->Draw(device, deviceContext, &gCamera);
+         it->second->Draw(device, deviceContext, &gCamera, st);
         it++;
     }
 

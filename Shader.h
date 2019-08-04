@@ -72,14 +72,18 @@ public:
     ID3DX11EffectMatrixVariable* WorldInvTranspose;
     ID3DX11EffectVectorVariable* EyePosW;
     ID3DX11EffectMatrixVariable* TexTransform;
+    ID3DX11EffectMatrixVariable* ShadowTransform;
     ID3DX11EffectShaderResourceVariable* DiffuseMap;
+    ID3DX11EffectShaderResourceVariable* ShadowMap;
     ID3DX11EffectVariable* Mat;
     ID3DX11EffectVariable* DirLights;
 
     void SetWorldViewProj(DirectX::CXMMATRIX M) { WorldViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
     void SetWorld(CXMMATRIX M) { World->SetMatrix(reinterpret_cast<const float*>(&M)); }
+    void SetShadowTransform(CXMMATRIX M) { ShadowTransform->SetMatrix(reinterpret_cast<const float*>(&M)); }
     void SetWorldInvTranspose(CXMMATRIX M) { WorldInvTranspose->SetMatrix(reinterpret_cast<const float*>(&M)); }
     void SetTexture(ID3D11ShaderResourceView* texture) { DiffuseMap->SetResource(texture); }
+    void SetShadowMap(ID3D11ShaderResourceView* tex) { ShadowMap->SetResource(tex); }
     void SetTexTransform(DirectX::CXMMATRIX M) { TexTransform->SetMatrix(reinterpret_cast<const float*>(&M)); }
     void SetEyePosW(const XMFLOAT3& v) { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
     void SetMaterial(const Material::Standard& mat) { Mat->SetRawValue(&mat, 0, sizeof(Material::Standard)); }
@@ -87,7 +91,7 @@ public:
 
 };
 
-
+/*include normalmap in lighting calculation*/
 class NormalMapShader : public Shader
 {
 public:
@@ -118,6 +122,33 @@ public:
 
 };
 
+/*build the shadow map in the depth srv*/
+class ShadowMapShader : public Shader
+{
+public:
+    ShadowMapShader(ID3D11Device* device, const std::wstring& filename);
+    ~ShadowMapShader();
+
+    void SetViewProj(CXMMATRIX M) { ViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
+    void SetWorldViewProj(CXMMATRIX M) { WorldViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
+    void SetWorld(CXMMATRIX M) { World->SetMatrix(reinterpret_cast<const float*>(&M)); }
+    void SetWorldInvTranspose(CXMMATRIX M) { WorldInvTranspose->SetMatrix(reinterpret_cast<const float*>(&M)); }
+    void SetTexTransform(CXMMATRIX M) { TexTransform->SetMatrix(reinterpret_cast<const float*>(&M)); }
+    void SetEyePosW(const XMFLOAT3& v) { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
+    void SetDiffuseMap(ID3D11ShaderResourceView* tex) { DiffuseMap->SetResource(tex); }
+
+    ID3DX11EffectTechnique* ShadowMapTech;
+
+    ID3DX11EffectMatrixVariable* ViewProj;
+    ID3DX11EffectMatrixVariable* WorldViewProj;
+    ID3DX11EffectMatrixVariable* World;
+    ID3DX11EffectMatrixVariable* WorldInvTranspose;
+    ID3DX11EffectMatrixVariable* TexTransform;
+    ID3DX11EffectVectorVariable* EyePosW;
+    ID3DX11EffectShaderResourceVariable* DiffuseMap;
+};
+
+
 
 class Shaders
 {
@@ -128,4 +159,5 @@ public:
     static SkyboxShader* skyShader;
     static BasicTextureShader* basicTextureShader;
     static NormalMapShader* normalMapShader;
+    static ShadowMapShader* shadowMapShader;
 };
