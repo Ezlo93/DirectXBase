@@ -7,14 +7,7 @@ const D3D11_INPUT_ELEMENT_DESC InputLayoutDesc::Pos[1] =
     {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
 };
 
-const D3D11_INPUT_ELEMENT_DESC InputLayoutDesc::Basic32[3] =
-{
-    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    {"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0}
-};
-
-const D3D11_INPUT_ELEMENT_DESC InputLayoutDesc::PosTexNormalTan[4] =
+const D3D11_INPUT_ELEMENT_DESC InputLayoutDesc::Standard[4] =
 {
     {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0},
     {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -22,7 +15,7 @@ const D3D11_INPUT_ELEMENT_DESC InputLayoutDesc::PosTexNormalTan[4] =
     {"TANGENT",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0}
 };
 
-const D3D11_INPUT_ELEMENT_DESC InputLayoutDesc::PosTexNormalTanSkinned[6] =
+const D3D11_INPUT_ELEMENT_DESC InputLayoutDesc::StandardSkinned[6] =
 {
     {"POSITION",     0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0},
     {"NORMAL",       0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -36,9 +29,8 @@ const D3D11_INPUT_ELEMENT_DESC InputLayoutDesc::PosTexNormalTanSkinned[6] =
 
 
 ID3D11InputLayout* InputLayouts::Pos = 0;
-ID3D11InputLayout* InputLayouts::Basic32 = 0;
-ID3D11InputLayout* InputLayouts::PosTexNormalTan = 0;
-ID3D11InputLayout* InputLayouts::PosTexNormalTanSkinned = 0;
+ID3D11InputLayout* InputLayouts::Standard = 0;
+ID3D11InputLayout* InputLayouts::StandardSkinned = 0;
 
 
 
@@ -54,30 +46,29 @@ void InputLayouts::Init(ID3D11Device* device)
 
 
     Shaders::basicTextureShader->BasicTextureTechnique->GetPassByIndex(0)->GetDesc(&passDesc);
-    device->CreateInputLayout(InputLayoutDesc::PosTexNormalTan, 4, passDesc.pIAInputSignature,
-       passDesc.IAInputSignatureSize, &PosTexNormalTan);
+    device->CreateInputLayout(InputLayoutDesc::Standard, 4, passDesc.pIAInputSignature,
+       passDesc.IAInputSignatureSize, &Standard);
     /*
     //
     // NormalMap
     //
 
     Effects::NormalMapFX->Light1Tech->GetPassByIndex(0)->GetDesc(&passDesc);
-    HR(device->CreateInputLayout(InputLayoutDesc::PosTexNormalTan, 4, passDesc.pIAInputSignature,
-       passDesc.IAInputSignatureSize, &PosTexNormalTan));
+    HR(device->CreateInputLayout(InputLayoutDesc::Standard, 4, passDesc.pIAInputSignature,
+       passDesc.IAInputSignatureSize, &Standard));
 
     //
     // NormalMapSkinned
     //
 
     Effects::NormalMapFX->Light1SkinnedTech->GetPassByIndex(0)->GetDesc(&passDesc);
-    HR(device->CreateInputLayout(InputLayoutDesc::PosTexNormalTanSkinned, 6, passDesc.pIAInputSignature,
-       passDesc.IAInputSignatureSize, &PosTexNormalTanSkinned));*/
+    HR(device->CreateInputLayout(InputLayoutDesc::StandardSkinned, 6, passDesc.pIAInputSignature,
+       passDesc.IAInputSignatureSize, &StandardSkinned));*/
 }
 
 void InputLayouts::Destroy()
 {
     DXRelease(Pos);
-    DXRelease(Basic32);
-    DXRelease(PosTexNormalTan);
-    DXRelease(PosTexNormalTanSkinned);
+    DXRelease(Standard);
+    DXRelease(StandardSkinned);
 }

@@ -298,7 +298,7 @@ void DXTest::Draw()
         deviceContext->RSSetState(RenderStates::wireFrame);
     }
     
-    deviceContext->IASetInputLayout(InputLayouts::PosTexNormalTan);
+    deviceContext->IASetInputLayout(InputLayouts::Standard);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     /*keep this because not object specific*/

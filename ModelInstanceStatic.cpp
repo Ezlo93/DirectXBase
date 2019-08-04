@@ -42,7 +42,7 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
 
     XMMATRIX wit = DXMath::InverseTranspose(world);
 
-    UINT stride = sizeof(Vertex::PosTexNormalTan);
+    UINT stride = sizeof(Vertex::Standard);
     UINT offset = 0;
 
     /*select tech*/

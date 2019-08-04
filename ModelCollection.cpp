@@ -113,42 +113,42 @@ Model* ModelCollection::CreateCubeModel(float width, float height, float depth)
     Model* model = new Model(device);
     Mesh* mesh = new Mesh();
     Material::Standard mat;
-    Vertex::PosTexNormalTan v[24];
+    Vertex::Standard v[24];
 
     float w = width * .5f;
     float h = height * .5f;
     float d = depth * .5f;
 
     /*define faces*/
-    v[0] = Vertex::PosTexNormalTan(XMFLOAT3(-w, -h, -d), XMFLOAT2(0.f, 1.f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
-    v[1] = Vertex::PosTexNormalTan(XMFLOAT3(-w, +h, -d), XMFLOAT2(0.f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
-    v[2] = Vertex::PosTexNormalTan(XMFLOAT3(+w, +h, -d), XMFLOAT2(1.f, 0.f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
-    v[3] = Vertex::PosTexNormalTan(XMFLOAT3(+w, -h, -d), XMFLOAT2(1.f, 1.f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
+    v[0] = Vertex::Standard(XMFLOAT3(-w, -h, -d), XMFLOAT2(0.f, 1.f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
+    v[1] = Vertex::Standard(XMFLOAT3(-w, +h, -d), XMFLOAT2(0.f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
+    v[2] = Vertex::Standard(XMFLOAT3(+w, +h, -d), XMFLOAT2(1.f, 0.f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
+    v[3] = Vertex::Standard(XMFLOAT3(+w, -h, -d), XMFLOAT2(1.f, 1.f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
 
-    v[4] = Vertex::PosTexNormalTan(-w, -h, +d, 1.f, 1.f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f);
-    v[5] = Vertex::PosTexNormalTan(+w, -h, +d, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f);
-    v[6] = Vertex::PosTexNormalTan(+w, +h, +d, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f);
-    v[7] = Vertex::PosTexNormalTan(-w, +h, +d, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f);
+    v[4] = Vertex::Standard(-w, -h, +d, 1.f, 1.f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f);
+    v[5] = Vertex::Standard(+w, -h, +d, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f);
+    v[6] = Vertex::Standard(+w, +h, +d, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f);
+    v[7] = Vertex::Standard(-w, +h, +d, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f);
 
-    v[8] = Vertex::PosTexNormalTan(-w, +h, -d, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-    v[9] = Vertex::PosTexNormalTan(-w, +h, +d, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-    v[10] = Vertex::PosTexNormalTan(+w, +h, +d, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-    v[11] = Vertex::PosTexNormalTan(+w, +h, -d, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+    v[8] = Vertex::Standard(-w, +h, -d, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+    v[9] = Vertex::Standard(-w, +h, +d, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+    v[10] = Vertex::Standard(+w, +h, +d, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+    v[11] = Vertex::Standard(+w, +h, -d, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f);
 
-    v[12] = Vertex::PosTexNormalTan(-w, -h, -d, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f);
-    v[13] = Vertex::PosTexNormalTan(+w, -h, -d, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f);
-    v[14] = Vertex::PosTexNormalTan(+w, -h, +d, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f);
-    v[15] = Vertex::PosTexNormalTan(-w, -h, +d, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f);
+    v[12] = Vertex::Standard(-w, -h, -d, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f);
+    v[13] = Vertex::Standard(+w, -h, -d, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f);
+    v[14] = Vertex::Standard(+w, -h, +d, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f);
+    v[15] = Vertex::Standard(-w, -h, +d, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f);
 
-    v[16] = Vertex::PosTexNormalTan(-w, -h, +d, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f);
-    v[17] = Vertex::PosTexNormalTan(-w, +h, +d, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f);
-    v[18] = Vertex::PosTexNormalTan(-w, +h, -d, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f);
-    v[19] = Vertex::PosTexNormalTan(-w, -h, -d, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f);
+    v[16] = Vertex::Standard(-w, -h, +d, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f);
+    v[17] = Vertex::Standard(-w, +h, +d, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f);
+    v[18] = Vertex::Standard(-w, +h, -d, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f);
+    v[19] = Vertex::Standard(-w, -h, -d, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f);
 
-    v[20] = Vertex::PosTexNormalTan(+w, -h, -d, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-    v[21] = Vertex::PosTexNormalTan(+w, +h, -d, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-    v[22] = Vertex::PosTexNormalTan(+w, +h, +d, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-    v[23] = Vertex::PosTexNormalTan(+w, -h, +d, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+    v[20] = Vertex::Standard(+w, -h, -d, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+    v[21] = Vertex::Standard(+w, +h, -d, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+    v[22] = Vertex::Standard(+w, +h, +d, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+    v[23] = Vertex::Standard(+w, -h, +d, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
     
     mesh->hasTextureCoordinates = true;
     mesh->hasTangentu = true;
@@ -198,8 +198,8 @@ Model* ModelCollection::CreateSphereModel(float radius, int slices, int stacks)
     Mesh* mesh = new Mesh();
     Material::Standard mat;
                                 //pos             //tex     //normal       //tang
-    Vertex::PosTexNormalTan top(0.f, radius, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f);
-    Vertex::PosTexNormalTan bot(0.f, -radius, 0.f, 0.f, 1.f,0.f, -1.f, 0.f, 1.f, 0.f, 0.f);
+    Vertex::Standard top(0.f, radius, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f);
+    Vertex::Standard bot(0.f, -radius, 0.f, 0.f, 1.f,0.f, -1.f, 0.f, 1.f, 0.f, 0.f);
 
     mesh->vertices.clear();
     mesh->indices.clear();
@@ -218,7 +218,7 @@ Model* ModelCollection::CreateSphereModel(float radius, int slices, int stacks)
         {
             float theta = j * thetaStep;
 
-            Vertex::PosTexNormalTan v;
+            Vertex::Standard v;
 
             v.Pos.x = radius * sinf(phi) * cosf(theta);
             v.Pos.y = radius * cosf(phi);
@@ -308,19 +308,19 @@ Model* ModelCollection::CreatePlaneModel(float width, float height)
 
     /*4 vertices*/
 
-    mesh->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(-w, 0.f, -h),       //pos
+    mesh->vertices.push_back(Vertex::Standard(XMFLOAT3(-w, 0.f, -h),       //pos
                              XMFLOAT2(0.f, 1.f),    //u v coord
                              XMFLOAT3(0.f, 1.f, 0.f),   //normal
                              XMFLOAT3(1.f, 0.f, 0.f))); //tangent
-    mesh->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(-w, 0.f, h),       //pos
+    mesh->vertices.push_back(Vertex::Standard(XMFLOAT3(-w, 0.f, h),       //pos
                              XMFLOAT2(0.f, 0.f),    //u v coord
                              XMFLOAT3(0.f, 1.f, 0.f),   //normal
                              XMFLOAT3(1.f, 0.f, 0.f))); //tangent
-    mesh->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(w, 0.f, h),       //pos
+    mesh->vertices.push_back(Vertex::Standard(XMFLOAT3(w, 0.f, h),       //pos
                              XMFLOAT2(1.f, 0.f),    //u v coord
                              XMFLOAT3(0.f, 1.f, 0.f),   //normal
                              XMFLOAT3(1.f, 0.f, 0.f))); //tangent
-    mesh->vertices.push_back(Vertex::PosTexNormalTan(XMFLOAT3(w, 0.f, -h),       //pos
+    mesh->vertices.push_back(Vertex::Standard(XMFLOAT3(w, 0.f, -h),       //pos
                              XMFLOAT2(1.f, 1.f),    //u v coord
                              XMFLOAT3(0.f, 1.f, 0.f),   //normal
                              XMFLOAT3(1.f, 0.f, 0.f))); //tangent

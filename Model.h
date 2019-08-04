@@ -18,11 +18,11 @@ namespace Vertex
         XMFLOAT2 Tex;
     };
 
-    struct PosTexNormalTan
+    struct Standard
     {
-        PosTexNormalTan(XMFLOAT3 p, XMFLOAT2 t, XMFLOAT3 n, XMFLOAT3 tu) : Pos(p), Tex(t), Normal(n), TangentU(tu) {}
-        PosTexNormalTan() : Pos(), Tex(), Normal(), TangentU() { RtlSecureZeroMemory(this, sizeof(this)); }
-        PosTexNormalTan(float px, float py, float pz,
+        Standard(XMFLOAT3 p, XMFLOAT2 t, XMFLOAT3 n, XMFLOAT3 tu) : Pos(p), Tex(t), Normal(n), TangentU(tu) {}
+        Standard() : Pos(), Tex(), Normal(), TangentU() { RtlSecureZeroMemory(this, sizeof(this)); }
+        Standard(float px, float py, float pz,
                         float u, float v,
                         float nx, float ny, float nz,
                         float tx, float ty, float tz
@@ -34,7 +34,7 @@ namespace Vertex
         XMFLOAT3 TangentU;
     };
 
-    struct PosTexNormalTanSkinned
+    struct StandardSkinned
     {
         XMFLOAT3 Pos;
         XMFLOAT3 Normal;
@@ -110,7 +110,7 @@ struct SpotLight
 class Mesh
 {
 public:
-    std::vector<Vertex::PosTexNormalTan> vertices;
+    std::vector<Vertex::Standard> vertices;
     std::vector<UINT> indices;
     Material::Standard material;
 
@@ -135,7 +135,7 @@ public:
 
         D3D11_BUFFER_DESC vbd;
         vbd.Usage = D3D11_USAGE_IMMUTABLE;
-        vbd.ByteWidth = (UINT)(sizeof(Vertex::PosTexNormalTan) * vertices.size());
+        vbd.ByteWidth = (UINT)(sizeof(Vertex::Standard) * vertices.size());
         vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         vbd.CPUAccessFlags = 0;
         vbd.MiscFlags = 0;
