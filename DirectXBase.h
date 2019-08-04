@@ -10,6 +10,14 @@
 #include "Camera.h"
 #include "Model.h"
 
+
+struct BoundingSphere
+{
+    BoundingSphere() : Center(0.0f, 0.0f, 0.0f), Radius(0.0f) {}
+    XMFLOAT3 Center;
+    float Radius;
+};
+
 class DirectXBase {
 
 public:

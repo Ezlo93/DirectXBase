@@ -13,6 +13,7 @@
 #include <chrono>
 #include "ModelInstanceStatic.h"
 #include "Level.h"
+#include "ShadowMap.h"
 
 #define MODEL_PATH "data/models"
 #define TEXTURE_PATH "data/textures"

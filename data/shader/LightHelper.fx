@@ -222,6 +222,7 @@ float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, floa
 // Performs shadowmap test to determine if a pixel is in shadow.
 //---------------------------------------------------------------------------------------
 
+
 static const float SMAP_SIZE = 2048.0f;
 static const float SMAP_DX = 1.0f / SMAP_SIZE;
 

@@ -157,6 +157,7 @@
     <ClCompile Include="RenderStates.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="TextureCollection.cpp" />
   </ItemGroup>
@@ -181,6 +182,7 @@
     <ClInclude Include="RenderStates.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShadowMap.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="TextureCollection.h" />
     <ClInclude Include="util.h" />
