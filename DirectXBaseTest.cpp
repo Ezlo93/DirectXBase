@@ -93,7 +93,7 @@ bool DXTest::Initialisation()
     /*create default cube*/
     res->getModelCollection()->AddModel(DEFAULT_PLANE, res->getModelCollection()->CreatePlaneModel(1.f, 1.f));
     res->getModelCollection()->AddModel(DEFAULT_CUBE, res->getModelCollection()->CreateCubeModel(1.f, 1.f, 1.f));
-    res->getModelCollection()->AddModel(DEFAULT_SPHERE, res->getModelCollection()->CreateSphereModel(.5f, 16, 16));
+    res->getModelCollection()->AddModel(DEFAULT_SPHERE, res->getModelCollection()->CreateSphereModel(.5f, 32, 32));
 
 
     /*load all models*/
@@ -304,6 +304,9 @@ void DXTest::Draw()
     /*keep this because not object specific*/
     Shaders::basicTextureShader->SetEyePosW(gCamera.getPosition());
     Shaders::basicTextureShader->SetDirLights(gDirLights);
+
+    Shaders::normalMapShader->SetEyePosW(gCamera.getPosition());
+    Shaders::normalMapShader->SetDirLights(gDirLights);
 
     /*draw static models*/
     std::map<int, ModelInstanceStatic*>::iterator it = testLevel->modelsStatic.begin();

@@ -15,20 +15,12 @@ cbuffer cbPerObject
 }; 
 
 Texture2D gDiffuseMap;
-Texture2D gNormalMap;
 
 SamplerState samAnisotropic
 {
 	Filter = ANISOTROPIC;
-	MaxAnisotropy = 4;
+	MaxAnisotropy = 16;
 
-	AddressU = WRAP;
-	AddressV = WRAP;
-};
-
-SamplerState samLinear
-{
-	Filter = MIN_MAG_MIP_LINEAR;
 	AddressU = WRAP;
 	AddressV = WRAP;
 };
@@ -89,7 +81,7 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting) : 
   // Sample texture.
    if(gUseTexture){
 		texColor = gDiffuseMap.Sample( samAnisotropic, pin.Tex ); // * gMultiTex.Sample(samAnisotropic, pin.Tex);
-		//clip(texColor.a - 0.1f); //alpha clipping
+		clip(texColor.a - 0.1f); //alpha clipping
    }
 
 	if(!gUseLighting){
@@ -124,14 +116,6 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting) : 
 
     return litColor;
 
-/*
-	float4 texColor = float4(1, 1, 1, 1);
-        texColor = diffuseMap.Sample( samAnisotropic, pin.Tex );
-
-
-    return texColor;
-//return gMaterial.Ambient;
-*/
 }
 
 technique11 BasicTextureTech

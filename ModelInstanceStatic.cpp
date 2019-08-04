@@ -59,6 +59,12 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                 default: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
             }
             break;
+        case UShader::Normal:
+            switch (usedTechnique)
+            {
+                case UTech::NormalTech: tech = Shaders::normalMapShader->NormalMapTech; break;
+                default: tech = Shaders::normalMapShader->NormalMapTech; break;
+            }
     }
 
     D3DX11_TECHNIQUE_DESC techDesc;
@@ -123,6 +129,37 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                             Shaders::basicTextureShader->SetMaterial(m->material);
                             break;
 
+                    }
+                    break;
+                case UShader::Normal:
+                    switch (usedTechnique)
+                    {
+                        case UTech::NormalTech:
+                            Shaders::normalMapShader->SetWorld(world);
+                            Shaders::normalMapShader->SetWorldViewProj(wvp);
+                            Shaders::normalMapShader->SetWorldInvTranspose(wit);
+                            Shaders::normalMapShader->SetMaterial(m->material);
+
+                            if (useOverwriteDiffuse)
+                            {
+                                Shaders::normalMapShader->SetTexture(resources->getTexture(ovrwrTex));
+                            }
+                            else
+                            {
+                                Shaders::normalMapShader->SetTexture(resources->getTexture(m->diffuseMapID));
+                            }
+
+                            if (useOverwriteNormalMap)
+                            {
+                                Shaders::normalMapShader->SetNormalMap(resources->getTexture(ovrwrNrm));
+                            }
+                            else
+                            {
+                                Shaders::normalMapShader->SetNormalMap(resources->getTexture(m->normalMapID));
+                            }
+
+                            Shaders::normalMapShader->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
+                            break;
                     }
                     break;
             }

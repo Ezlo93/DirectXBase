@@ -3,17 +3,20 @@
 
 SkyboxShader* Shaders::skyShader = 0;
 BasicTextureShader* Shaders::basicTextureShader = 0;
+NormalMapShader* Shaders::normalMapShader = 0;
 
 void Shaders::Init(ID3D11Device* device)
 {
     skyShader = new SkyboxShader(device, L"data/shader/skybox.fxo");
     basicTextureShader = new BasicTextureShader(device, L"data/shader/basictexture.fxo");
+    normalMapShader = new NormalMapShader(device, L"data/shader/normalmap.fxo");
 }
 
 void Shaders::Destroy()
 {
     delete skyShader; skyShader = 0;
     delete basicTextureShader; basicTextureShader = 0;
+    delete normalMapShader; normalMapShader = 0;
 }
 
 
@@ -89,6 +92,36 @@ BasicTextureShader::~BasicTextureShader()
     DXRelease(BasicTextureNoLighting);
     DXRelease(WorldViewProj);
     DXRelease(DiffuseMap);
+    DXRelease(TexTransform);
+    DXRelease(World);
+    DXRelease(WorldInvTranspose);
+    DXRelease(EyePosW);
+    DXRelease(Mat);
+    DXRelease(DirLights);
+}
+
+/*normal map shader*/
+NormalMapShader::NormalMapShader(ID3D11Device* device, const std::wstring& filename) : Shader(device, filename)
+{
+    NormalMapTech = effect->GetTechniqueByName("NormalTech");
+
+    WorldViewProj = effect->GetVariableByName("gWorldViewProj")->AsMatrix();
+    DiffuseMap = effect->GetVariableByName("gDiffuseMap")->AsShaderResource();
+    NormalMap = effect->GetVariableByName("gNormalMap")->AsShaderResource();
+    TexTransform = effect->GetVariableByName("gTexTransform")->AsMatrix();
+    World = effect->GetVariableByName("gWorld")->AsMatrix();
+    WorldInvTranspose = effect->GetVariableByName("gWorldInvTranspose")->AsMatrix();
+    EyePosW = effect->GetVariableByName("gEyePosW")->AsVector();
+    Mat = effect->GetVariableByName("gMaterial");
+    DirLights = effect->GetVariableByName("gDirLights");
+}
+
+NormalMapShader::~NormalMapShader()
+{
+    DXRelease(NormalMapTech);
+    DXRelease(WorldViewProj);
+    DXRelease(DiffuseMap);
+    DXRelease(NormalMap);
     DXRelease(TexTransform);
     DXRelease(World);
     DXRelease(WorldInvTranspose);

@@ -48,22 +48,6 @@ void InputLayouts::Init(ID3D11Device* device)
     Shaders::basicTextureShader->BasicTextureTechnique->GetPassByIndex(0)->GetDesc(&passDesc);
     device->CreateInputLayout(InputLayoutDesc::Standard, 4, passDesc.pIAInputSignature,
        passDesc.IAInputSignatureSize, &Standard);
-    /*
-    //
-    // NormalMap
-    //
-
-    Effects::NormalMapFX->Light1Tech->GetPassByIndex(0)->GetDesc(&passDesc);
-    HR(device->CreateInputLayout(InputLayoutDesc::Standard, 4, passDesc.pIAInputSignature,
-       passDesc.IAInputSignatureSize, &Standard));
-
-    //
-    // NormalMapSkinned
-    //
-
-    Effects::NormalMapFX->Light1SkinnedTech->GetPassByIndex(0)->GetDesc(&passDesc);
-    HR(device->CreateInputLayout(InputLayoutDesc::StandardSkinned, 6, passDesc.pIAInputSignature,
-       passDesc.IAInputSignatureSize, &StandardSkinned));*/
 }
 
 void InputLayouts::Destroy()
