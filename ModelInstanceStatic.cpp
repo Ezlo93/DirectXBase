@@ -128,6 +128,8 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                             Shaders::basicTextureShader->SetWorldInvTranspose(wit);
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
                             Shaders::basicTextureShader->SetMaterial(m->material);
+                            Shaders::basicTextureShader->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
+                            Shaders::basicTextureShader->SetShadowTransform(world* shadowT);
                             break;
 
                     }
@@ -180,7 +182,8 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
 
 
 
-void ModelInstanceStatic::ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c)
+void ModelInstanceStatic::ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c,
+                                     XMMATRIX lightView, XMMATRIX lightProj)
 {
     Model* model = resources->getModel(modelID);
 
@@ -190,9 +193,9 @@ void ModelInstanceStatic::ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* 
 
     XMStoreFloat4x4(&World, _s * model->axisRot * _r * _t);
 
-    XMMATRIX view = c->getView();
-    XMMATRIX proj = c->getProj();
-    XMMATRIX viewProj = c->getViewProj();
+    XMMATRIX view = lightView;
+    XMMATRIX proj = lightProj;
+    XMMATRIX viewProj = XMMatrixMultiply(view, proj);
 
     XMMATRIX world = XMLoadFloat4x4(&World);
     XMMATRIX wvp = world * view * proj;
@@ -222,6 +225,8 @@ void ModelInstanceStatic::ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* 
             Shaders::shadowMapShader->SetWorld(world);
             Shaders::shadowMapShader->SetWorldInvTranspose(wit);
             Shaders::shadowMapShader->SetWorldViewProj(wvp);
+            Shaders::shadowMapShader->SetViewProj(viewProj);
+            Shaders::shadowMapShader->SetDiffuseMap(resources->getTexture(m->diffuseMapID));
 
             /*apply and draw*/
             tech->GetPassByIndex(p)->Apply(0, deviceContext);

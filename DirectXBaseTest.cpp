@@ -139,7 +139,7 @@ bool DXTest::Initialisation()
     gDirLights.Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
     gDirLights.Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
     gDirLights.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
-    gDirLights.Direction = XMFLOAT3(.57735f, -0.57735f, .57735f);
+    gDirLights.Direction = XMFLOAT3(-.57735f, -0.57735f, .57735f);
 
     originalLightDir = gDirLights.Direction;
 
@@ -333,8 +333,6 @@ void DXTest::Update(float deltaTime)
         }
     }
 
-    /*update camera position*/
-    gCamera.UpdateViewMatrix();
 
     /*rotate light*/
     lightRotationAngle += 0.25f * deltaTime;
@@ -345,7 +343,10 @@ void DXTest::Update(float deltaTime)
 
     /*build shadow transform*/
     buildShadowTransform();
-    
+
+    /*update camera position*/
+    gCamera.UpdateViewMatrix();
+
 }
 
 
@@ -357,18 +358,15 @@ void DXTest::Draw()
 
     XMMATRIX lview = XMLoadFloat4x4(&lightView);
     XMMATRIX lproj = XMLoadFloat4x4(&lightProj);
-    XMMATRIX lviewproj = XMMatrixMultiply(lview, lproj);
-
-    Shaders::shadowMapShader->SetEyePosW(gCamera.getPosition());
-    Shaders::shadowMapShader->SetViewProj(lviewproj);
-    
-    Shaders::basicTextureShader->SetShadowMap(shadowMap->DepthMapSRV());
 
     /*draw shadow of static models*/
+    deviceContext->IASetInputLayout(InputLayouts::Standard);
+    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
     std::map<int, ModelInstanceStatic*>::iterator it = testLevel->modelsStatic.begin();
     while (it != testLevel->modelsStatic.end())
     {
-        it->second->ShadowDraw(device, deviceContext, &gCamera);
+        it->second->ShadowDraw(device, deviceContext, &gCamera, lview, lproj);
         it++;
     }
 
@@ -403,6 +401,8 @@ void DXTest::Draw()
 
     Shaders::normalMapShader->SetEyePosW(gCamera.getPosition());
     Shaders::normalMapShader->SetDirLights(gDirLights);
+
+    Shaders::basicTextureShader->SetShadowMap(shadowMap->DepthMapSRV());
 
     /*draw static models*/
     XMMATRIX st = XMLoadFloat4x4(&shadowTransform);

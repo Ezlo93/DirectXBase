@@ -29,7 +29,7 @@ public:
     }
 
     void Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera *c, XMMATRIX shadowT);
-    void ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c);
+    void ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX lightView, XMMATRIX lightProj);
     void OverwriteDiffuseMap(std::string id);
     void OverwriteNormalMap(std::string id);
 

@@ -1,17 +1,10 @@
 
-cbuffer cbPerFrame
-{
-	float3 gEyePosW;
-	float gHeightScale;
-};
-
 cbuffer cbPerObject
 {
 	float4x4 gWorld;
 	float4x4 gWorldInvTranspose;
 	float4x4 gViewProj;
 	float4x4 gWorldViewProj;
-	float4x4 gTexTransform;
 }; 
 
 // Nonnumeric values cannot be added to a cbuffer.
