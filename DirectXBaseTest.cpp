@@ -121,7 +121,7 @@ bool DXTest::Initialisation()
     skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 100.f);
 
     /*create shadow map*/
-    shadowMap = new ShadowMap(device, 2048, 2048);
+    shadowMap = new ShadowMap(device, SHADOW_HIGH, SHADOW_HIGH);
 
     sceneBounds.Center = XMFLOAT3(0.f, 0.f, 0.f);
     sceneBounds.Radius = sqrtf(200);

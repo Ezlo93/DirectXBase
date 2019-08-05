@@ -3,6 +3,8 @@
 #include "util.h"
 #include "Camera.h"
 
+#define SHADOW_HIGH 4096
+
 class ShadowMap
 {
 public:
