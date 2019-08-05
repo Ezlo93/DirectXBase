@@ -37,11 +37,14 @@ private:
 
     ResourceManager* res;
     Level* testLevel;
-    DirectionalLight gDirLights;
-
     float clearColor[4];
+    Skybox* skybox;
 
-    Skybox *skybox;
+    /*lighting*/
+    DirectionalLight gDirLights;
+    float lightRotationAngle = 0.f;
+    XMFLOAT3 originalLightDir;
+
 
     /*shadow related*/
     ShadowMap* shadowMap;

@@ -141,6 +141,8 @@ bool DXTest::Initialisation()
     gDirLights.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
     gDirLights.Direction = XMFLOAT3(.57735f, -0.57735f, .57735f);
 
+    originalLightDir = gDirLights.Direction;
+
     /*lighting configuration to check it works*/
     //gDirLights.Ambient = XMFLOAT4(0.f, 0.3f, 0.f, 1.0f);
     //gDirLights.Diffuse = XMFLOAT4(0.f, 0.f, 0.8f, 1.0f);
@@ -269,15 +271,17 @@ void DXTest::Update(float deltaTime)
                 break;
             }
 
-            if (i == INPUT_MAX-1)
-            {
-                gCamera.UpdateViewMatrix();
-                return;
-            }
+            //if (i == INPUT_MAX-1)
+            //{
+            //    gCamera.UpdateViewMatrix();
+            //    return;
+            //}
         }
 
     }
 
+    if (controllingInput != -1)
+    {
         //handle input
         InputData* in = input->getInput(controllingInput);
         InputData* prevIn = input->getPrevInput(controllingInput);
@@ -327,9 +331,21 @@ void DXTest::Update(float deltaTime)
         {
             exit(0);
         }
+    }
 
-    buildShadowTransform();
+    /*update camera position*/
     gCamera.UpdateViewMatrix();
+
+    /*rotate light*/
+    lightRotationAngle += 0.25f * deltaTime;
+    XMMATRIX R = XMMatrixRotationY(lightRotationAngle);
+    XMVECTOR lDir = XMLoadFloat3(&originalLightDir);
+    lDir = XMVector3TransformNormal(lDir, R);
+    XMStoreFloat3(&gDirLights.Direction, lDir);
+
+    /*build shadow transform*/
+    buildShadowTransform();
+    
 }
 
 
