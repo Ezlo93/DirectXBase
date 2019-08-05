@@ -99,6 +99,8 @@ BasicTextureShader::~BasicTextureShader()
     DXRelease(WorldViewProj);
     DXRelease(DiffuseMap);
     DXRelease(TexTransform);
+    DXRelease(ShadowMap);
+    DXRelease(ShadowTransform);
     DXRelease(World);
     DXRelease(WorldInvTranspose);
     DXRelease(EyePosW);
@@ -120,6 +122,9 @@ NormalMapShader::NormalMapShader(ID3D11Device* device, const std::wstring& filen
     EyePosW = effect->GetVariableByName("gEyePosW")->AsVector();
     Mat = effect->GetVariableByName("gMaterial");
     DirLights = effect->GetVariableByName("gDirLights");
+    ShadowMap = effect->GetVariableByName("gShadowMap")->AsShaderResource();
+    ShadowTransform = effect->GetVariableByName("gShadowTransform")->AsMatrix();
+
 }
 
 NormalMapShader::~NormalMapShader()
@@ -128,6 +133,8 @@ NormalMapShader::~NormalMapShader()
     DXRelease(WorldViewProj);
     DXRelease(DiffuseMap);
     DXRelease(NormalMap);
+    DXRelease(ShadowMap);
+    DXRelease(ShadowTransform);
     DXRelease(TexTransform);
     DXRelease(World);
     DXRelease(WorldInvTranspose);

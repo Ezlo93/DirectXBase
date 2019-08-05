@@ -121,6 +121,7 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                             }
 
                             Shaders::basicTextureShader->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
+                            Shaders::basicTextureShader->SetShadowTransform(world * shadowT);
                             break;
 
                         case UTech::BasicNoTexture:
@@ -162,6 +163,7 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                             }
 
                             Shaders::normalMapShader->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
+                            Shaders::normalMapShader->SetShadowTransform(world* shadowT);
                             break;
                     }
                     break;

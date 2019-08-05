@@ -395,14 +395,20 @@ void DXTest::Draw()
     deviceContext->IASetInputLayout(InputLayouts::Standard);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    /*keep this because not object specific*/
+
+    /*set shader constants that are not object dependant*/
+    /*basic shader*/
     Shaders::basicTextureShader->SetEyePosW(gCamera.getPosition());
     Shaders::basicTextureShader->SetDirLights(gDirLights);
 
+    Shaders::basicTextureShader->SetShadowMap(shadowMap->DepthMapSRV());
+
+    /*normal shader*/
     Shaders::normalMapShader->SetEyePosW(gCamera.getPosition());
     Shaders::normalMapShader->SetDirLights(gDirLights);
 
-    Shaders::basicTextureShader->SetShadowMap(shadowMap->DepthMapSRV());
+    Shaders::normalMapShader->SetShadowMap(shadowMap->DepthMapSRV());
+
 
     /*draw static models*/
     XMMATRIX st = XMLoadFloat4x4(&shadowTransform);
