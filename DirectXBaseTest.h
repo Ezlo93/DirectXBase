@@ -14,6 +14,7 @@
 #include "ModelInstanceStatic.h"
 #include "Level.h"
 #include "ShadowMap.h"
+#include "TextureToView.h"
 
 #define MODEL_PATH "data/models"
 #define TEXTURE_PATH "data/textures"
@@ -37,8 +38,9 @@ private:
 
     ResourceManager* res;
     Level* testLevel;
-    float clearColor[4];
+    float clearColor[4], clearColorSec[4];
     Skybox* skybox;
+    TextureToView* texToView;
 
     /*lighting*/
     DirectionalLight gDirLights;
@@ -55,8 +57,12 @@ private:
     BoundingSphere sceneBounds;
     void buildShadowTransform();
 
+    /*render related*/
+    ID3D11ShaderResourceView* mOffscreenSRV;
+    ID3D11UnorderedAccessView* mOffscreenUAV;
+    ID3D11RenderTargetView* mOffscreenRTV;
 
-    ID3DX11Effect* effect;
+    void buildOffscreenRender();
 
     bool renderWireFrame = false;
 };

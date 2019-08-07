@@ -52,6 +52,11 @@ DXTest::DXTest(HINSTANCE hProgramID) : DirectXBase(hProgramID)
     clearColor[2] = 0.75f;
     clearColor[3] = 1.f;
 
+    clearColorSec[0] = 0.0f;
+    clearColorSec[1] = 0.8f;
+    clearColorSec[2] = 0.8f;
+    clearColorSec[3] = 1.f;
+
 }
 
 DXTest::~DXTest()
@@ -62,7 +67,9 @@ DXTest::~DXTest()
     delete res; res = 0;
     delete testLevel;
 
-    DXRelease(effect);
+    DXRelease(mOffscreenSRV);
+    DXRelease(mOffscreenUAV);
+    DXRelease(mOffscreenRTV);
 
     RenderStates::Destroy();
     Shaders::Destroy();
@@ -121,7 +128,7 @@ bool DXTest::Initialisation()
     skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 100.f);
 
     /*create shadow map*/
-    shadowMap = new ShadowMap(device, SHADOW_HIGH, SHADOW_HIGH);
+    shadowMap = new ShadowMap(device, SHADOW_HIGH);
 
     sceneBounds.Center = XMFLOAT3(0.f, 0.f, 0.f);
     sceneBounds.Radius = sqrtf(200);
@@ -149,6 +156,9 @@ bool DXTest::Initialisation()
     //gDirLights.Specular = XMFLOAT4(0.6f, 0.f, 0.f, 16.0f);
     //gDirLights.Direction = XMFLOAT3(.57735f, -0.57735f, .57735f);
 
+    texToView = new TextureToView();
+    texToView->Init(device);
+
     //goFullscreen(true);
 
     return true;
@@ -158,6 +168,8 @@ bool DXTest::Initialisation()
 void DXTest::OnWindowResize()
 {
     DirectXBase::OnWindowResize();
+
+    buildOffscreenRender();
 
     /*recalc camera*/
     gCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
@@ -171,9 +183,6 @@ bool DXTest::goFullscreen(bool s)
     }
 
     OnWindowResize();
-
-    /*potentially additional proj matrix etc recalc*/
-    
 
     return true;
 }
@@ -371,15 +380,18 @@ void DXTest::Draw()
     }
 
 
-    /*reset to normal rendertarget*/
+
+    /*reset to offscreen texture rendertarget*/
     deviceContext->RSSetState(0);
 
     ID3D11RenderTargetView* renderTargets[1] = { renderTargetView };
+    //ID3D11RenderTargetView* renderTargets[1] = { mOffscreenRTV };
     deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
     deviceContext->RSSetViewports(1, &mainViewport);
 
     /*clear buffers*/
     deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
+    //deviceContext->ClearRenderTargetView(mOffscreenRTV, clearColor);
     deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 
@@ -425,7 +437,77 @@ void DXTest::Draw()
     deviceContext->OMSetDepthStencilState(0, 0);
 
 
+    /*restore back buffer*/
+    //deviceContext->RSSetState(0);
+
+    //renderTargets[0] = renderTargetView;
+    //deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
+
+    //deviceContext->ClearRenderTargetView(renderTargetView, clearColorSec);
+    //deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+    //deviceContext->IASetInputLayout(InputLayouts::Standard);
+    //deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+    //UINT stride = sizeof(Vertex::Standard);
+    //UINT offset = 0;
+    //XMMATRIX identity = XMMatrixIdentity();
+
+    //ID3DX11EffectTechnique* texOnlyTech = Shaders::basicTextureShader->BasicTextureNoLighting;
+    //D3DX11_TECHNIQUE_DESC techDesc;
+
+    //texOnlyTech->GetDesc(&techDesc);
+    //for (UINT p = 0; p < techDesc.Passes; ++p)
+    //{
+    //    ID3D11Buffer* b = texToView->getVertexBuffer();
+    //    deviceContext->IASetVertexBuffers(0, 1, &b, &stride, &offset);
+    //    deviceContext->IASetIndexBuffer(texToView->getIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+
+    //    Shaders::basicTextureShader->SetWorld(identity);
+    //    Shaders::basicTextureShader->SetWorldInvTranspose(identity);
+    //    Shaders::basicTextureShader->SetWorldViewProj(identity);
+    //    Shaders::basicTextureShader->SetTexTransform(identity);
+    //    Shaders::basicTextureShader->SetTexture(mOffscreenSRV);
+
+    //    texOnlyTech->GetPassByIndex(p)->Apply(0, deviceContext);
+    //    deviceContext->DrawIndexed(6, 0, 0);
+    //}
+
+
     //show backbuffer
                      //this value is vsync => 0 is off, 1 - 4 sync intervalls
     swapChain->Present(0, 0);
+}
+
+/*create resources needed for render to texture*/
+void DXTest::buildOffscreenRender()
+{
+    DXRelease(mOffscreenRTV);
+    DXRelease(mOffscreenSRV);
+    DXRelease(mOffscreenUAV);
+
+    D3D11_TEXTURE2D_DESC tDesc;
+
+    tDesc.Width = wndWidth;
+    tDesc.Height = wndHeight;
+    tDesc.MipLevels = 1;
+    tDesc.ArraySize = 1;
+    tDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    tDesc.SampleDesc.Count = 1;
+    tDesc.SampleDesc.Quality = 0;
+    tDesc.Usage = D3D11_USAGE_DEFAULT;
+    tDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+    tDesc.CPUAccessFlags = 0;
+    tDesc.MiscFlags = 0;
+
+    ID3D11Texture2D* tex = 0;
+    device->CreateTexture2D(&tDesc, 0, &tex);
+
+    device->CreateShaderResourceView(tex, 0, &mOffscreenSRV);
+    device->CreateRenderTargetView(tex, 0, &mOffscreenRTV);
+    device->CreateUnorderedAccessView(tex, 0, &mOffscreenUAV);
+
+    DXRelease(tex);
+
 }

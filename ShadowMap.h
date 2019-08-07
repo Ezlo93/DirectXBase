@@ -8,7 +8,7 @@
 class ShadowMap
 {
 public:
-    ShadowMap(ID3D11Device* device, UINT width, UINT height);
+    ShadowMap(ID3D11Device* device, UINT size);
     ~ShadowMap();
 
     ID3D11ShaderResourceView* DepthMapSRV();

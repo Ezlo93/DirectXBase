@@ -5,19 +5,6 @@
 namespace Vertex
 {
 
-    struct BasicColor
-    {
-        XMFLOAT3 Pos;
-        XMFLOAT4 Color;
-    };
-
-    struct Basic32
-    {
-        XMFLOAT3 Pos;
-        XMFLOAT3 Normal;
-        XMFLOAT2 Tex;
-    };
-
     struct Standard
     {
         Standard(XMFLOAT3 p, XMFLOAT2 t, XMFLOAT3 n, XMFLOAT3 tu) : Pos(p), Tex(t), Normal(n), TangentU(tu) {}

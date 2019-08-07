@@ -1,12 +1,12 @@
 #include "ShadowMap.h"
 
-ShadowMap::ShadowMap(ID3D11Device* device, UINT width, UINT height)
-    : mWidth(width), mHeight(height), mDepthMapSRV(0), mDepthMapDSV(0)
+ShadowMap::ShadowMap(ID3D11Device* device, UINT size)
+    : mWidth(size), mHeight(size), mDepthMapSRV(0), mDepthMapDSV(0)
 {
     mViewport.TopLeftX = 0.0f;
     mViewport.TopLeftY = 0.0f;
-    mViewport.Width = static_cast<float>(width);
-    mViewport.Height = static_cast<float>(height);
+    mViewport.Width = static_cast<float>(size);
+    mViewport.Height = static_cast<float>(size);
     mViewport.MinDepth = 0.0f;
     mViewport.MaxDepth = 1.0f;
 
@@ -14,8 +14,8 @@ ShadowMap::ShadowMap(ID3D11Device* device, UINT width, UINT height)
     // the bits as DXGI_FORMAT_D24_UNORM_S8_UINT, whereas the SRV is going to interpret
     // the bits as DXGI_FORMAT_R24_UNORM_X8_TYPELESS.
     D3D11_TEXTURE2D_DESC texDesc;
-    texDesc.Width = mWidth;
-    texDesc.Height = mHeight;
+    texDesc.Width = size;
+    texDesc.Height = size;
     texDesc.MipLevels = 1;
     texDesc.ArraySize = 1;
     texDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
