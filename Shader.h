@@ -153,6 +153,24 @@ public:
 };
 
 
+class BlurShader : public Shader
+{
+public:
+    BlurShader(ID3D11Device* device, const std::wstring& filename);
+    ~BlurShader();
+
+    void SetWeights(const float _weights[9]) { weights->SetFloatArray(_weights, 0, 9); }
+    void SetInput(ID3D11ShaderResourceView* tex) { input->SetResource(tex); }
+    void SetOutput(ID3D11UnorderedAccessView* tex) { output->SetUnorderedAccessView(tex); }
+
+    ID3DX11EffectTechnique* HorizontalBlur;
+    ID3DX11EffectTechnique* VerticalBlur;
+
+    ID3DX11EffectScalarVariable* weights;
+    ID3DX11EffectShaderResourceVariable* input;
+    ID3DX11EffectUnorderedAccessViewVariable* output;
+};
+
 
 class Shaders
 {
@@ -164,4 +182,5 @@ public:
     static BasicTextureShader* basicTextureShader;
     static NormalMapShader* normalMapShader;
     static ShadowMapShader* shadowMapShader;
+    static BlurShader* blurShader;
 };

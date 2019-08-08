@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Blur.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ControllerInput.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="TextureToView.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Blur.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ControllerInput.h" />
     <ClInclude Include="d3dx11effect.h" />

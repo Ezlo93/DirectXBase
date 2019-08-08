@@ -15,6 +15,7 @@
 #include "Level.h"
 #include "ShadowMap.h"
 #include "TextureToView.h"
+#include "Blur.h"
 
 #define MODEL_PATH "data/models"
 #define TEXTURE_PATH "data/textures"
@@ -58,6 +59,8 @@ private:
     void buildShadowTransform();
 
     /*render related*/
+    Blur* blurEffect;
+
     ID3D11ShaderResourceView* mOffscreenSRV;
     ID3D11UnorderedAccessView* mOffscreenUAV;
     ID3D11RenderTargetView* mOffscreenRTV;

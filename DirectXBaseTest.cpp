@@ -53,8 +53,8 @@ DXTest::DXTest(HINSTANCE hProgramID) : DirectXBase(hProgramID)
     clearColor[3] = 1.f;
 
     clearColorSec[0] = 0.0f;
-    clearColorSec[1] = 0.8f;
-    clearColorSec[2] = 0.8f;
+    clearColorSec[1] = 0.f;
+    clearColorSec[2] = 0.f;
     clearColorSec[3] = 1.f;
 
 }
@@ -170,6 +170,9 @@ void DXTest::OnWindowResize()
     DirectXBase::OnWindowResize();
 
     buildOffscreenRender();
+    if(!blurEffect) blurEffect = new Blur();
+    blurEffect->Init(device, wndWidth, wndHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+
 
     /*recalc camera*/
     gCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
@@ -436,8 +439,13 @@ void DXTest::Draw()
     deviceContext->RSSetState(0);
     deviceContext->OMSetDepthStencilState(0, 0);
 
+    ///*apply blur*/
+    //renderTargets[0] = renderTargetView;
+    //deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
 
-    /*restore back buffer*/
+    //blurEffect->BlurSRV(deviceContext, mOffscreenSRV, mOffscreenUAV, 4);
+
+    ///*restore back buffer*/
     //deviceContext->RSSetState(0);
 
     //renderTargets[0] = renderTargetView;

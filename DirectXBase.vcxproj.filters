@@ -71,6 +71,9 @@
     <ClCompile Include="TextureToView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Blur.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DirectXBase.h">
@@ -137,6 +140,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TextureToView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blur.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

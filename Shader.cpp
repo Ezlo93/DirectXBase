@@ -1,10 +1,15 @@
 #include "Shader.h"
 #include <fstream>
 
+
+
 SkyboxShader* Shaders::skyShader = 0;
 BasicTextureShader* Shaders::basicTextureShader = 0;
 NormalMapShader* Shaders::normalMapShader = 0;
 ShadowMapShader* Shaders::shadowMapShader = 0;
+BlurShader* Shaders::blurShader = 0;
+
+
 
 void Shaders::Init(ID3D11Device* device)
 {
@@ -12,6 +17,7 @@ void Shaders::Init(ID3D11Device* device)
     basicTextureShader = new BasicTextureShader(device, L"data/shader/basictexture.fxo");
     normalMapShader = new NormalMapShader(device, L"data/shader/normalmap.fxo");
     shadowMapShader = new ShadowMapShader(device, L"data/shader/shadowmap.fxo");
+    blurShader = new BlurShader(device, L"data/shader/blur.fxo");
 }
 
 void Shaders::Destroy()
@@ -20,6 +26,7 @@ void Shaders::Destroy()
     delete basicTextureShader; basicTextureShader = 0;
     delete normalMapShader; normalMapShader = 0;
     delete shadowMapShader; shadowMapShader = 0;
+    delete blurShader; blurShader = 0;
 }
 
 
@@ -168,4 +175,22 @@ ShadowMapShader::~ShadowMapShader()
     DXRelease(World);
     DXRelease(WorldInvTranspose);
     DXRelease(EyePosW);
+}
+
+
+/*blur shader*/
+
+BlurShader::BlurShader(ID3D11Device* device, const std::wstring& filename) : Shader(device, filename)
+{
+    HorizontalBlur = effect->GetTechniqueByName("HorzBlur");
+    VerticalBlur = effect->GetTechniqueByName("VertBlur");
+
+    weights = effect->GetVariableByName("gWeights")->AsScalar();
+    input = effect->GetVariableByName("gInput")->AsShaderResource();
+    output = effect->GetVariableByName("gOutput")->AsUnorderedAccessView();
+}
+
+BlurShader::~BlurShader()
+{
+
 }

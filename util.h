@@ -17,7 +17,7 @@ using namespace std;
 /*often used macros and functions*/
 
 /*release Dx11 COMs*/
-#define DXRelease(x) { if(x){x->Release(); x = 0; }}
+#define DXRelease(x) { if(x && x != nullptr){x->Release(); x = 0; }}
 
 
 /*print to vs output, only in debug mode*/
