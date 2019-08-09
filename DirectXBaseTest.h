@@ -60,6 +60,7 @@ private:
 
     /*render related*/
     Blur blurEffect;
+    int blurStrength = 0;
 
     ID3D11Buffer* mScreenQuadVB;
     ID3D11Buffer* mScreenQuadIB;

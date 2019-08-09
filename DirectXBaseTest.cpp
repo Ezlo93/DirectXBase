@@ -339,6 +339,16 @@ void DXTest::Update(float deltaTime)
             renderWireFrame = !renderWireFrame;
         }
 
+        if (input->ButtonReleased(controllingInput, BUTTON_X))
+        {
+            blurStrength++;
+        }
+
+        if (input->ButtonReleased(controllingInput, BUTTON_Y))
+        {
+            if(blurStrength > 0) blurStrength--;
+        }
+
         if (input->ButtonReleased(controllingInput, BACK))
         {
             exit(0);
@@ -440,10 +450,14 @@ void DXTest::Draw()
     renderTargets[0] = renderTargetView;
     deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
 
-    blurEffect.BlurSRV(deviceContext, mOffscreenSRV, mOffscreenUAV, 4);
+    if (blurStrength > 0)
+    {
+        blurEffect.BlurSRV(deviceContext, mOffscreenSRV, mOffscreenUAV, blurStrength);
+    }
+    
 
 
-    DrawScreenQuad(blurEffect.getOutput());
+    DrawScreenQuad(mOffscreenSRV);
 
 
     /*default*/
@@ -548,7 +562,7 @@ void DXTest::DrawScreenQuad(ID3D11ShaderResourceView* srv)
     // Scale and shift quad to lower-right corner.
     XMMATRIX world = XMMatrixIdentity();
 
-    ID3DX11EffectTechnique* tech = Shaders::DebugTexFX->ViewRedTech;
+    ID3DX11EffectTechnique* tech = Shaders::DebugTexFX->ViewStandard;
     D3DX11_TECHNIQUE_DESC techDesc;
 
     tech->GetDesc(&techDesc);

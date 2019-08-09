@@ -206,11 +206,7 @@ BlurShader::~BlurShader()
 DebugTexEffect::DebugTexEffect(ID3D11Device* device, const std::wstring& filename)
     : Shader(device, filename)
 {
-    ViewArgbTech = effect->GetTechniqueByName("ViewArgbTech");
-    ViewRedTech = effect->GetTechniqueByName("ViewRedTech");
-    ViewGreenTech = effect->GetTechniqueByName("ViewGreenTech");
-    ViewBlueTech = effect->GetTechniqueByName("ViewBlueTech");
-    ViewAlphaTech = effect->GetTechniqueByName("ViewAlphaTech");
+    ViewStandard = effect->GetTechniqueByName("Standard");
 
     WorldViewProj = effect->GetVariableByName("gWorldViewProj")->AsMatrix();
     Texture = effect->GetVariableByName("gTexture")->AsShaderResource();
