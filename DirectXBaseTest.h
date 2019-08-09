@@ -14,7 +14,6 @@
 #include "ModelInstanceStatic.h"
 #include "Level.h"
 #include "ShadowMap.h"
-#include "TextureToView.h"
 #include "Blur.h"
 
 #define MODEL_PATH "data/models"
@@ -43,7 +42,6 @@ private:
     Level* testLevel;
     float clearColor[4], clearColorSec[4];
     Skybox* skybox;
-    TextureToView* texToView;
 
     /*lighting*/
     DirectionalLight gDirLights;
@@ -62,13 +60,12 @@ private:
 
     /*render related*/
     Blur blurEffect;
-    void drawTextureFullscreen(ID3D11ShaderResourceView* srv);
 
-    ID3D11ShaderResourceView* mOffscreenSRV;
-    ID3D11UnorderedAccessView* mOffscreenUAV;
-    ID3D11RenderTargetView* mOffscreenRTV;
+    ID3D11Buffer* mScreenQuadVB;
+    ID3D11Buffer* mScreenQuadIB;
 
-    void buildOffscreenRender();
+    void BuildScreenQuadGeometryBuffers();
+    void DrawScreenQuad(ID3D11ShaderResourceView* srv);
 
     bool renderWireFrame = false;
 };

@@ -103,6 +103,7 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting) : 
    }
 
 	if(!gUseLighting){
+		texColor.a = gMaterial.Diffuse.a;
 		return texColor;
 	}
 

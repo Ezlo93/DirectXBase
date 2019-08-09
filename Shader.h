@@ -168,6 +168,28 @@ public:
 };
 
 
+/*debug texture*/
+
+class DebugTexEffect : public Shader
+{
+public:
+    DebugTexEffect(ID3D11Device* device, const std::wstring& filename);
+    ~DebugTexEffect();
+
+    void SetWorldViewProj(CXMMATRIX M) { WorldViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
+    void SetTexture(ID3D11ShaderResourceView* tex) { Texture->SetResource(tex); }
+
+    ID3DX11EffectTechnique* ViewArgbTech;
+    ID3DX11EffectTechnique* ViewRedTech;
+    ID3DX11EffectTechnique* ViewGreenTech;
+    ID3DX11EffectTechnique* ViewBlueTech;
+    ID3DX11EffectTechnique* ViewAlphaTech;
+
+    ID3DX11EffectMatrixVariable* WorldViewProj;
+    ID3DX11EffectShaderResourceVariable* Texture;
+};
+
+
 class Shaders
 {
 public:
@@ -179,4 +201,5 @@ public:
     static NormalMapShader* normalMapShader;
     static ShadowMapShader* shadowMapShader;
     static BlurShader* blurShader;
+    static DebugTexEffect* DebugTexFX;
 };

@@ -66,9 +66,8 @@ DXTest::~DXTest()
     delete res; res = 0;
     delete testLevel;
 
-    DXRelease(mOffscreenSRV);
-    DXRelease(mOffscreenUAV);
-    DXRelease(mOffscreenRTV);
+    DXRelease(mScreenQuadVB);
+    DXRelease(mScreenQuadIB);
 
     RenderStates::Destroy();
     Shaders::Destroy();
@@ -154,9 +153,7 @@ bool DXTest::Initialisation()
     //gDirLights.Specular = XMFLOAT4(0.6f, 0.f, 0.f, 16.0f);
     //gDirLights.Direction = XMFLOAT3(.57735f, -0.57735f, .57735f);
 
-
-    texToView = new TextureToView();
-    texToView->Init(device);
+    BuildScreenQuadGeometryBuffers();
 
     OnWindowResize();
     //goFullscreen(true);
@@ -169,8 +166,6 @@ void DXTest::OnWindowResize()
 {
     DBOUT("wnd resize");
     DirectXBase::OnWindowResize();
-
-    buildOffscreenRender();
 
     blurEffect.Init(device, wndWidth, wndHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 
@@ -382,30 +377,26 @@ void DXTest::Draw()
         it->second->ShadowDraw(device, deviceContext, &gCamera, lview, lproj);
         it++;
     }
+
+    deviceContext->RSSetState(0);
     /*end of shadow map*/
 
 
     /*reset to offscreen texture rendertarget*/
 
-#ifdef POST_PROCESS
-    ID3D11RenderTargetView* renderTargets[1] = { mOffscreenRTV };
-#else
-    ID3D11RenderTargetView* renderTargets[1] = { renderTargetView };
-#endif
 
-    deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
-    
 
     /*clear buffers*/
     
-#ifdef POST_PROCESS
-    deviceContext->ClearRenderTargetView(mOffscreenRTV, clearColor);
-#else
-    deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
-#endif
 
-    deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+    ID3D11RenderTargetView* renderTargets[1] = { renderTargetView };
+    deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
     deviceContext->RSSetViewports(1, &mainViewport);
+
+
+    deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
+    deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
 
     if (!renderWireFrame)
     {
@@ -439,82 +430,124 @@ void DXTest::Draw()
         it++;
     }
 
+    DrawScreenQuad(shadowMap->DepthMapSRV());
+
     //render sky box last
     skybox->Draw(deviceContext, gCamera);
+
+    /*default*/
     deviceContext->RSSetState(0);
     deviceContext->OMSetDepthStencilState(0, 0);
+    ID3D11ShaderResourceView* nullSRV[16] = { 0 };
+    deviceContext->PSSetShaderResources(0, 16, nullSRV);
 
-
-
-#ifdef POST_PROCESS
-    /*apply blur*/
-    renderTargets[0] = renderTargetView;
-    deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
-
-    blurEffect.BlurSRV(deviceContext, mOffscreenSRV, mOffscreenUAV, 4);
-
-    /* finished render is always in mOffscreenSRV, doesnt matter if blur used or not*/
-
-
-    /*restore back buffer*/
-    deviceContext->ClearRenderTargetView(renderTargetView, clearColorSec);
-    deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-    deviceContext->IASetInputLayout(InputLayouts::Standard);
-    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    /*TEST*/
-    D3DX11_TECHNIQUE_DESC techDesc;
-    Shaders::basicTextureShader->BasicTextureNoLighting->GetDesc(&techDesc);
-
-    testLevel->modelsStatic[10001]->Draw(device, deviceContext, &gCamera, st, mOffscreenSRV);
-
-    
-#endif
 
     //show backbuffer
                      //this value is vsync => 0 is off, 1 - 4 sync intervalls
     swapChain->Present(0, 0);
 }
 
-/*create resources needed for render to texture*/
-void DXTest::buildOffscreenRender()
+
+
+void DXTest::BuildScreenQuadGeometryBuffers()
 {
-    DXRelease(mOffscreenSRV);
-    DXRelease(mOffscreenRTV);
-    DXRelease(mOffscreenUAV);
 
-    D3D11_TEXTURE2D_DESC texDesc;
+    //
+    // Extract the vertex elements we are interested in and pack the
+    // vertices of all the meshes into one vertex buffer.
+    //
 
-    texDesc.Width = wndWidth;
-    texDesc.Height = wndHeight;
-    texDesc.MipLevels = 1;
-    texDesc.ArraySize = 1;
-    texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    texDesc.SampleDesc.Count = 1;
-    texDesc.SampleDesc.Quality = 0;
-    texDesc.Usage = D3D11_USAGE_DEFAULT;
-    texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-    texDesc.CPUAccessFlags = 0;
-    texDesc.MiscFlags = 0;
+    std::vector<Vertex::Standard> Vertices(4);
+    std::vector<UINT> indices(6);
 
-    ID3D11Texture2D* offscreenTex = 0;
-    device->CreateTexture2D(&texDesc, 0, &offscreenTex);
+    // Position coordinates specified in NDC space.
+    Vertices[0] = Vertex::Standard(
+        -1.0f, -1.0f, 0.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f, -1.0f,
+        1.0f, 0.0f, 0.0f
+        );
 
-    // Null description means to create a view to all mipmap levels using 
-    // the format the texture was created with.
-    device->CreateShaderResourceView(offscreenTex, 0, &mOffscreenSRV);
-    device->CreateRenderTargetView(offscreenTex, 0, &mOffscreenRTV);
-    device->CreateUnorderedAccessView(offscreenTex, 0, &mOffscreenUAV);
+    Vertices[1] = Vertex::Standard(
+        -1.0f, +1.0f, 0.0f,
+        0.0f, 0.0f,
+        0.0f, 0.0f, -1.0f,
+        1.0f, 0.0f, 0.0f
+        );
 
-    // View saves a reference to the texture so we can release our reference.
-    DXRelease(offscreenTex);
+    Vertices[2] = Vertex::Standard(
+        +1.0f, +1.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 0.0f, -1.0f,
+        1.0f, 0.0f, 0.0f
+        );
 
+    Vertices[3] = Vertex::Standard(
+        +1.0f, -1.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 0.0f, -1.0f,
+        1.0f, 0.0f, 0.0f
+       );
+
+    indices[0] = 0;
+    indices[1] = 1;
+    indices[2] = 2;
+
+    indices[3] = 0;
+    indices[4] = 2;
+    indices[5] = 3;
+
+    D3D11_BUFFER_DESC vbd;
+    vbd.Usage = D3D11_USAGE_IMMUTABLE;
+    vbd.ByteWidth = sizeof(Vertex::Standard) * Vertices.size();
+    vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    vbd.CPUAccessFlags = 0;
+    vbd.MiscFlags = 0;
+    D3D11_SUBRESOURCE_DATA vinitData;
+    vinitData.pSysMem = &Vertices[0];
+    device->CreateBuffer(&vbd, &vinitData, &mScreenQuadVB);
+
+    //
+    // Pack the indices of all the meshes into one index buffer.
+    //
+
+    D3D11_BUFFER_DESC ibd;
+    ibd.Usage = D3D11_USAGE_IMMUTABLE;
+    ibd.ByteWidth = sizeof(UINT) * indices.size();
+    ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    ibd.CPUAccessFlags = 0;
+    ibd.MiscFlags = 0;
+    D3D11_SUBRESOURCE_DATA iinitData;
+    iinitData.pSysMem = &indices[0];
+    device->CreateBuffer(&ibd, &iinitData, &mScreenQuadIB);
 }
 
 
-void DXTest::drawTextureFullscreen(ID3D11ShaderResourceView* srv)
+void DXTest::DrawScreenQuad(ID3D11ShaderResourceView* srv)
 {
 
+    UINT stride = sizeof(Vertex::Standard);
+    UINT offset = 0;
+
+    deviceContext->IASetInputLayout(InputLayouts::Standard);
+    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    deviceContext->IASetVertexBuffers(0, 1, &mScreenQuadVB, &stride, &offset);
+    deviceContext->IASetIndexBuffer(mScreenQuadIB, DXGI_FORMAT_R32_UINT, 0);
+
+    // Scale and shift quad to lower-right corner.
+    XMMATRIX world = XMMatrixIdentity();
+
+    ID3DX11EffectTechnique* tech = Shaders::DebugTexFX->ViewRedTech;
+    D3DX11_TECHNIQUE_DESC techDesc;
+
+    tech->GetDesc(&techDesc);
+    for (UINT p = 0; p < techDesc.Passes; ++p)
+    {
+        Shaders::DebugTexFX->SetWorldViewProj(world);
+        Shaders::DebugTexFX->SetTexture(srv);
+
+        tech->GetPassByIndex(p)->Apply(0, deviceContext);
+        deviceContext->DrawIndexed(6, 0, 0);
+    }
 
 }
