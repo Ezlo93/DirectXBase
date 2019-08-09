@@ -11,6 +11,7 @@ public:
     static ID3D11RasterizerState* wireFrame;
     static ID3D11RasterizerState* noCullRS;
     static ID3D11DepthStencilState* equalsDSS;
+    static ID3D11DepthStencilState* noDSS;
     static ID3D11BlendState* alphaToCoverageBS;
     static ID3D11BlendState* transparentBS;
 

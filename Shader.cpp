@@ -96,6 +96,7 @@ BasicTextureShader::BasicTextureShader(ID3D11Device* device, const std::wstring&
     ShadowTransform = effect->GetVariableByName("gShadowTransform")->AsMatrix();
     ShadowMap = effect->GetVariableByName("gShadowMap")->AsShaderResource();
 
+    DBOUT("finished setting basic shader vars\n");
 }
 
 BasicTextureShader::~BasicTextureShader()
@@ -132,6 +133,7 @@ NormalMapShader::NormalMapShader(ID3D11Device* device, const std::wstring& filen
     ShadowMap = effect->GetVariableByName("gShadowMap")->AsShaderResource();
     ShadowTransform = effect->GetVariableByName("gShadowTransform")->AsMatrix();
 
+    DBOUT("finished setting normal shader vars\n");
 }
 
 NormalMapShader::~NormalMapShader()
@@ -161,9 +163,9 @@ ShadowMapShader::ShadowMapShader(ID3D11Device* device, const std::wstring& filen
     WorldViewProj = effect->GetVariableByName("gWorldViewProj")->AsMatrix();
     World = effect->GetVariableByName("gWorld")->AsMatrix();
     WorldInvTranspose = effect->GetVariableByName("gWorldInvTranspose")->AsMatrix();
-    TexTransform = effect->GetVariableByName("gTexTransform")->AsMatrix();
-    EyePosW = effect->GetVariableByName("gEyePosW")->AsVector();
     DiffuseMap = effect->GetVariableByName("gDiffuseMap")->AsShaderResource();
+
+    DBOUT("finished setting shadowmap shader vars\n");
 }
 
 ShadowMapShader::~ShadowMapShader()
@@ -171,10 +173,9 @@ ShadowMapShader::~ShadowMapShader()
     DXRelease(ShadowMapTech);
     DXRelease(WorldViewProj);
     DXRelease(DiffuseMap);
-    DXRelease(TexTransform);
     DXRelease(World);
     DXRelease(WorldInvTranspose);
-    DXRelease(EyePosW);
+    DXRelease(ViewProj);
 }
 
 
@@ -188,6 +189,8 @@ BlurShader::BlurShader(ID3D11Device* device, const std::wstring& filename) : Sha
     weights = effect->GetVariableByName("gWeights")->AsScalar();
     input = effect->GetVariableByName("gInput")->AsShaderResource();
     output = effect->GetVariableByName("gOutput")->AsUnorderedAccessView();
+
+    DBOUT("finished setting blur shader vars\n");
 }
 
 BlurShader::~BlurShader()

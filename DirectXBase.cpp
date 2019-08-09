@@ -233,7 +233,7 @@ bool DirectXBase::InitDirect3D()
     DXRelease(dxgiAdapter);
     DXRelease(dxgiFactory);
 
-    OnWindowResize();
+    DirectXBase::OnWindowResize();
 
     return true;
 }

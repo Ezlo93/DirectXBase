@@ -20,6 +20,8 @@
 #define MODEL_PATH "data/models"
 #define TEXTURE_PATH "data/textures"
 
+#define POST_PROCESS
+
 class DXTest : public DirectXBase
 {
 public:
@@ -59,7 +61,8 @@ private:
     void buildShadowTransform();
 
     /*render related*/
-    Blur* blurEffect;
+    Blur blurEffect;
+    void drawTextureFullscreen(ID3D11ShaderResourceView* srv);
 
     ID3D11ShaderResourceView* mOffscreenSRV;
     ID3D11UnorderedAccessView* mOffscreenUAV;

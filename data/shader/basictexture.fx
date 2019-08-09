@@ -102,6 +102,10 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting) : 
 		clip(texColor.a - 0.1f); //alpha clipping
    }
 
+	if(!gUseLighting){
+		return texColor;
+	}
+
 	// Lighting.
 	//
 
@@ -116,9 +120,7 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting) : 
 	float3 shadow = float3(1.0f, 1.0f, 1.0f);
 	shadow[0] = CalcShadowFactor(samShadow, gShadowMap, pin.ShadowPosH);
 
-	if(!gUseLighting){
-		return texColor * shadow[0];
-	}
+
 
 	// Sum the light contribution from each light source.  
 

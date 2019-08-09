@@ -1,64 +1,62 @@
 #include "Blur.h"
 
-Blur::Blur() : outputSRV(0), outputUAV(0), width(0), height(0), format(DXGI_FORMAT_R8G8B8A8_UNORM)
+Blur::Blur() : mBlurredOutputTexSRV(0), mBlurredOutputTexUAV(0), width(0), height(0), format(DXGI_FORMAT_R8G8B8A8_UNORM)
 {
 }
 
 Blur::~Blur()
 {
-    DXRelease(outputSRV);
-    DXRelease(outputUAV);
+    DXRelease(mBlurredOutputTexSRV);
+    DXRelease(mBlurredOutputTexUAV);
 }
 
 ID3D11ShaderResourceView* Blur::getOutput()
 {
-    return outputSRV;
+    return mBlurredOutputTexSRV;
 }
 
 void Blur::Init(ID3D11Device* device, UINT _width, UINT _height, DXGI_FORMAT _format)
 {
     
-    DXRelease(outputSRV);
-    DXRelease(outputUAV);
+    // Start fresh.
+    DXRelease(mBlurredOutputTexSRV);
+    DXRelease(mBlurredOutputTexUAV);
 
     width = _width;
     height = _height;
     format = _format;
 
-    /*create texture and views*/
+    D3D11_TEXTURE2D_DESC blurredTexDesc;
+    blurredTexDesc.Width = width;
+    blurredTexDesc.Height = height;
+    blurredTexDesc.MipLevels = 1;
+    blurredTexDesc.ArraySize = 1;
+    blurredTexDesc.Format = format;
+    blurredTexDesc.SampleDesc.Count = 1;
+    blurredTexDesc.SampleDesc.Quality = 0;
+    blurredTexDesc.Usage = D3D11_USAGE_DEFAULT;
+    blurredTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+    blurredTexDesc.CPUAccessFlags = 0;
+    blurredTexDesc.MiscFlags = 0;
 
-    D3D11_TEXTURE2D_DESC bTex;
-    bTex.Width = width;
-    bTex.Height = height;
-    bTex.Format = format;
-    bTex.MipLevels = 1;
-    bTex.ArraySize = 1;
-    bTex.SampleDesc.Count = 1;
-    bTex.SampleDesc.Quality = 0;
-    bTex.Usage = D3D11_USAGE_DEFAULT;
-    bTex.CPUAccessFlags = 0;
-    bTex.MipLevels = 0;
-    bTex.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+    ID3D11Texture2D* blurredTex = 0;
+    device->CreateTexture2D(&blurredTexDesc, 0, &blurredTex);
 
-    ID3D11Texture2D* tex = 0;
-    device->CreateTexture2D(&bTex, 0, &tex);
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+    srvDesc.Format = format;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.MipLevels = 1;
+    device->CreateShaderResourceView(blurredTex, &srvDesc, &mBlurredOutputTexSRV);
 
-    if (tex == nullptr) return;
+    D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+    uavDesc.Format = format;
+    uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+    uavDesc.Texture2D.MipSlice = 0;
+    device->CreateUnorderedAccessView(blurredTex, &uavDesc, &mBlurredOutputTexUAV);
 
-    D3D11_SHADER_RESOURCE_VIEW_DESC srvD;
-    srvD.Format = format;
-    srvD.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    srvD.Texture2D.MostDetailedMip = 0;
-    srvD.Texture2D.MipLevels = 1;
-    device->CreateShaderResourceView(tex, &srvD, &outputSRV);
-
-    D3D11_UNORDERED_ACCESS_VIEW_DESC uavD;
-    uavD.Format = format;
-    uavD.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
-    uavD.Texture2D.MipSlice = 0;
-    device->CreateUnorderedAccessView(tex, &uavD, &outputUAV);
-
-    DXRelease(tex);
+    // Views save a reference to the texture so we can release our reference.
+    DXRelease(blurredTex);
 }
 
 void Blur::BlurSRV(ID3D11DeviceContext* context, ID3D11ShaderResourceView* inputSRV, ID3D11UnorderedAccessView* inputUAV, int count)
@@ -74,7 +72,7 @@ void Blur::BlurSRV(ID3D11DeviceContext* context, ID3D11ShaderResourceView* input
         for (UINT p = 0; p < tech.Passes; p++)
         {
             Shaders::blurShader->SetInput(inputSRV);
-            Shaders::blurShader->SetOutput(outputUAV);
+            Shaders::blurShader->SetOutput(mBlurredOutputTexUAV);
 
             Shaders::blurShader->HorizontalBlur->GetPassByIndex(p)->Apply(0, context);
 
@@ -95,7 +93,7 @@ void Blur::BlurSRV(ID3D11DeviceContext* context, ID3D11ShaderResourceView* input
 
         for (UINT p = 0; p < tech.Passes; p++)
         {
-            Shaders::blurShader->SetInput(outputSRV);
+            Shaders::blurShader->SetInput(mBlurredOutputTexSRV);
             Shaders::blurShader->SetOutput(inputUAV);
             Shaders::blurShader->VerticalBlur->GetPassByIndex(p)->Apply(0, context);
 

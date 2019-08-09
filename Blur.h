@@ -24,6 +24,6 @@ private:
     UINT width, height;
     DXGI_FORMAT format;
 
-    ID3D11ShaderResourceView* outputSRV;
-    ID3D11UnorderedAccessView* outputUAV;
+    ID3D11ShaderResourceView* mBlurredOutputTexSRV;
+    ID3D11UnorderedAccessView* mBlurredOutputTexUAV;
 };

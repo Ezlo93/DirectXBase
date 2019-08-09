@@ -137,8 +137,6 @@ public:
     void SetWorldViewProj(CXMMATRIX M) { WorldViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
     void SetWorld(CXMMATRIX M) { World->SetMatrix(reinterpret_cast<const float*>(&M)); }
     void SetWorldInvTranspose(CXMMATRIX M) { WorldInvTranspose->SetMatrix(reinterpret_cast<const float*>(&M)); }
-    void SetTexTransform(CXMMATRIX M) { TexTransform->SetMatrix(reinterpret_cast<const float*>(&M)); }
-    void SetEyePosW(const XMFLOAT3& v) { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
     void SetDiffuseMap(ID3D11ShaderResourceView* tex) { DiffuseMap->SetResource(tex); }
 
     ID3DX11EffectTechnique* ShadowMapTech;
@@ -147,8 +145,6 @@ public:
     ID3DX11EffectMatrixVariable* WorldViewProj;
     ID3DX11EffectMatrixVariable* World;
     ID3DX11EffectMatrixVariable* WorldInvTranspose;
-    ID3DX11EffectMatrixVariable* TexTransform;
-    ID3DX11EffectVectorVariable* EyePosW;
     ID3DX11EffectShaderResourceVariable* DiffuseMap;
 };
 

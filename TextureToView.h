@@ -9,7 +9,6 @@ class TextureToView
 
 public:
     void Init(ID3D11Device* device);
-    void Draw();
 
     ID3D11Buffer* getVertexBuffer() { return ttvIB; }
     ID3D11Buffer* getIndexBuffer() { return ttvIB; }

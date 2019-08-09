@@ -59,9 +59,3 @@ void TextureToView::Init(ID3D11Device *device)
     device->CreateBuffer(&ibd, &iinitData, &ttvIB);
 
 }
-
-void TextureToView::Draw()
-{
-
-    
-}

@@ -28,10 +28,16 @@ public:
         return World;
     }
 
+    /*standard draw call*/
     void Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera *c, XMMATRIX shadowT);
+    /*stupid for fun call, overwrite textures with srv*/
+    void Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX shadowT, ID3D11ShaderResourceView* srv);
+
     void ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX lightView, XMMATRIX lightProj);
     void OverwriteDiffuseMap(std::string id);
     void OverwriteNormalMap(std::string id);
+
+
 
     /*public properties*/
     XMFLOAT3 Translation, Rotation, Scale;

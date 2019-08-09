@@ -29,8 +29,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
     if (!dxbase.Initialisation())
         return 0;
 
-    dxbase.OnWindowResize();
-
     auto end = chrono::system_clock::now();
     chrono::duration<double> elapsed = end - start;
 
@@ -53,14 +51,15 @@ DXTest::DXTest(HINSTANCE hProgramID) : DirectXBase(hProgramID)
     clearColor[3] = 1.f;
 
     clearColorSec[0] = 0.0f;
-    clearColorSec[1] = 0.f;
-    clearColorSec[2] = 0.f;
+    clearColorSec[1] = 0.2f;
+    clearColorSec[2] = 0.2f;
     clearColorSec[3] = 1.f;
 
 }
 
 DXTest::~DXTest()
 {
+    deviceContext->ClearState();
 
     delete input; input = 0;
     delete skybox; skybox = 0;
@@ -83,6 +82,10 @@ bool DXTest::Initialisation()
     {
         return false;
     }
+
+    Shaders::Init(device);
+    InputLayouts::Init(device);
+    RenderStates::Init(device);
 
     /*check data structure integrity*/
     std::filesystem::path modelPath(MODEL_PATH);
@@ -119,11 +122,6 @@ bool DXTest::Initialisation()
     res->getTextureCollection()->SetDefaultTexture("default");
     res->getModelCollection()->SetDefaultModel("defaultCube");
 
-    Shaders::Init(device);
-    InputLayouts::Init(device);
-    RenderStates::Init(device);
-
-
     /*create 100 unit radius sized skysphere*/
     skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 100.f);
 
@@ -156,9 +154,11 @@ bool DXTest::Initialisation()
     //gDirLights.Specular = XMFLOAT4(0.6f, 0.f, 0.f, 16.0f);
     //gDirLights.Direction = XMFLOAT3(.57735f, -0.57735f, .57735f);
 
+
     texToView = new TextureToView();
     texToView->Init(device);
 
+    OnWindowResize();
     //goFullscreen(true);
 
     return true;
@@ -167,11 +167,12 @@ bool DXTest::Initialisation()
 
 void DXTest::OnWindowResize()
 {
+    DBOUT("wnd resize");
     DirectXBase::OnWindowResize();
 
     buildOffscreenRender();
-    if(!blurEffect) blurEffect = new Blur();
-    blurEffect->Init(device, wndWidth, wndHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+
+    blurEffect.Init(device, wndWidth, wndHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 
 
     /*recalc camera*/
@@ -381,22 +382,30 @@ void DXTest::Draw()
         it->second->ShadowDraw(device, deviceContext, &gCamera, lview, lproj);
         it++;
     }
-
+    /*end of shadow map*/
 
 
     /*reset to offscreen texture rendertarget*/
-    deviceContext->RSSetState(0);
 
+#ifdef POST_PROCESS
+    ID3D11RenderTargetView* renderTargets[1] = { mOffscreenRTV };
+#else
     ID3D11RenderTargetView* renderTargets[1] = { renderTargetView };
-    //ID3D11RenderTargetView* renderTargets[1] = { mOffscreenRTV };
+#endif
+
     deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
-    deviceContext->RSSetViewports(1, &mainViewport);
+    
 
     /*clear buffers*/
+    
+#ifdef POST_PROCESS
+    deviceContext->ClearRenderTargetView(mOffscreenRTV, clearColor);
+#else
     deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
-    //deviceContext->ClearRenderTargetView(mOffscreenRTV, clearColor);
-    deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+#endif
 
+    deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+    deviceContext->RSSetViewports(1, &mainViewport);
 
     if (!renderWireFrame)
     {
@@ -407,10 +416,6 @@ void DXTest::Draw()
         deviceContext->RSSetState(RenderStates::wireFrame);
     }
     
-    deviceContext->IASetInputLayout(InputLayouts::Standard);
-    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-
     /*set shader constants that are not object dependant*/
     /*basic shader*/
     Shaders::basicTextureShader->SetEyePosW(gCamera.getPosition());
@@ -439,49 +444,33 @@ void DXTest::Draw()
     deviceContext->RSSetState(0);
     deviceContext->OMSetDepthStencilState(0, 0);
 
-    ///*apply blur*/
-    //renderTargets[0] = renderTargetView;
-    //deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
-
-    //blurEffect->BlurSRV(deviceContext, mOffscreenSRV, mOffscreenUAV, 4);
-
-    ///*restore back buffer*/
-    //deviceContext->RSSetState(0);
-
-    //renderTargets[0] = renderTargetView;
-    //deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
-
-    //deviceContext->ClearRenderTargetView(renderTargetView, clearColorSec);
-    //deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-    //deviceContext->IASetInputLayout(InputLayouts::Standard);
-    //deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 
-    //UINT stride = sizeof(Vertex::Standard);
-    //UINT offset = 0;
-    //XMMATRIX identity = XMMatrixIdentity();
+#ifdef POST_PROCESS
+    /*apply blur*/
+    renderTargets[0] = renderTargetView;
+    deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
 
-    //ID3DX11EffectTechnique* texOnlyTech = Shaders::basicTextureShader->BasicTextureNoLighting;
-    //D3DX11_TECHNIQUE_DESC techDesc;
+    blurEffect.BlurSRV(deviceContext, mOffscreenSRV, mOffscreenUAV, 4);
 
-    //texOnlyTech->GetDesc(&techDesc);
-    //for (UINT p = 0; p < techDesc.Passes; ++p)
-    //{
-    //    ID3D11Buffer* b = texToView->getVertexBuffer();
-    //    deviceContext->IASetVertexBuffers(0, 1, &b, &stride, &offset);
-    //    deviceContext->IASetIndexBuffer(texToView->getIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+    /* finished render is always in mOffscreenSRV, doesnt matter if blur used or not*/
 
-    //    Shaders::basicTextureShader->SetWorld(identity);
-    //    Shaders::basicTextureShader->SetWorldInvTranspose(identity);
-    //    Shaders::basicTextureShader->SetWorldViewProj(identity);
-    //    Shaders::basicTextureShader->SetTexTransform(identity);
-    //    Shaders::basicTextureShader->SetTexture(mOffscreenSRV);
 
-    //    texOnlyTech->GetPassByIndex(p)->Apply(0, deviceContext);
-    //    deviceContext->DrawIndexed(6, 0, 0);
-    //}
+    /*restore back buffer*/
+    deviceContext->ClearRenderTargetView(renderTargetView, clearColorSec);
+    deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
+    deviceContext->IASetInputLayout(InputLayouts::Standard);
+    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    /*TEST*/
+    D3DX11_TECHNIQUE_DESC techDesc;
+    Shaders::basicTextureShader->BasicTextureNoLighting->GetDesc(&techDesc);
+
+    testLevel->modelsStatic[10001]->Draw(device, deviceContext, &gCamera, st, mOffscreenSRV);
+
+    
+#endif
 
     //show backbuffer
                      //this value is vsync => 0 is off, 1 - 4 sync intervalls
@@ -491,31 +480,41 @@ void DXTest::Draw()
 /*create resources needed for render to texture*/
 void DXTest::buildOffscreenRender()
 {
-    DXRelease(mOffscreenRTV);
     DXRelease(mOffscreenSRV);
+    DXRelease(mOffscreenRTV);
     DXRelease(mOffscreenUAV);
 
-    D3D11_TEXTURE2D_DESC tDesc;
+    D3D11_TEXTURE2D_DESC texDesc;
 
-    tDesc.Width = wndWidth;
-    tDesc.Height = wndHeight;
-    tDesc.MipLevels = 1;
-    tDesc.ArraySize = 1;
-    tDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    tDesc.SampleDesc.Count = 1;
-    tDesc.SampleDesc.Quality = 0;
-    tDesc.Usage = D3D11_USAGE_DEFAULT;
-    tDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-    tDesc.CPUAccessFlags = 0;
-    tDesc.MiscFlags = 0;
+    texDesc.Width = wndWidth;
+    texDesc.Height = wndHeight;
+    texDesc.MipLevels = 1;
+    texDesc.ArraySize = 1;
+    texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    texDesc.SampleDesc.Count = 1;
+    texDesc.SampleDesc.Quality = 0;
+    texDesc.Usage = D3D11_USAGE_DEFAULT;
+    texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+    texDesc.CPUAccessFlags = 0;
+    texDesc.MiscFlags = 0;
 
-    ID3D11Texture2D* tex = 0;
-    device->CreateTexture2D(&tDesc, 0, &tex);
+    ID3D11Texture2D* offscreenTex = 0;
+    device->CreateTexture2D(&texDesc, 0, &offscreenTex);
 
-    device->CreateShaderResourceView(tex, 0, &mOffscreenSRV);
-    device->CreateRenderTargetView(tex, 0, &mOffscreenRTV);
-    device->CreateUnorderedAccessView(tex, 0, &mOffscreenUAV);
+    // Null description means to create a view to all mipmap levels using 
+    // the format the texture was created with.
+    device->CreateShaderResourceView(offscreenTex, 0, &mOffscreenSRV);
+    device->CreateRenderTargetView(offscreenTex, 0, &mOffscreenRTV);
+    device->CreateUnorderedAccessView(offscreenTex, 0, &mOffscreenUAV);
 
-    DXRelease(tex);
+    // View saves a reference to the texture so we can release our reference.
+    DXRelease(offscreenTex);
+
+}
+
+
+void DXTest::drawTextureFullscreen(ID3D11ShaderResourceView* srv)
+{
+
 
 }

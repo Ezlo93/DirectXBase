@@ -5,9 +5,11 @@ ID3D11RasterizerState* RenderStates::wireFrame = 0;
 ID3D11RasterizerState* RenderStates::noCullRS = 0;
 
 ID3D11DepthStencilState* RenderStates::equalsDSS = 0;
+ID3D11DepthStencilState* RenderStates::noDSS = 0;
 
 ID3D11BlendState* RenderStates::alphaToCoverageBS = 0;
 ID3D11BlendState* RenderStates::transparentBS = 0;
+
 
 void RenderStates::Init(ID3D11Device* device)
 {
@@ -45,6 +47,15 @@ void RenderStates::Init(ID3D11Device* device)
     equalsDesc.DepthFunc = D3D11_COMPARISON_EQUAL;
 
     device->CreateDepthStencilState(&equalsDesc, &equalsDSS);
+
+    //
+// no depth
+//
+    D3D11_DEPTH_STENCIL_DESC noDesc;
+    ZeroMemory(&equalsDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
+    noDesc.DepthEnable = false;
+
+    device->CreateDepthStencilState(&noDesc, &noDSS);
 
     //
     // AlphaToCoverageBS
