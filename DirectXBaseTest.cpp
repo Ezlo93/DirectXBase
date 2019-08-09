@@ -68,6 +68,9 @@ DXTest::~DXTest()
 
     DXRelease(mScreenQuadVB);
     DXRelease(mScreenQuadIB);
+    DXRelease(mOffscreenSRV);
+    DXRelease(mOffscreenUAV);
+    DXRelease(mOffscreenRTV);
 
     RenderStates::Destroy();
     Shaders::Destroy();
@@ -167,6 +170,7 @@ void DXTest::OnWindowResize()
     DBOUT("wnd resize");
     DirectXBase::OnWindowResize();
 
+    BuildOffscreenViews();
     blurEffect.Init(device, wndWidth, wndHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 
 
@@ -383,18 +387,15 @@ void DXTest::Draw()
 
 
     /*reset to offscreen texture rendertarget*/
-
-
-
     /*clear buffers*/
     
-
-    ID3D11RenderTargetView* renderTargets[1] = { renderTargetView };
+    //ID3D11RenderTargetView* renderTargets[1] = { renderTargetView };
+    ID3D11RenderTargetView* renderTargets[1] = { mOffscreenRTV };
     deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
     deviceContext->RSSetViewports(1, &mainViewport);
 
-
     deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
+    //deviceContext->ClearRenderTargetView(mOffscreenRTV, clearColor);
     deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 
@@ -430,10 +431,20 @@ void DXTest::Draw()
         it++;
     }
 
-    DrawScreenQuad(shadowMap->DepthMapSRV());
-
     //render sky box last
     skybox->Draw(deviceContext, gCamera);
+
+
+    /*blur*/
+
+    renderTargets[0] = renderTargetView;
+    deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
+
+    blurEffect.BlurSRV(deviceContext, mOffscreenSRV, mOffscreenUAV, 4);
+
+
+    DrawScreenQuad(blurEffect.getOutput());
+
 
     /*default*/
     deviceContext->RSSetState(0);
@@ -550,4 +561,40 @@ void DXTest::DrawScreenQuad(ID3D11ShaderResourceView* srv)
         deviceContext->DrawIndexed(6, 0, 0);
     }
 
+}
+
+
+void DXTest::BuildOffscreenViews()
+{
+    // We call this function everytime the window is resized so that the render target is a quarter
+    // the client area dimensions.  So Release the previous views before we create new ones.
+    DXRelease(mOffscreenSRV);
+    DXRelease(mOffscreenRTV);
+    DXRelease(mOffscreenUAV);
+
+    D3D11_TEXTURE2D_DESC texDesc;
+
+    texDesc.Width = wndWidth;
+    texDesc.Height = wndHeight;
+    texDesc.MipLevels = 1;
+    texDesc.ArraySize = 1;
+    texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    texDesc.SampleDesc.Count = 1;
+    texDesc.SampleDesc.Quality = 0;
+    texDesc.Usage = D3D11_USAGE_DEFAULT;
+    texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+    texDesc.CPUAccessFlags = 0;
+    texDesc.MiscFlags = 0;
+
+    ID3D11Texture2D* offscreenTex = 0;
+    device->CreateTexture2D(&texDesc, 0, &offscreenTex);
+
+    // Null description means to create a view to all mipmap levels using 
+    // the format the texture was created with.
+    device->CreateShaderResourceView(offscreenTex, 0, &mOffscreenSRV);
+    device->CreateRenderTargetView(offscreenTex, 0, &mOffscreenRTV);
+    device->CreateUnorderedAccessView(offscreenTex, 0, &mOffscreenUAV);
+
+    // View saves a reference to the texture so we can release our reference.
+    DXRelease(offscreenTex);
 }

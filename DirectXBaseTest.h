@@ -65,7 +65,12 @@ private:
     ID3D11Buffer* mScreenQuadIB;
 
     void BuildScreenQuadGeometryBuffers();
+    void BuildOffscreenViews();
     void DrawScreenQuad(ID3D11ShaderResourceView* srv);
+
+    ID3D11ShaderResourceView* mOffscreenSRV;
+    ID3D11UnorderedAccessView* mOffscreenUAV;
+    ID3D11RenderTargetView* mOffscreenRTV;
 
     bool renderWireFrame = false;
 };
