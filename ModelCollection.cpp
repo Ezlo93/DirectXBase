@@ -55,6 +55,10 @@ bool ModelCollection::Add(std::string file)
         return false;
     }
 
+    /*calculate collision box*/
+
+
+
     return AddModel(id, m);
 }
 

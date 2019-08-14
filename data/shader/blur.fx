@@ -23,14 +23,8 @@ groupshared float4 gCache[CacheSize];
 void HorzBlurCS(int3 groupThreadID : SV_GroupThreadID,
 				int3 dispatchThreadID : SV_DispatchThreadID)
 {
-	//
-	// Fill local thread storage to reduce bandwidth.  To blur 
-	// N pixels, we will need to load N + 2*BlurRadius pixels
-	// due to the blur radius.
-	//
-	
-	// This thread group runs N threads.  To get the extra 2*BlurRadius pixels, 
-	// have 2*BlurRadius threads sample an extra pixel.
+
+
 	if(groupThreadID.x < gBlurRadius)
 	{
 		// Clamp out of bound samples that occur at image borders.
@@ -71,14 +65,8 @@ void HorzBlurCS(int3 groupThreadID : SV_GroupThreadID,
 void VertBlurCS(int3 groupThreadID : SV_GroupThreadID,
 				int3 dispatchThreadID : SV_DispatchThreadID)
 {
-	//
-	// Fill local thread storage to reduce bandwidth.  To blur 
-	// N pixels, we will need to load N + 2*BlurRadius pixels
-	// due to the blur radius.
-	//
-	
-	// This thread group runs N threads.  To get the extra 2*BlurRadius pixels, 
-	// have 2*BlurRadius threads sample an extra pixel.
+
+
 	if(groupThreadID.y < gBlurRadius)
 	{
 		// Clamp out of bound samples that occur at image borders.

@@ -3,6 +3,7 @@
 #pragma comment(lib, "d3d11.lib")
 #include <d3d11.h>
 #include <DirectXMath.h>
+#include <DirectXCollision.h>
 #include <DirectXPackedVector.h>
 #include <stdexcept>
 #include <string>
@@ -48,14 +49,6 @@ using namespace std;
 #else 
 #define ASSERT(expr) //nothing
 #endif
-
-
-struct BoundingSphere
-{
-    BoundingSphere() : Center(0.0f, 0.0f, 0.0f), Radius(0.0f) {}
-    XMFLOAT3 Center;
-    float Radius;
-};
 
 
 class DXMath
