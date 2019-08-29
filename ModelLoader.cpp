@@ -4,7 +4,7 @@
 
 #pragma warning( disable : 26451)
 
-#define CHECK_NORMALS
+//#define CHECK_NORMALS
 
 bool ModelLoader::LoadB3D(const std::string& fileName, Model* m)
 {
@@ -45,6 +45,11 @@ bool ModelLoader::LoadB3D(const std::string& fileName, Model* m)
 
     m->meshes.reserve((size_t)numMeshes);
 
+    XMFLOAT3 cMin(+FLT_MAX, +FLT_MAX, +FLT_MAX);
+    XMFLOAT3 cMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+    XMVECTOR vMin = XMLoadFloat3(&cMin);
+    XMVECTOR vMax = XMLoadFloat3(&cMax);
 
     for (char i = 0; i < numMeshes; i++)
     {
@@ -129,6 +134,14 @@ bool ModelLoader::LoadB3D(const std::string& fileName, Model* m)
             file.read((char*)(&m->meshes[i]->vertices[j].TangentU.x), sizeof(float));
             file.read((char*)(&m->meshes[i]->vertices[j].TangentU.y), sizeof(float));
             file.read((char*)(&m->meshes[i]->vertices[j].TangentU.z), sizeof(float));
+
+            /*collision box related*/
+            XMVECTOR P = XMLoadFloat3(&m->meshes[i]->vertices[j].Pos);
+
+            vMin = XMVectorMin(vMin, P);
+            vMax = XMVectorMax(vMax, P);
+
+
         }
 
         /*number of indices*/
@@ -144,6 +157,10 @@ bool ModelLoader::LoadB3D(const std::string& fileName, Model* m)
 
     }
 
+    /*finalize collision*/
+
+    XMStoreFloat3(&m->collisionBox.Center, 0.5f * (vMin + vMax));
+    XMStoreFloat3(&m->collisionBox.Extents, 0.5f * (vMax - vMin));
 
     return true;
 }

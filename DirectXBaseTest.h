@@ -15,6 +15,7 @@
 #include "Level.h"
 #include "ShadowMap.h"
 #include "Blur.h"
+#include "Ball.h"
 
 #define MODEL_PATH "data/models"
 #define TEXTURE_PATH "data/textures"
@@ -42,6 +43,8 @@ private:
     Level* testLevel;
     float clearColor[4], clearColorSec[4];
     Skybox* skybox;
+
+    Ball* playball;
 
     /*lighting*/
     DirectionalLight gDirLights;

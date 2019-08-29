@@ -55,10 +55,6 @@ bool ModelCollection::Add(std::string file)
         return false;
     }
 
-    /*calculate collision box*/
-
-
-
     return AddModel(id, m);
 }
 
@@ -72,6 +68,7 @@ bool ModelCollection::AddModel(std::string id, Model* m)
     }
 
     m->CreateBuffers();
+    
     collection.insert(std::make_pair(id, m));
 
     return true;
@@ -179,6 +176,8 @@ Model* ModelCollection::CreateCubeModel(float width, float height, float depth)
 
     mesh->indices.assign(&i[0], &i[36]);
 
+    model->collisionBox.CreateFromPoints(model->collisionBox, 24, &v[0].Pos, sizeof(Vertex::Standard));
+
     /*material*/
 
     mat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
@@ -283,6 +282,8 @@ Model* ModelCollection::CreateSphereModel(float radius, int slices, int stacks)
         mesh->indices.push_back(baseIndex + i + 1);
     }
 
+    model->collisionBox.CreateFromPoints(model->collisionBox, 24, &mesh->vertices[0].Pos, sizeof(Vertex::Standard));
+
     /*material*/
 
     mat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
@@ -345,6 +346,9 @@ Model* ModelCollection::CreatePlaneModel(float width, float height)
     mesh->indices.push_back(0);
     mesh->indices.push_back(3);
     mesh->indices.push_back(2);
+
+    model->collisionBox.CreateFromPoints(model->collisionBox, 24, &mesh->vertices[0].Pos, sizeof(Vertex::Standard));
+
 
     /*material*/
     mat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);

@@ -6,6 +6,8 @@ Camera::Camera() : position(0.f,0.f,0.f), right(1.f,0.f,0.f),up(0.f,1.f,0.f),loo
     // 0.25f * pi = 90° FOV
     setLens(0.2f * XM_PI, 1.f, .01f, 1000.f);
     yAxis = XMVectorSet(0.f, 1.0f, 0.f, 0.f);
+
+    UpdateCollision();
 }
 
 Camera::~Camera()
@@ -113,6 +115,11 @@ float Camera::getFarWWidth()
 float Camera::getFarWHeight()
 {
     return farWHeight;
+}
+
+BoundingSphere& Camera::getCollisionSphere()
+{
+    return collision;
 }
 
 //set frustum
@@ -254,6 +261,16 @@ void Camera::UpdateViewMatrix()
     viewMatrix(1, 3) = 0.0f;
     viewMatrix(2, 3) = 0.0f;
     viewMatrix(3, 3) = 1.0f;
+
+    UpdateCollision();
+}
+
+void Camera::UpdateCollision()
+{
+
+    collision.Center = this->getPosition();
+    collision.Radius = .1f;
+
 }
 
 

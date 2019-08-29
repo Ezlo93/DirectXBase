@@ -140,7 +140,7 @@ bool DXTest::Initialisation()
     //ASSERT(modelsStatic.size() == 3);
 
 
-
+    playball = new Ball("defaultSphere", res);
 
     /*test light values*/
     gDirLights.Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
@@ -307,31 +307,29 @@ void DXTest::Update(float deltaTime)
         float ws = tlY * 10.f * deltaTime;
         float ss = tlX * 10.f * deltaTime;
 
-        gCamera.walk(ws);
-        gCamera.strafe(ss);
+
+        //for (auto& i : testLevel->modelsStatic)
+        //{
+        //    BoundingBox b;
+        //    
+        //    XMVECTOR r = XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&i.second->Rotation));
+        //    res->getModel(i.second->GetModelID())->collisionBox.Transform(b, 1.f, r, XMLoadFloat3(&i.second->Translation));
+
+        //    if (b.Contains(gCamera.getCollisionSphere()))
+        //        DBOUT("COLLISION with " << i.second->GetModelID().c_str() << "\n");
+
+        //}
+
+
+            gCamera.walk(ws);
+            gCamera.strafe(ss);
+
 
         float yaw = 1.5f * deltaTime * trX;
         float pitch = 1.5f * deltaTime * trY;
 
         gCamera.yaw(yaw);
         gCamera.pitch(pitch);
-
-        /*
-        if (in->buttons[BUTTON_A])
-        {
-            testLevel->modelsStatic[10011]->Translation.x += 2 * deltaTime;
-        }
-
-        if (in->buttons[BUTTON_X])
-        {
-            testLevel->modelsStatic[10011]->Translation.y += 2 * deltaTime;
-        }
-
-        if (in->buttons[BUTTON_Y])
-        {
-            testLevel->modelsStatic[10011]->Translation.z += 2 * deltaTime;
-        }
-        */
 
 
         if (input->ButtonPressed(controllingInput, START))
@@ -392,6 +390,8 @@ void DXTest::Draw()
         it++;
     }
 
+    playball->ShadowDraw(device, deviceContext, &gCamera, lview, lproj);
+
     deviceContext->RSSetState(0);
     /*end of shadow map*/
 
@@ -404,8 +404,8 @@ void DXTest::Draw()
     deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
     deviceContext->RSSetViewports(1, &mainViewport);
 
-    deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
-    //deviceContext->ClearRenderTargetView(mOffscreenRTV, clearColor);
+    //deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
+    deviceContext->ClearRenderTargetView(mOffscreenRTV, clearColor);
     deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 
@@ -440,6 +440,9 @@ void DXTest::Draw()
          it->second->Draw(device, deviceContext, &gCamera, st);
         it++;
     }
+
+    //draw ball
+    playball->Draw(device, deviceContext, &gCamera, st);
 
     //render sky box last
     skybox->Draw(deviceContext, gCamera);

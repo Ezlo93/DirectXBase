@@ -144,6 +144,7 @@ public:
         device->CreateBuffer(&ibd, &initData, &index);
 
     }
+
 };
 
 
@@ -152,9 +153,9 @@ class Model
 
 public:
 
+    BoundingBox collisionBox;
+
     std::vector<Mesh*> meshes;
-    BoundingOrientedBox collisionBox;
-    BoundingSphere collisionSphere;
 
     Model(ID3D11Device* dev);
     ~Model();

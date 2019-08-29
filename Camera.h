@@ -39,6 +39,9 @@ public:
     float getFarWWidth();
     float getFarWHeight();
 
+    //coll
+    BoundingSphere& getCollisionSphere();
+
     //set frustum
     void setLens(float _fovy, float _aspect, float _zn, float _zf);
 
@@ -72,6 +75,10 @@ private:
     XMVECTOR yAxis;
     XMFLOAT4X4 viewMatrix;
     XMFLOAT4X4 projMatrix;
+
+    BoundingSphere collision;
+
+    void UpdateCollision();
 
     //frustum
     float nearZ, farZ, aspectRatio, fovY, nearWHeight, farWHeight;
