@@ -354,6 +354,9 @@ void DXTest::Update(float deltaTime)
     }
 
 
+    //ball
+    playball->Update(deltaTime);
+
     /*rotate light*/
     lightRotationAngle += 0.25f * deltaTime;
     XMMATRIX R = XMMatrixRotationY(lightRotationAngle);

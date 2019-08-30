@@ -12,9 +12,10 @@ public:
     Ball(std::string id, ResourceManager* r);
     ~Ball();
 
+    XMFLOAT3 Translation, Rotation, Scale;
 
-    void Update();
-    void ConfirmUpdate();
+    void Update(float deltaTime);
+
     void Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX shadowT);
     void ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX lightView, XMMATRIX lightProj);
 private:
