@@ -8,9 +8,13 @@ Ball::Ball(std::string id, ResourceManager* r)
     modelID = id;
     XMStoreFloat4x4(&World, XMMatrixIdentity());
 
-    Position = XMFLOAT3(0.f,3.5f,0.f);
+    Position = XMFLOAT3(0.f,.51f,0.f);
     Scale = XMFLOAT3(2.f, 2.f, 2.f);
     Rotation = XMFLOAT3(0.f, 0.f, 0.f);
+
+    Velocity.y = 10.f;
+    bounceFactor = 0.75f;
+    bounceTime = 0.f;
 }
 
 Ball::~Ball()
@@ -21,13 +25,23 @@ Ball::~Ball()
 void Ball::Update(float deltaTime)
 {
 
+    if (Velocity.y <= 0.1f)
+    {
+        bounceTime = 0.f;
+        return;
+    }
+
+    bounceTime += deltaTime;
+
     if (Position.y > 0.5f)
     {
-        Position.y -= 1.f * deltaTime;
+        Position.y = Velocity.y * bounceTime - (GRAVITY / 2.f * bounceTime * bounceTime) + 0.51f;
     }
     else
     {
-        Position.y = 0.5f;
+        bounceTime = 0.f;
+        Position.y = 0.51f;
+        Velocity.y = Velocity.y * 0.75f;
     }
 
 }

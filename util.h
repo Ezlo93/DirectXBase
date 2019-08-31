@@ -50,6 +50,7 @@ using namespace std;
 #define ASSERT(expr) //nothing
 #endif
 
+#define GRAVITY 9.81f
 
 class DXMath
 {

@@ -12,7 +12,7 @@ public:
     Ball(std::string id, ResourceManager* r);
     ~Ball();
 
-    XMFLOAT3 Translation, Rotation, Scale;
+    XMFLOAT3 Translation, Rotation, Scale, Velocity;
 
     void Update(float deltaTime);
 
@@ -24,5 +24,7 @@ private:
     ResourceManager* res = 0;
     XMFLOAT4X4 World;
     XMFLOAT3 Position;
-    XMFLOAT3 Velocity;
+
+    float bounceFactor;
+    float bounceTime;
 };

@@ -347,6 +347,11 @@ void DXTest::Update(float deltaTime)
             if(blurStrength > 0) blurStrength--;
         }
 
+        if (input->ButtonReleased(controllingInput, BUTTON_A))
+        {
+            playball->Velocity.y = 10.f;
+        }
+
         if (input->ButtonReleased(controllingInput, BACK))
         {
             exit(0);
@@ -358,11 +363,11 @@ void DXTest::Update(float deltaTime)
     playball->Update(deltaTime);
 
     /*rotate light*/
-    lightRotationAngle += 0.25f * deltaTime;
-    XMMATRIX R = XMMatrixRotationY(lightRotationAngle);
-    XMVECTOR lDir = XMLoadFloat3(&originalLightDir);
-    lDir = XMVector3TransformNormal(lDir, R);
-    XMStoreFloat3(&gDirLights.Direction, lDir);
+    //lightRotationAngle += 0.25f * deltaTime;
+    //XMMATRIX R = XMMatrixRotationY(lightRotationAngle);
+    //XMVECTOR lDir = XMLoadFloat3(&originalLightDir);
+    //lDir = XMVector3TransformNormal(lDir, R);
+    //XMStoreFloat3(&gDirLights.Direction, lDir);
 
     /*build shadow transform*/
     buildShadowTransform();
