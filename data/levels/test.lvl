@@ -2,7 +2,7 @@
 13
 10001 defaultPlane basictexture 0 0 0 12 1 12 0 0 0 floor floor_nmap
 10005 defaultCube basictexture -18.5 0.61 2.5 1.2 1.2 1.2 0 10 0 bricks bricks_nmap
-10006 defaultCube normalmap -16.9 0.71 2.2 1.4 1.4 1.4 0 -40 0 bricks bricks_nmap
+10006 bar normalmap 0 0.5 -20 1 1 1 0 0 0 bricks bricks_nmap
 10007 defaultCube basicnotexture -15 .86 .8 1.7 1.7 1.7 0 170 0 bricks bricks_nmap
 10008 defaultCube basictexture -12.5 1.01 0 2 2 2 0 0 0 bricks bricks_nmap
 10009 plant normalmap -15 1.76 .65 1 1 1 0 25 0 none none

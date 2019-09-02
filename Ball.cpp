@@ -14,7 +14,7 @@ Ball::Ball(std::string id, ResourceManager* r)
 
     Velocity.y = 10.f;
     bounceFactor = 0.75f;
-    bounceTime = 0.f;
+    bounceTime = 1.f;
 }
 
 Ball::~Ball()
@@ -27,7 +27,9 @@ void Ball::Update(float deltaTime)
 
     if (Velocity.y <= 0.1f)
     {
+        
         bounceTime = 0.f;
+        Velocity.y = 0.f;
         return;
     }
 

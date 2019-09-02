@@ -16,6 +16,7 @@
 #include "ShadowMap.h"
 #include "Blur.h"
 #include "Ball.h"
+#include "Player.h"
 
 #define MODEL_PATH "data/models"
 #define TEXTURE_PATH "data/textures"

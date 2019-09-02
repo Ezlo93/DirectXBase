@@ -42,7 +42,7 @@ DXTest::DXTest(HINSTANCE hProgramID) : DirectXBase(hProgramID)
 {
     wndTitle = L"DirectXBaseTest";
 
-    gCamera.setPosition(0.f, 2.f, -15.f);
+    gCamera.setPosition(0.f, 4.f, -25.f);
 
     /*clear color to silver*/
     clearColor[0] = 0.75f;
@@ -167,7 +167,7 @@ bool DXTest::Initialisation()
 
 void DXTest::OnWindowResize()
 {
-    DBOUT("wnd resize");
+
     DirectXBase::OnWindowResize();
 
     BuildOffscreenViews();

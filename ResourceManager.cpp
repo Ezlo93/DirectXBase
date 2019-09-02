@@ -23,7 +23,7 @@ bool ResourceManager::AddModelsFromFolder(std::filesystem::path p)
 
     for (const auto& entry : std::filesystem::recursive_directory_iterator(p))
     {
-
+        DBOUT(L"Loading model " << entry.path().c_str() << std::endl);
         if (!AddModelFromFile(entry.path().u8string()))
         {
             return false;
