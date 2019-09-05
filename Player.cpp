@@ -2,15 +2,12 @@
 
 Player::Player()
 {
-
 }
 
-Player::~Player()
+void Player::AssignCharacter(int i)
 {
-
-
 }
 
-void Player::Update(float deltaTime)
+void Player::Init()
 {
 }

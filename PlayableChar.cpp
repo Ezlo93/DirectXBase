@@ -1,99 +1,44 @@
-#include "Ball.h"
+#include "PlayableChar.h"
 #include "Shader.h"
 
-Ball::Ball(std::string id, ResourceManager* r)
+PlayableChar::PlayableChar(std::string id, ResourceManager* r)
 {
-    ballState = SPAWN;
     res = r;
     modelID = id;
     XMStoreFloat4x4(&World, XMMatrixIdentity());
 
-    Scale = XMFLOAT3(2.f, 2.f, 2.f);
-    ballHeight = Scale.x / 2.f;
-    Translation = XMFLOAT3(0.f, ballHeight,0.f);
-    
+
+    Translation = XMFLOAT3(0.f, 1.01f, 0.f);
+    Scale = XMFLOAT3(1.f, 1.f, 1.f);
     Rotation = XMFLOAT3(0.f, 0.f, 0.f);
+    Velocity = XMFLOAT3(0.f, 0.f, 0.f);
 
-    Velocity.y = 10.f;
-    bounceFactor = 0.75f;
-    bounceTime = 1.f;
+    texID = "bar";
+    Speed = 40.f;
+    cam = new Camera();
 }
 
-Ball::~Ball()
+PlayableChar::~PlayableChar()
 {
 
+    delete cam;
 }
 
-void Ball::Update(float deltaTime)
+void PlayableChar::Update(float deltaTime)
 {
 
-    if (ballState == SPAWN)
-    {
-        bounceTime += deltaTime;
-
-        if (Translation.y >= ballHeight)
-        {
-            Translation.y = Velocity.y * bounceTime - (GRAVITY / 2.f * bounceTime * bounceTime) + ballHeight;
-        }
-        else
-        {
-            bounceTime = 0.f;
-            Translation.y = ballHeight;
-            Velocity.y = Velocity.y * 0.75f;
-
-            if (Velocity.y < 0.1f)
-            {
-                ballState = INPLAY;
-                Velocity.y = 0.f;
-                Velocity.z = 25.f;
-                Velocity.x = 17.f;
-            }
-            
-        }
-    }
-    else if (ballState == INPLAY)
-    {
-        Translation.x += Velocity.x * deltaTime;
-        Translation.z += Velocity.z * deltaTime;
-
-        /*check collision*/
-
-        
-
-        /*test border*/
-        if (Translation.z <= -BALL_BORDER)
-        {
-            Translation.z = -BALL_BORDER;
-            Velocity.z *= -1;
-        }
-        else if (Translation.z >= BALL_BORDER)
-        {
-            Translation.z = BALL_BORDER;
-            Velocity.z *= -1;
-        }
-
-        if (Translation.x <= -BALL_BORDER)
-        {
-            Translation.x = -BALL_BORDER;
-            Velocity.x *= -1;
-        }
-        else if (Translation.x >= BALL_BORDER)
-        {
-            Translation.x = BALL_BORDER;
-            Velocity.x *= -1;
-        }
-    }
-
-
-
+    cam->setPosition(Translation.x, Translation.y + 4.0f, Translation.z - 25);
+    cam->UpdateViewMatrix();
 }
 
-void Ball::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX shadowT)
+
+
+void PlayableChar::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX shadowT)
 {
 
     Model* model = res->getModel(modelID);
 
-    XMStoreFloat4x4(&World, XMMatrixScaling(Scale.x, Scale.y, Scale.z) * XMMatrixRotationRollPitchYaw(Rotation.x, Rotation.y, Rotation.z) * XMMatrixTranslation(Translation.x, Translation.y, Translation.z));
+    XMStoreFloat4x4(&World, XMMatrixScaling(Scale.x, Scale.y, Scale.z) * XMMatrixRotationRollPitchYaw(Rotation.x, Rotation.y, Rotation.z) * model->axisRot * XMMatrixTranslation(Translation.x, Translation.y, Translation.z) );
 
     XMMATRIX view = c->getView();
     XMMATRIX proj = c->getProj();
@@ -108,7 +53,7 @@ void Ball::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera
     UINT offset = 0;
 
     D3DX11_TECHNIQUE_DESC techDesc;
-    Shaders::basicTextureShader->BasicNoTextureTechnique->GetDesc(&techDesc);
+    Shaders::basicTextureShader->BasicTextureTechnique->GetDesc(&techDesc);
 
     for (auto& m : model->meshes)
     {
@@ -123,8 +68,9 @@ void Ball::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera
             Shaders::basicTextureShader->SetWorldInvTranspose(wit);
             Shaders::basicTextureShader->SetMaterial(m->material);
             Shaders::basicTextureShader->SetShadowTransform(world * shadowT);
+            Shaders::basicTextureShader->SetTexture(res->getTexture(texID));
 
-            Shaders::basicTextureShader->BasicNoTextureTechnique->GetPassByIndex(p)->Apply(0, deviceContext);
+            Shaders::basicTextureShader->BasicTextureTechnique->GetPassByIndex(p)->Apply(0, deviceContext);
             deviceContext->DrawIndexed((UINT)(m->indices.size()), 0, 0);
         }
 
@@ -133,7 +79,12 @@ void Ball::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera
 
 }
 
-void Ball::ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX lightView, XMMATRIX lightProj)
+Camera* PlayableChar::getCamera()
+{
+    return cam;
+}
+
+void PlayableChar::ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX lightView, XMMATRIX lightProj)
 {
 
     Model* model = res->getModel(modelID);

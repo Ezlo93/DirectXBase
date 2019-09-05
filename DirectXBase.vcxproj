@@ -156,6 +156,7 @@
     </ClCompile>
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ModelCollection.cpp" />
+    <ClCompile Include="PlayableChar.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="RenderStates.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -184,6 +185,7 @@
     </ClInclude>
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="ModelCollection.h" />
+    <ClInclude Include="PlayableChar.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="RenderStates.h" />
     <ClInclude Include="ResourceManager.h" />

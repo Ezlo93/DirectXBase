@@ -16,10 +16,12 @@
 #include "ShadowMap.h"
 #include "Blur.h"
 #include "Ball.h"
-#include "Player.h"
+#include "PlayableChar.h"
 
 #define MODEL_PATH "data/models"
 #define TEXTURE_PATH "data/textures"
+#define PLAYER_DISTANCE 40
+
 
 #define POST_PROCESS
 
@@ -46,6 +48,7 @@ private:
     Skybox* skybox;
 
     Ball* playball;
+    std::vector<PlayableChar*> playCharacters;
 
     /*lighting*/
     DirectionalLight gDirLights;

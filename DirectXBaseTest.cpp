@@ -142,6 +142,17 @@ bool DXTest::Initialisation()
 
     playball = new Ball("defaultSphere", res);
 
+    for(int i = 0; i < 4; i++)
+        playCharacters.push_back(new PlayableChar("bar", res));
+
+    playCharacters[0]->Translation.z -= PLAYER_DISTANCE;
+    playCharacters[1]->Translation.z += PLAYER_DISTANCE;
+    playCharacters[2]->Translation.x -= PLAYER_DISTANCE;
+    playCharacters[3]->Translation.x += PLAYER_DISTANCE;
+
+    playCharacters[2]->Rotation.z += XM_PIDIV2;
+    playCharacters[3]->Rotation.z -= XM_PIDIV2;
+
     /*test light values*/
     gDirLights.Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
     gDirLights.Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
@@ -176,6 +187,11 @@ void DXTest::OnWindowResize()
 
     /*recalc camera*/
     gCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
+
+    for (auto& i : playCharacters)
+    {
+        i->getCamera()->setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
+    }
 }
 
 bool DXTest::goFullscreen(bool s)
@@ -321,9 +337,19 @@ void DXTest::Update(float deltaTime)
         //}
 
 
-            gCamera.walk(ws);
-            gCamera.strafe(ss);
+        gCamera.walk(ws);
+        gCamera.strafe(ss);
 
+        playCharacters[0]->Translation.x += tlX * playCharacters[0]->Speed * deltaTime;
+
+        if (playCharacters[0]->Translation.x <= -25.f)
+        {
+            playCharacters[0]->Translation.x = -25.f;
+        }
+        else if(playCharacters[0]->Translation.x >= 25.f)
+        {
+            playCharacters[0]->Translation.x = 25.f;
+        }
 
         float yaw = 1.5f * deltaTime * trX;
         float pitch = 1.5f * deltaTime * trY;
@@ -347,11 +373,6 @@ void DXTest::Update(float deltaTime)
             if(blurStrength > 0) blurStrength--;
         }
 
-        if (input->ButtonReleased(controllingInput, BUTTON_A))
-        {
-            playball->Velocity.y = 10.f;
-        }
-
         if (input->ButtonReleased(controllingInput, BACK))
         {
             exit(0);
@@ -361,6 +382,11 @@ void DXTest::Update(float deltaTime)
 
     //ball
     playball->Update(deltaTime);
+
+    for (auto& i : playCharacters)
+    {
+        i->Update(deltaTime);
+    }
 
     /*rotate light*/
     //lightRotationAngle += 0.25f * deltaTime;
@@ -380,7 +406,7 @@ void DXTest::Update(float deltaTime)
 
 void DXTest::Draw()
 {
-
+    Camera* activeCamera = &gCamera;
     /*draw to shadow map*/
     shadowMap->BindDsvAndSetNullRenderTarget(deviceContext);
 
@@ -399,6 +425,11 @@ void DXTest::Draw()
     }
 
     playball->ShadowDraw(device, deviceContext, &gCamera, lview, lproj);
+
+    for (auto& i : playCharacters)
+    {
+        i->ShadowDraw(device, deviceContext, &gCamera, lview, lproj);
+    }
 
     deviceContext->RSSetState(0);
     /*end of shadow map*/
@@ -428,13 +459,13 @@ void DXTest::Draw()
     
     /*set shader constants that are not object dependant*/
     /*basic shader*/
-    Shaders::basicTextureShader->SetEyePosW(gCamera.getPosition());
+    Shaders::basicTextureShader->SetEyePosW(activeCamera->getPosition());
     Shaders::basicTextureShader->SetDirLights(gDirLights);
 
     Shaders::basicTextureShader->SetShadowMap(shadowMap->DepthMapSRV());
 
     /*normal shader*/
-    Shaders::normalMapShader->SetEyePosW(gCamera.getPosition());
+    Shaders::normalMapShader->SetEyePosW(activeCamera->getPosition());
     Shaders::normalMapShader->SetDirLights(gDirLights);
 
     Shaders::normalMapShader->SetShadowMap(shadowMap->DepthMapSRV());
@@ -445,15 +476,21 @@ void DXTest::Draw()
 
     it = testLevel->modelsStatic.begin();
     while(it != testLevel->modelsStatic.end()){
-         it->second->Draw(device, deviceContext, &gCamera, st);
+         it->second->Draw(device, deviceContext, activeCamera, st);
         it++;
     }
 
     //draw ball
-    playball->Draw(device, deviceContext, &gCamera, st);
+    playball->Draw(device, deviceContext, activeCamera, st);
+
+    //play characters
+    for (auto& i : playCharacters)
+    {
+        i->Draw(device, deviceContext, activeCamera, st);
+    }
 
     //render sky box last
-    skybox->Draw(deviceContext, gCamera);
+    skybox->Draw(deviceContext, *activeCamera);
 
 
     /*blur*/
