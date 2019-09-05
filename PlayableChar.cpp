@@ -89,11 +89,7 @@ void PlayableChar::ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceC
 
     Model* model = res->getModel(modelID);
 
-    XMMATRIX _r = XMMatrixRotationRollPitchYaw(Rotation.x, Rotation.y, Rotation.z);
-    XMMATRIX _t = XMMatrixTranslation(Translation.x, Translation.y, Translation.z);
-    XMMATRIX _s = XMMatrixScaling(Scale.x, Scale.y, Scale.z);
-
-    XMStoreFloat4x4(&World, _s * model->axisRot * _r * _t);
+    XMStoreFloat4x4(&World, XMMatrixScaling(Scale.x, Scale.y, Scale.z) * XMMatrixRotationRollPitchYaw(Rotation.x, Rotation.y, Rotation.z) * model->axisRot * XMMatrixTranslation(Translation.x, Translation.y, Translation.z));
 
     XMMATRIX view = lightView;
     XMMATRIX proj = lightProj;

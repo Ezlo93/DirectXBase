@@ -131,7 +131,7 @@ bool DXTest::Initialisation()
     shadowMap = new ShadowMap(device, SHADOW_HIGH);
 
     sceneBounds.Center = XMFLOAT3(0.f, 0.f, 0.f);
-    sceneBounds.Radius = sqrtf(200);
+    sceneBounds.Radius = sqrtf(4000);
 
     /*add static models for testing*/
     testLevel = new Level(res);
@@ -389,11 +389,11 @@ void DXTest::Update(float deltaTime)
     }
 
     /*rotate light*/
-    //lightRotationAngle += 0.25f * deltaTime;
-    //XMMATRIX R = XMMatrixRotationY(lightRotationAngle);
-    //XMVECTOR lDir = XMLoadFloat3(&originalLightDir);
-    //lDir = XMVector3TransformNormal(lDir, R);
-    //XMStoreFloat3(&gDirLights.Direction, lDir);
+    lightRotationAngle += 0.1f * deltaTime;
+    XMMATRIX R = XMMatrixRotationY(lightRotationAngle);
+    XMVECTOR lDir = XMLoadFloat3(&originalLightDir);
+    lDir = XMVector3TransformNormal(lDir, R);
+    XMStoreFloat3(&gDirLights.Direction, lDir);
 
     /*build shadow transform*/
     buildShadowTransform();
@@ -420,15 +420,15 @@ void DXTest::Draw()
     std::map<int, ModelInstanceStatic*>::iterator it = testLevel->modelsStatic.begin();
     while (it != testLevel->modelsStatic.end())
     {
-        it->second->ShadowDraw(device, deviceContext, &gCamera, lview, lproj);
+        it->second->ShadowDraw(device, deviceContext, activeCamera, lview, lproj);
         it++;
     }
 
-    playball->ShadowDraw(device, deviceContext, &gCamera, lview, lproj);
+    playball->ShadowDraw(device, deviceContext, activeCamera, lview, lproj);
 
     for (auto& i : playCharacters)
     {
-        i->ShadowDraw(device, deviceContext, &gCamera, lview, lproj);
+        i->ShadowDraw(device, deviceContext, activeCamera, lview, lproj);
     }
 
     deviceContext->RSSetState(0);
