@@ -16,6 +16,14 @@ PlayableChar::PlayableChar(std::string id, ResourceManager* r)
     texID = "bar";
     Speed = 40.f;
     cam = new Camera();
+
+    hitBox.Center = res->getModel(modelID)->collisionBox.Center;
+    hitBox.Extents = res->getModel(modelID)->collisionBox.Extents;
+    hitBox.Orientation = XMFLOAT4(0.f, 0.f, 0.f, 1.f);
+    
+    hitBox.Center.x += Translation.x;
+    hitBox.Center.y += Translation.y;
+    hitBox.Center.z += Translation.z;
 }
 
 PlayableChar::~PlayableChar()
@@ -26,6 +34,12 @@ PlayableChar::~PlayableChar()
 
 void PlayableChar::Update(float deltaTime)
 {
+
+    hitBox.Center.x = res->getModel(modelID)->collisionBox.Center.x + Translation.x;
+    hitBox.Center.y = res->getModel(modelID)->collisionBox.Center.y + Translation.y;
+    hitBox.Center.z = res->getModel(modelID)->collisionBox.Center.z + Translation.z;
+
+   // DBOUT("hitbox: " << hitBox.Center.x << " " << hitBox.Center.y << " "<< hitBox.Center.z << std::endl);
 
     cam->setPosition(Translation.x, Translation.y + 4.0f, Translation.z - 25);
     cam->UpdateViewMatrix();

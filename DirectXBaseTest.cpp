@@ -139,9 +139,6 @@ bool DXTest::Initialisation()
 
     //ASSERT(modelsStatic.size() == 3);
 
-
-    playball = new Ball("defaultSphere", res);
-
     for(int i = 0; i < 4; i++)
         playCharacters.push_back(new PlayableChar("bar", res));
 
@@ -152,6 +149,13 @@ bool DXTest::Initialisation()
 
     playCharacters[2]->Rotation.z += XM_PIDIV2;
     playCharacters[3]->Rotation.z -= XM_PIDIV2;
+    playCharacters[2]->Orientation = true;
+    playCharacters[3]->Orientation = true;
+
+    playCharacters[2]->hitBox.Orientation = XMFLOAT4(0.f, 0.f, 0.7071068f, 0.7071068f);
+    playCharacters[3]->hitBox.Orientation = XMFLOAT4(0.f, 0.f, -0.7071068f, 0.7071068f);
+
+    playball = new Ball("defaultSphere", res, playCharacters);
 
     /*test light values*/
     gDirLights.Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
@@ -161,16 +165,10 @@ bool DXTest::Initialisation()
 
     originalLightDir = gDirLights.Direction;
 
-    /*lighting configuration to check it works*/
-    //gDirLights.Ambient = XMFLOAT4(0.f, 0.3f, 0.f, 1.0f);
-    //gDirLights.Diffuse = XMFLOAT4(0.f, 0.f, 0.8f, 1.0f);
-    //gDirLights.Specular = XMFLOAT4(0.6f, 0.f, 0.f, 16.0f);
-    //gDirLights.Direction = XMFLOAT3(.57735f, -0.57735f, .57735f);
-
     BuildScreenQuadGeometryBuffers();
 
     OnWindowResize();
-    //goFullscreen(true);
+    goFullscreen(true);
 
     return true;
 }
@@ -299,11 +297,6 @@ void DXTest::Update(float deltaTime)
                 break;
             }
 
-            //if (i == INPUT_MAX-1)
-            //{
-            //    gCamera.UpdateViewMatrix();
-            //    return;
-            //}
         }
 
     }
@@ -322,19 +315,6 @@ void DXTest::Update(float deltaTime)
 
         float ws = tlY * 10.f * deltaTime;
         float ss = tlX * 10.f * deltaTime;
-
-
-        //for (auto& i : testLevel->modelsStatic)
-        //{
-        //    BoundingBox b;
-        //    
-        //    XMVECTOR r = XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&i.second->Rotation));
-        //    res->getModel(i.second->GetModelID())->collisionBox.Transform(b, 1.f, r, XMLoadFloat3(&i.second->Translation));
-
-        //    if (b.Contains(gCamera.getCollisionSphere()))
-        //        DBOUT("COLLISION with " << i.second->GetModelID().c_str() << "\n");
-
-        //}
 
 
         gCamera.walk(ws);
@@ -385,6 +365,15 @@ void DXTest::Update(float deltaTime)
 
     for (auto& i : playCharacters)
     {
+        if (i->Orientation)
+        {
+            i->Translation.z = playball->Translation.z;
+        }
+        else
+        {
+            i->Translation.x = playball->Translation.x;
+        }
+        
         i->Update(deltaTime);
     }
 
@@ -407,6 +396,7 @@ void DXTest::Update(float deltaTime)
 void DXTest::Draw()
 {
     Camera* activeCamera = &gCamera;
+    //activeCamera = playCharacters[0]->getCamera();
     /*draw to shadow map*/
     shadowMap->BindDsvAndSetNullRenderTarget(deviceContext);
 

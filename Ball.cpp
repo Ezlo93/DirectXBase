@@ -1,7 +1,7 @@
 #include "Ball.h"
 #include "Shader.h"
 
-Ball::Ball(std::string id, ResourceManager* r)
+Ball::Ball(std::string id, ResourceManager* r, std::vector<PlayableChar*> p)
 {
     ballState = SPAWN;
     res = r;
@@ -17,6 +17,14 @@ Ball::Ball(std::string id, ResourceManager* r)
     Velocity.y = 10.f;
     bounceFactor = 0.75f;
     bounceTime = 1.f;
+
+    players = p;
+
+    hitBox.Center.x = Translation.x;
+    hitBox.Center.y = Translation.y;
+    hitBox.Center.z = Translation.z;
+
+    hitBox.Radius = 1.f;
 }
 
 Ball::~Ball()
@@ -56,9 +64,39 @@ void Ball::Update(float deltaTime)
         Translation.x += Velocity.x * deltaTime;
         Translation.z += Velocity.z * deltaTime;
 
+        hitBox.Center.x = Translation.x;
+        hitBox.Center.y = Translation.y;
+        hitBox.Center.z = Translation.z;
+
+        /*inc velocity*/
+
+        Velocity.x += Velocity.x * 0.1f * deltaTime;
+        Velocity.z += Velocity.z * 0.1f * deltaTime;
+
+        Velocity.x = min(Velocity.x, MAX_VELOCITY);
+        Velocity.z = min(Velocity.z, MAX_VELOCITY);
+
         /*check collision*/
 
-        
+        for (auto& p : players)
+        {
+            if (hitBox.Intersects(p->hitBox))
+            {
+                if (p->Orientation)
+                {
+                    Translation.x -= Velocity.x * deltaTime;
+                    Translation.z -= Velocity.z * deltaTime;
+                    Velocity.x *= -1;
+                }
+                else
+                {
+                    Translation.x -= Velocity.x * deltaTime;
+                    Translation.z -= Velocity.z * deltaTime;
+                    Velocity.z *= -1;
+                }
+            }
+        }
+
 
         /*test border*/
         if (Translation.z <= -BALL_BORDER)

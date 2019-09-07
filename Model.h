@@ -152,11 +152,8 @@ class Model
 {
 
 public:
-
-    BoundingBox collisionBox;
-
     std::vector<Mesh*> meshes;
-
+    BoundingBox collisionBox;
     Model(ID3D11Device* dev);
     ~Model();
 

@@ -5,6 +5,11 @@
 #include "Model.h"
 #include "ResourceManager.h"
 
+struct PCHitbox
+{
+    XMFLOAT3 x,y;
+};
+
 class PlayableChar
 {
 
@@ -20,8 +25,10 @@ public:
     void Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX shadowT);
     void ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX lightView, XMMATRIX lightProj);
 
+    BoundingOrientedBox hitBox;
     string texID;
     Camera* getCamera();
+    bool Orientation = false;
 
 private:
     string modelID;

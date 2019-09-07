@@ -4,8 +4,10 @@
 #include "Model.h"
 #include "ResourceManager.h"
 #include "Camera.h"
+#include "PlayableChar.h"
 
 #define BALL_BORDER 43
+#define MAX_VELOCITY 150
 
 enum BallState
 {
@@ -16,11 +18,13 @@ class Ball
 {
 
 public:
-    Ball(std::string id, ResourceManager* r);
+    Ball(std::string id, ResourceManager* r, std::vector<PlayableChar*> p);
     ~Ball();
 
     XMFLOAT3 Translation, Rotation, Scale, Velocity;
     bool Collision = true;
+    BoundingSphere hitBox;
+
 
     void Update(float deltaTime);
 
@@ -31,6 +35,8 @@ private:
     std::string modelID;
     ResourceManager* res = 0;
     XMFLOAT4X4 World;
+
+    std::vector<PlayableChar*> players;
 
     float bounceFactor;
     float bounceTime;
