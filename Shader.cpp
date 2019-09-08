@@ -86,6 +86,7 @@ BasicTextureShader::BasicTextureShader(ID3D11Device* device, const std::wstring&
     BasicTextureTechnique = effect->GetTechniqueByName("BasicTextureTech");
     BasicNoTextureTechnique = effect->GetTechniqueByName("BasicNoTextureTech");
     BasicTextureNoLighting = effect->GetTechniqueByName("BasicTextureNoLighting");
+    BasicStaticColor = effect->GetTechniqueByName("BasicStaticColor");
 
     WorldViewProj = effect->GetVariableByName("gWorldViewProj")->AsMatrix();
     DiffuseMap = effect->GetVariableByName("gDiffuseMap")->AsShaderResource();
@@ -93,6 +94,7 @@ BasicTextureShader::BasicTextureShader(ID3D11Device* device, const std::wstring&
     World = effect->GetVariableByName("gWorld")->AsMatrix();
     WorldInvTranspose = effect->GetVariableByName("gWorldInvTranspose")->AsMatrix();
     EyePosW = effect->GetVariableByName("gEyePosW")->AsVector();
+    StaticColor = effect->GetVariableByName("gStaticColor")->AsVector();
     Mat = effect->GetVariableByName("gMaterial");
     DirLights = effect->GetVariableByName("gDirLights");
     ShadowTransform = effect->GetVariableByName("gShadowTransform")->AsMatrix();
@@ -106,6 +108,7 @@ BasicTextureShader::~BasicTextureShader()
     DXRelease(BasicTextureTechnique);
     DXRelease(BasicNoTextureTechnique);
     DXRelease(BasicTextureNoLighting);
+    DXRelease(BasicStaticColor);
     DXRelease(WorldViewProj);
     DXRelease(DiffuseMap);
     DXRelease(TexTransform);
@@ -114,6 +117,7 @@ BasicTextureShader::~BasicTextureShader()
     DXRelease(World);
     DXRelease(WorldInvTranspose);
     DXRelease(EyePosW);
+    DXRelease(StaticColor);
     DXRelease(Mat);
     DXRelease(DirLights);
 }

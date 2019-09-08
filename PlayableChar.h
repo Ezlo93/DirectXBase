@@ -26,9 +26,10 @@ public:
     void ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX lightView, XMMATRIX lightProj);
 
     BoundingOrientedBox hitBox;
-    string texID;
     Camera* getCamera();
     bool Orientation = false;
+    bool npc = true;
+    XMFLOAT4 Color;
 
 private:
     string modelID;

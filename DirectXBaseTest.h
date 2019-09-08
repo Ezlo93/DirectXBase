@@ -17,6 +17,7 @@
 #include "Blur.h"
 #include "Ball.h"
 #include "PlayableChar.h"
+#include "Player.h"
 
 #define MODEL_PATH "data/models"
 #define TEXTURE_PATH "data/textures"
@@ -24,6 +25,11 @@
 
 
 #define POST_PROCESS
+
+enum MainGameState
+{
+    PLAYER_REGISTRATION, INGAME
+};
 
 class DXTest : public DirectXBase
 {
@@ -39,16 +45,22 @@ public:
 
 private:
 
+    /*+++*/
     InputManager* input;
-    int controllingInput = -1;
 
     ResourceManager* res;
     Level* testLevel;
     float clearColor[4], clearColorSec[4];
     Skybox* skybox;
 
+    /*gameplay related*/
     Ball* playball;
     std::vector<PlayableChar*> playCharacters;
+    std::vector<Player*> players;
+    MainGameState gameState = PLAYER_REGISTRATION;
+
+    int playerCount = 0;
+    XMFLOAT4 playerColors[4];
 
     /*lighting*/
     DirectionalLight gDirLights;
@@ -69,6 +81,7 @@ private:
     Blur blurEffect;
     int blurStrength = 0;
 
+    Camera* activeCamera = 0;
     ID3D11Buffer* mScreenQuadVB;
     ID3D11Buffer* mScreenQuadIB;
 

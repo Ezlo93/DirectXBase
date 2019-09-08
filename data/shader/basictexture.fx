@@ -13,6 +13,7 @@ cbuffer cbPerObject
 	float4x4 gTexTransform;
     float4x4 gShadowTransform;
 	Material gMaterial;
+	float4 gStaticColor;
 }; 
 
 Texture2D gDiffuseMap;
@@ -78,7 +79,7 @@ VertexOut VS(VertexIn vin)
 	return vout;
 }
  
-float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting) : SV_Target
+float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting, uniform bool gUseStaticColor) : SV_Target
 {
 
 	// Interpolating normal can unnormalize it, so normalize it.
@@ -105,6 +106,10 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting) : 
 	if(!gUseLighting){
 		texColor.a = gMaterial.Diffuse.a;
 		return texColor;
+	}
+
+	if(gUseStaticColor){
+		texColor = gStaticColor;
 	}
 
 	// Lighting.
@@ -149,7 +154,7 @@ technique11 BasicTextureTech
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(true,  true) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS(true,  true, false) ) );
     }
 }
 
@@ -159,7 +164,7 @@ technique11 BasicNoTextureTech
 	{
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(false, true) ) );	
+        SetPixelShader( CompileShader( ps_5_0, PS(false, true, false) ) );	
 	}
 }
 
@@ -169,6 +174,16 @@ technique11 BasicTextureNoLighting
 	{
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(true, false) ) );	
+        SetPixelShader( CompileShader( ps_5_0, PS(true, false,false) ) );	
 	}
+}
+
+technique11 BasicStaticColor
+{
+    pass P0
+    {
+        SetVertexShader( CompileShader( vs_5_0, VS() ) );
+		SetGeometryShader( NULL );
+        SetPixelShader( CompileShader( ps_5_0, PS(false,  true, true) ) );
+    }
 }

@@ -18,7 +18,7 @@ namespace UTech {
         Basic,
         BasicNoTexture,
         BasicNoLighting,
-
+        BasicStaticColor,
         NormalTech
     };
 }
@@ -66,11 +66,13 @@ public:
     ID3DX11EffectTechnique* BasicTextureTechnique;
     ID3DX11EffectTechnique* BasicNoTextureTechnique;
     ID3DX11EffectTechnique* BasicTextureNoLighting;
+    ID3DX11EffectTechnique* BasicStaticColor;
 
     ID3DX11EffectMatrixVariable* WorldViewProj;
     ID3DX11EffectMatrixVariable* World;
     ID3DX11EffectMatrixVariable* WorldInvTranspose;
     ID3DX11EffectVectorVariable* EyePosW;
+    ID3DX11EffectVectorVariable* StaticColor;
     ID3DX11EffectMatrixVariable* TexTransform;
     ID3DX11EffectMatrixVariable* ShadowTransform;
     ID3DX11EffectShaderResourceVariable* DiffuseMap;
@@ -86,6 +88,7 @@ public:
     void SetShadowMap(ID3D11ShaderResourceView* tex) { ShadowMap->SetResource(tex); }
     void SetTexTransform(DirectX::CXMMATRIX M) { TexTransform->SetMatrix(reinterpret_cast<const float*>(&M)); }
     void SetEyePosW(const XMFLOAT3& v) { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
+    void SetStaticColor(const XMFLOAT4& v) { StaticColor->SetRawValue(&v, 0, sizeof(XMFLOAT4)); }
     void SetMaterial(const Material::Standard& mat) { Mat->SetRawValue(&mat, 0, sizeof(Material::Standard)); }
     void SetDirLights(const DirectionalLight lights) { DirLights->SetRawValue(&lights, 0, sizeof(DirectionalLight)); }
 

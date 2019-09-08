@@ -13,7 +13,7 @@ PlayableChar::PlayableChar(std::string id, ResourceManager* r)
     Rotation = XMFLOAT3(0.f, 0.f, 0.f);
     Velocity = XMFLOAT3(0.f, 0.f, 0.f);
 
-    texID = "bar";
+    Color = XMFLOAT4(1.f, 0.5f, 0.5f, 1.0f);
     Speed = 40.f;
     cam = new Camera();
 
@@ -38,8 +38,6 @@ void PlayableChar::Update(float deltaTime)
     hitBox.Center.x = res->getModel(modelID)->collisionBox.Center.x + Translation.x;
     hitBox.Center.y = res->getModel(modelID)->collisionBox.Center.y + Translation.y;
     hitBox.Center.z = res->getModel(modelID)->collisionBox.Center.z + Translation.z;
-
-   // DBOUT("hitbox: " << hitBox.Center.x << " " << hitBox.Center.y << " "<< hitBox.Center.z << std::endl);
 
     cam->setPosition(Translation.x, Translation.y + 4.0f, Translation.z - 25);
     cam->UpdateViewMatrix();
@@ -67,7 +65,7 @@ void PlayableChar::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext
     UINT offset = 0;
 
     D3DX11_TECHNIQUE_DESC techDesc;
-    Shaders::basicTextureShader->BasicTextureTechnique->GetDesc(&techDesc);
+    Shaders::basicTextureShader->BasicStaticColor->GetDesc(&techDesc);
 
     for (auto& m : model->meshes)
     {
@@ -82,9 +80,9 @@ void PlayableChar::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext
             Shaders::basicTextureShader->SetWorldInvTranspose(wit);
             Shaders::basicTextureShader->SetMaterial(m->material);
             Shaders::basicTextureShader->SetShadowTransform(world * shadowT);
-            Shaders::basicTextureShader->SetTexture(res->getTexture(texID));
+            Shaders::basicTextureShader->SetStaticColor(Color);
 
-            Shaders::basicTextureShader->BasicTextureTechnique->GetPassByIndex(p)->Apply(0, deviceContext);
+            Shaders::basicTextureShader->BasicStaticColor->GetPassByIndex(p)->Apply(0, deviceContext);
             deviceContext->DrawIndexed((UINT)(m->indices.size()), 0, 0);
         }
 

@@ -32,7 +32,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     auto end = chrono::system_clock::now();
     chrono::duration<double> elapsed = end - start;
 
-    DBOUT("Loading finished in " << elapsed.count() << " seconds");
+    DBOUT("Loading finished in " << elapsed.count() << " seconds"<< std::endl);
 
     return dxbase.Run();
 }
@@ -65,6 +65,11 @@ DXTest::~DXTest()
     delete skybox; skybox = 0;
     delete res; res = 0;
     delete testLevel;
+
+    for (auto& i : playCharacters)
+        delete i;
+    for (auto& i : players)
+        delete i;
 
     DXRelease(mScreenQuadVB);
     DXRelease(mScreenQuadIB);
@@ -139,6 +144,14 @@ bool DXTest::Initialisation()
 
     //ASSERT(modelsStatic.size() == 3);
 
+
+    /*player character and ball*/
+
+    playerColors[0] = XMFLOAT4(0.3f, 0.55f, 1.f, 1.0f);
+    playerColors[1] = XMFLOAT4(1.f, 0.2f, 0.25f, 1.0f);
+    playerColors[2] = XMFLOAT4(1.f, 0.8f, 0.22f, 1.0f);
+    playerColors[3] = XMFLOAT4(0.f, 0.5f, 0.2f, 1.0f);
+
     for(int i = 0; i < 4; i++)
         playCharacters.push_back(new PlayableChar("bar", res));
 
@@ -168,7 +181,7 @@ bool DXTest::Initialisation()
     BuildScreenQuadGeometryBuffers();
 
     OnWindowResize();
-    goFullscreen(true);
+    //goFullscreen(true);
 
     return true;
 }
@@ -249,133 +262,165 @@ void DXTest::Update(float deltaTime)
 
     /*game logic*/
 
-    /*need update mouse here*/
-    if (!wndInactive)
+    /*dont update if window inactive*/
+    if (wndInactive)
     {
-        int wndCenterX, wndCenterY;
-        POINT mousePos;
-        RECT r;
-
-        GetWindowRect(wndHandle, &r);
-        wndCenterX = r.left + wndWidth / 2;
-        wndCenterY = r.top + wndHeight / 2;
-
-
-        if (GetCursorPos(&mousePos))
-        {
-
-            mousePos.x -= wndCenterX;
-            mousePos.y -= wndCenterY;
-        }
-
-        SetCursorPos(wndCenterX, wndCenterY);
-        input->UpdateMouse(mousePos);
+        return;
     }
-    else
+
+    /*update input independent of gamestate*/
+    int wndCenterX, wndCenterY;
+    POINT mousePos;
+    RECT r;
+
+    GetWindowRect(wndHandle, &r);
+    wndCenterX = r.left + wndWidth / 2;
+    wndCenterY = r.top + wndHeight / 2;
+
+
+    if (GetCursorPos(&mousePos))
     {
-        POINT m;
-        m.x = 0;
-        m.y = 0;
-        input->UpdateMouse(m);
+
+        mousePos.x -= wndCenterX;
+        mousePos.y -= wndCenterY;
     }
+
+    SetCursorPos(wndCenterX, wndCenterY);
+    input->UpdateMouse(mousePos);
 
     input->Update(deltaTime);
     
-
-    /*basic movement and camera*/
-
-    /*wait for input device*/
-    if (controllingInput == -1)
+    /*exit always possible*/
+    if (input->ButtonReleased(0, BACK))
     {
+        exit(0);
+    }
+
+
+    /*update depending on gamestate*/
+
+    /*player registration*/
+
+    if (gameState == MainGameState::PLAYER_REGISTRATION)
+    {
+        activeCamera = &gCamera;
+
+        /*first player press start to continue*/
+        if (playerCount > 0)
+        {
+
+            if (input->ButtonPressed(players[0]->getInput(), START))
+            {
+                gameState = MainGameState::INGAME;
+            }
+
+        }
+
+        /*up to 4 players can join*/
+
         for (int i = 0; i < INPUT_MAX; i++)
         {
-            InputData* n = input->getInput(i);
-
-            if (n->buttons[BUTTON_A])
+            
+            if (input->ButtonPressed(i, BUTTON_A))
             {
-                controllingInput = i;
+                Player* p = new Player();
+                p->AssignCharacter(playerCount++);
+                p->AssignInput(i);
+                p->AssignColor(playerColors[playerCount - 1]);
+                players.push_back(p);
+
+                DBOUT("Player " << playerCount << " registered to input " << i << std::endl);
                 break;
             }
 
         }
 
     }
-
-    if (controllingInput != -1)
+    else if (gameState == MainGameState::INGAME)
     {
-        //handle input
-        InputData* in = input->getInput(controllingInput);
-        InputData* prevIn = input->getPrevInput(controllingInput);
 
-        float tlX = in->trigger[THUMB_LX];
-        float tlY = in->trigger[THUMB_LY];
+        activeCamera = playCharacters[players.front()->getCharacter()]->getCamera();
 
-        float trX = in->trigger[THUMB_RX];
-        float trY = in->trigger[THUMB_RY] * -1;
-
-        float ws = tlY * 10.f * deltaTime;
-        float ss = tlX * 10.f * deltaTime;
-
-
-        gCamera.walk(ws);
-        gCamera.strafe(ss);
-
-        playCharacters[0]->Translation.x += tlX * playCharacters[0]->Speed * deltaTime;
-
-        if (playCharacters[0]->Translation.x <= -25.f)
+        for (auto& p : players)
         {
-            playCharacters[0]->Translation.x = -25.f;
-        }
-        else if(playCharacters[0]->Translation.x >= 25.f)
-        {
-            playCharacters[0]->Translation.x = 25.f;
+            playCharacters[p->getCharacter()]->Color = p->getColor();
         }
 
-        float yaw = 1.5f * deltaTime * trX;
-        float pitch = 1.5f * deltaTime * trY;
-
-        gCamera.yaw(yaw);
-        gCamera.pitch(pitch);
-
-
-        if (input->ButtonPressed(controllingInput, START))
+        /*update players and then the ball*/
+        for (auto& i : playCharacters)
         {
-            renderWireFrame = !renderWireFrame;
+            if (i->npc)
+            {
+                if (i->Orientation)
+                {
+                    i->Translation.z = playball->Translation.z;
+                }
+                else
+                {
+                    i->Translation.x = playball->Translation.x;
+                }
+            }
+
+            i->Update(deltaTime);
         }
 
-        if (input->ButtonReleased(controllingInput, BUTTON_X))
-        {
-            blurStrength++;
-        }
-
-        if (input->ButtonReleased(controllingInput, BUTTON_Y))
-        {
-            if(blurStrength > 0) blurStrength--;
-        }
-
-        if (input->ButtonReleased(controllingInput, BACK))
-        {
-            exit(0);
-        }
-    }
-
-
-    //ball
-    playball->Update(deltaTime);
-
-    for (auto& i : playCharacters)
-    {
-        if (i->Orientation)
-        {
-            i->Translation.z = playball->Translation.z;
-        }
-        else
-        {
-            i->Translation.x = playball->Translation.x;
-        }
         
-        i->Update(deltaTime);
+        playball->Update(deltaTime);
     }
+
+    /*wait for input device*/
+
+
+        ////handle input
+        //InputData* in = input->getInput(controllingInput);
+        //InputData* prevIn = input->getPrevInput(controllingInput);
+
+        //float tlX = in->trigger[THUMB_LX];
+        //float tlY = in->trigger[THUMB_LY];
+
+        //float trX = in->trigger[THUMB_RX];
+        //float trY = in->trigger[THUMB_RY] * -1;
+
+        //float ws = tlY * 10.f * deltaTime;
+        //float ss = tlX * 10.f * deltaTime;
+
+
+        //gCamera.walk(ws);
+        //gCamera.strafe(ss);
+
+        //playCharacters[0]->Translation.x += tlX * playCharacters[0]->Speed * deltaTime;
+
+        //if (playCharacters[0]->Translation.x <= -25.f)
+        //{
+        //    playCharacters[0]->Translation.x = -25.f;
+        //}
+        //else if(playCharacters[0]->Translation.x >= 25.f)
+        //{
+        //    playCharacters[0]->Translation.x = 25.f;
+        //}
+
+        //float yaw = 1.5f * deltaTime * trX;
+        //float pitch = 1.5f * deltaTime * trY;
+
+        //gCamera.yaw(yaw);
+        //gCamera.pitch(pitch);
+
+
+        //if (input->ButtonPressed(controllingInput, START))
+        //{
+        //    renderWireFrame = !renderWireFrame;
+        //}
+
+        //if (input->ButtonReleased(controllingInput, BUTTON_X))
+        //{
+        //    blurStrength++;
+        //}
+
+        //if (input->ButtonReleased(controllingInput, BUTTON_Y))
+        //{
+        //    if(blurStrength > 0) blurStrength--;
+        //}
+    
 
     /*rotate light*/
     lightRotationAngle += 0.1f * deltaTime;
@@ -395,8 +440,7 @@ void DXTest::Update(float deltaTime)
 
 void DXTest::Draw()
 {
-    Camera* activeCamera = &gCamera;
-    //activeCamera = playCharacters[0]->getCamera();
+  
     /*draw to shadow map*/
     shadowMap->BindDsvAndSetNullRenderTarget(deviceContext);
 
