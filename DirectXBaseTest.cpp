@@ -107,6 +107,8 @@ bool DXTest::Initialisation()
 
     input = new InputManager();
     res = new ResourceManager(device, deviceContext);
+    
+    blurStrength = 1;
 
     /*create default cube*/
     res->getModelCollection()->AddModel(DEFAULT_PLANE, res->getModelCollection()->CreatePlaneModel(1.f, 1.f));
@@ -170,6 +172,8 @@ bool DXTest::Initialisation()
 
     playball = new Ball("defaultSphere", res, playCharacters);
 
+    introCamera.setPosition(10.f, 15.f, 10.f);
+
     /*test light values*/
     gDirLights.Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
     gDirLights.Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
@@ -203,6 +207,8 @@ void DXTest::OnWindowResize()
     {
         i->getCamera()->setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
     }
+
+    introCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
 }
 
 bool DXTest::goFullscreen(bool s)
@@ -303,17 +309,34 @@ void DXTest::Update(float deltaTime)
 
     if (gameState == MainGameState::PLAYER_REGISTRATION)
     {
-        activeCamera = &gCamera;
+        activeCamera = &introCamera;
 
+        /*set position of introcamera*/
+
+        introCameraTime += deltaTime;
+
+        XMFLOAT3 introPos;
+        introPos.y = INTROCAMERA_HEIGHT;
+        introPos.x = INTROCAMERA_RADIUS * cos(2 * XM_PI * introCameraTime * INTROCAMERA_SPEED);
+        introPos.z = INTROCAMERA_RADIUS * sin(2 * XM_PI * introCameraTime * INTROCAMERA_SPEED);
+
+        introCamera.lookAt(introPos, XMFLOAT3(0.f, 0.f, 0.f), XMFLOAT3(0.f, 1.0f, 0.f));
         /*first player press start to continue*/
         if (playerCount > 0)
         {
 
             if (input->ButtonPressed(players[0]->getInput(), START))
             {
+                blurStrength = 0;
                 gameState = MainGameState::INGAME;
             }
 
+        }
+
+        /*debug*/
+        if (input->ButtonPressed(0, BUTTON_Y))
+        {
+            renderWireFrame = !renderWireFrame;
         }
 
         /*up to 4 players can join*/
@@ -321,18 +344,30 @@ void DXTest::Update(float deltaTime)
         for (int i = 0; i < INPUT_MAX; i++)
         {
             
+            /*skip already registered inputs*/
+            for (auto& p : players)
+            {
+                if (p->getInput() == i)
+                {
+                    goto cnt;
+                }
+            }
+
             if (input->ButtonPressed(i, BUTTON_A))
             {
                 Player* p = new Player();
                 p->AssignCharacter(playerCount++);
                 p->AssignInput(i);
                 p->AssignColor(playerColors[playerCount - 1]);
+                playCharacters[p->getCharacter()]->Color = p->getColor();
+                playCharacters[p->getCharacter()]->npc = false;
                 players.push_back(p);
 
                 DBOUT("Player " << playerCount << " registered to input " << i << std::endl);
                 break;
             }
 
+        cnt:;
         }
 
     }
@@ -341,14 +376,38 @@ void DXTest::Update(float deltaTime)
 
         activeCamera = playCharacters[players.front()->getCharacter()]->getCamera();
 
-        for (auto& p : players)
+        /*update players and then the ball*/
+
+        /*player input*/
+        for (auto& i : players)
         {
-            playCharacters[p->getCharacter()]->Color = p->getColor();
+
+            int playerCharID = i->getCharacter();
+            int inputID = i->getInput();
+
+            InputData* in = input->getInput(inputID);
+
+            float leftJoystickX = in->trigger[THUMB_LX];
+            float leftJoystickY = in->trigger[THUMB_RX];
+
+            playCharacters[playerCharID]->Translation.x += leftJoystickX * playCharacters[0]->Speed* deltaTime;
+
+            if (playCharacters[playerCharID]->Translation.x <= -PLAYER_MAX_MOVEMENT)
+            {
+                playCharacters[playerCharID]->Translation.x = -PLAYER_MAX_MOVEMENT;
+            }
+            else if (playCharacters[playerCharID]->Translation.x >= PLAYER_MAX_MOVEMENT)
+            {
+                playCharacters[playerCharID]->Translation.x = PLAYER_MAX_MOVEMENT;
+            }
+
+            playCharacters[playerCharID]->Update(deltaTime);
         }
 
-        /*update players and then the ball*/
+        /*bot*/
         for (auto& i : playCharacters)
         {
+            
             if (i->npc)
             {
                 if (i->Orientation)
@@ -359,67 +418,38 @@ void DXTest::Update(float deltaTime)
                 {
                     i->Translation.x = playball->Translation.x;
                 }
+                i->Update(deltaTime);
             }
 
-            i->Update(deltaTime);
         }
 
-        
+        /*ball*/
         playball->Update(deltaTime);
     }
 
-    /*wait for input device*/
+    ////handle input
+    //InputData* in = input->getInput(controllingInput);
+    //InputData* prevIn = input->getPrevInput(controllingInput);
+
+    //float tlX = in->trigger[THUMB_LX];
+    //float tlY = in->trigger[THUMB_LY];
+
+    //float trX = in->trigger[THUMB_RX];
+    //float trY = in->trigger[THUMB_RY] * -1;
+
+    //float ws = tlY * 10.f * deltaTime;
+    //float ss = tlX * 10.f * deltaTime;
 
 
-        ////handle input
-        //InputData* in = input->getInput(controllingInput);
-        //InputData* prevIn = input->getPrevInput(controllingInput);
+    //gCamera.walk(ws);
+    //gCamera.strafe(ss);
 
-        //float tlX = in->trigger[THUMB_LX];
-        //float tlY = in->trigger[THUMB_LY];
+    //float yaw = 1.5f * deltaTime * trX;
+    //float pitch = 1.5f * deltaTime * trY;
 
-        //float trX = in->trigger[THUMB_RX];
-        //float trY = in->trigger[THUMB_RY] * -1;
+    //gCamera.yaw(yaw);
+    //gCamera.pitch(pitch);
 
-        //float ws = tlY * 10.f * deltaTime;
-        //float ss = tlX * 10.f * deltaTime;
-
-
-        //gCamera.walk(ws);
-        //gCamera.strafe(ss);
-
-        //playCharacters[0]->Translation.x += tlX * playCharacters[0]->Speed * deltaTime;
-
-        //if (playCharacters[0]->Translation.x <= -25.f)
-        //{
-        //    playCharacters[0]->Translation.x = -25.f;
-        //}
-        //else if(playCharacters[0]->Translation.x >= 25.f)
-        //{
-        //    playCharacters[0]->Translation.x = 25.f;
-        //}
-
-        //float yaw = 1.5f * deltaTime * trX;
-        //float pitch = 1.5f * deltaTime * trY;
-
-        //gCamera.yaw(yaw);
-        //gCamera.pitch(pitch);
-
-
-        //if (input->ButtonPressed(controllingInput, START))
-        //{
-        //    renderWireFrame = !renderWireFrame;
-        //}
-
-        //if (input->ButtonReleased(controllingInput, BUTTON_X))
-        //{
-        //    blurStrength++;
-        //}
-
-        //if (input->ButtonReleased(controllingInput, BUTTON_Y))
-        //{
-        //    if(blurStrength > 0) blurStrength--;
-        //}
     
 
     /*rotate light*/
@@ -434,7 +464,7 @@ void DXTest::Update(float deltaTime)
 
     /*update camera position*/
     gCamera.UpdateViewMatrix();
-
+    introCamera.UpdateViewMatrix();
 }
 
 
