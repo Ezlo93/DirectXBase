@@ -25,6 +25,8 @@ Ball::Ball(std::string id, ResourceManager* r, std::vector<PlayableChar*> p)
     hitBox.Center.z = Translation.z;
 
     hitBox.Radius = 1.f;
+
+    Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
 }
 
 Ball::~Ball()
@@ -35,7 +37,7 @@ Ball::~Ball()
 void Ball::Update(float deltaTime)
 {
 
-    if (ballState == SPAWN)
+    if (ballState == BallState::SPAWN)
     {
         bounceTime += deltaTime;
 
@@ -59,7 +61,7 @@ void Ball::Update(float deltaTime)
             
         }
     }
-    else if (ballState == INPLAY)
+    else if (ballState == BallState::INPLAY)
     {
         Translation.x += Velocity.x * deltaTime;
         Translation.z += Velocity.z * deltaTime;
@@ -78,11 +80,16 @@ void Ball::Update(float deltaTime)
 
         /*check collision*/
 
-        for (auto& p : players)
+        for (int index = 0; index < players.size(); ++index)
         {
-            if (hitBox.Intersects(p->hitBox))
+            if (hitBox.Intersects(players[index]->hitBox))
             {
-                if (p->Orientation)
+                DBOUT("Player " << index << " touched the ball\n");
+
+                Color = players[index]->Color;
+                lastTouch = index;
+
+                if (players[index]->Orientation)
                 {
                     Translation.x -= Velocity.x * deltaTime;
                     Translation.z -= Velocity.z * deltaTime;
@@ -90,6 +97,7 @@ void Ball::Update(float deltaTime)
                 }
                 else
                 {
+
                     Translation.x -= Velocity.x * deltaTime;
                     Translation.z -= Velocity.z * deltaTime;
                     Velocity.z *= -1;
@@ -98,28 +106,60 @@ void Ball::Update(float deltaTime)
         }
 
 
-        /*test border*/
+        /*check if ball not defended*/
         if (Translation.z <= -BALL_BORDER)
         {
-            Translation.z = -BALL_BORDER;
-            Velocity.z *= -1;
+            resetB = true;
+            DBOUT("Player 1 hit by Player " << lastTouch << "\n");
+            players[0]->controllingPlayer->hp--;
         }
         else if (Translation.z >= BALL_BORDER)
         {
-            Translation.z = BALL_BORDER;
-            Velocity.z *= -1;
+            resetB = true;
+            DBOUT("Player 2 hit by Player " << lastTouch << "\n");
+            players[1]->controllingPlayer->hp--;
         }
 
         if (Translation.x <= -BALL_BORDER)
         {
-            Translation.x = -BALL_BORDER;
-            Velocity.x *= -1;
+            resetB = true;
+            DBOUT("Player 3 hit by Player " << lastTouch << "\n");
+            players[2]->controllingPlayer->hp--;
         }
         else if (Translation.x >= BALL_BORDER)
         {
-            Translation.x = BALL_BORDER;
-            Velocity.x *= -1;
+            resetB = true;
+            DBOUT("Player 4 hit by Player " << lastTouch << "\n");
+            players[3]->controllingPlayer->hp--;
         }
+
+        if (resetB)
+        {
+            
+            ballState = BallState::RESET;
+
+
+        }
+
+    }
+    else if (ballState == BallState::RESET)
+    {
+        DBOUT("HP LEVEL:\n");
+        for (auto& p : players)
+        {
+            if(p->controllingPlayer != nullptr)
+            DBOUT("Player " << p->controllingPlayer->pID << ": "<< p->controllingPlayer->hp << "\n");
+        }
+
+        /*check if all but one player dead*/
+
+
+
+        /*move ball back to middle and do random velocity*/
+
+
+
+
     }
 
 
@@ -146,7 +186,7 @@ void Ball::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera
     UINT offset = 0;
 
     D3DX11_TECHNIQUE_DESC techDesc;
-    Shaders::basicTextureShader->BasicNoTextureTechnique->GetDesc(&techDesc);
+    Shaders::basicTextureShader->BasicStaticColor->GetDesc(&techDesc);
 
     for (auto& m : model->meshes)
     {
@@ -160,9 +200,10 @@ void Ball::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera
             Shaders::basicTextureShader->SetWorldViewProj(wvp);
             Shaders::basicTextureShader->SetWorldInvTranspose(wit);
             Shaders::basicTextureShader->SetMaterial(m->material);
+            Shaders::basicTextureShader->SetStaticColor(Color);
             Shaders::basicTextureShader->SetShadowTransform(world * shadowT);
 
-            Shaders::basicTextureShader->BasicNoTextureTechnique->GetPassByIndex(p)->Apply(0, deviceContext);
+            Shaders::basicTextureShader->BasicStaticColor->GetPassByIndex(p)->Apply(0, deviceContext);
             deviceContext->DrawIndexed((UINT)(m->indices.size()), 0, 0);
         }
 

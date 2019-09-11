@@ -14,9 +14,11 @@ public:
     XMFLOAT4& getColor();
     int getCharacter();
 
+    int hp;
+    int pID = -1;
 private:
     int assignedCharacter = -1;
-    int hp;
+    
     int inputID;
     XMFLOAT4 Color;
 };

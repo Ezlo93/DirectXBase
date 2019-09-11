@@ -343,7 +343,10 @@ void DXTest::Update(float deltaTime)
 
         for (int i = 0; i < INPUT_MAX; i++)
         {
-            
+            if (playerCount == 3)
+            {
+                break;
+            }
             /*skip already registered inputs*/
             for (auto& p : players)
             {
@@ -359,15 +362,24 @@ void DXTest::Update(float deltaTime)
                 p->AssignCharacter(playerCount++);
                 p->AssignInput(i);
                 p->AssignColor(playerColors[playerCount - 1]);
+                p->pID = playerCount;
                 playCharacters[p->getCharacter()]->Color = p->getColor();
                 playCharacters[p->getCharacter()]->npc = false;
                 players.push_back(p);
+
+                playCharacters[p->getCharacter()]->Velocity.y = 8.f;
+                playCharacters[p->getCharacter()]->controllingPlayer = p;
 
                 DBOUT("Player " << playerCount << " registered to input " << i << std::endl);
                 break;
             }
 
         cnt:;
+        }
+
+        for (auto& p : playCharacters)
+        {
+            p->Update(deltaTime);
         }
 
     }

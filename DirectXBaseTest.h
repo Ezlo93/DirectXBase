@@ -22,7 +22,7 @@
 #define MODEL_PATH "data/models"
 #define TEXTURE_PATH "data/textures"
 #define PLAYER_DISTANCE 40
-#define PLAYER_MAX_MOVEMENT 36.f
+#define PLAYER_MAX_MOVEMENT 35.f
 
 #define INTROCAMERA_RADIUS 80.f
 #define INTROCAMERA_HEIGHT 35.f

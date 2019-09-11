@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Model.h"
 #include "ResourceManager.h"
+#include "Player.h"
 
 struct PCHitbox
 {
@@ -30,10 +31,11 @@ public:
     bool Orientation = false;
     bool npc = true;
     XMFLOAT4 Color;
-
+    Player* controllingPlayer = 0;
 private:
     string modelID;
     ResourceManager* res = 0;
     XMFLOAT4X4 World;
     Camera* cam;
+    float jumpTime = 0.f;
 };

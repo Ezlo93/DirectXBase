@@ -24,7 +24,8 @@ public:
     XMFLOAT3 Translation, Rotation, Scale, Velocity;
     bool Collision = true;
     BoundingSphere hitBox;
-
+    XMFLOAT4 Color;
+    int lastTouch = -1;
 
     void Update(float deltaTime);
 
@@ -41,6 +42,8 @@ private:
     float bounceFactor;
     float bounceTime;
     float ballHeight;
+    bool resetB = false;
 
     BallState ballState;
+    
 };

@@ -13,7 +13,7 @@ PlayableChar::PlayableChar(std::string id, ResourceManager* r)
     Rotation = XMFLOAT3(0.f, 0.f, 0.f);
     Velocity = XMFLOAT3(0.f, 0.f, 0.f);
 
-    Color = XMFLOAT4(1.f, 0.5f, 0.5f, 1.0f);
+    Color = XMFLOAT4(.5f, 0.5f, 0.5f, 1.0f);
     Speed = 40.f;
     cam = new Camera();
 
@@ -34,6 +34,21 @@ PlayableChar::~PlayableChar()
 
 void PlayableChar::Update(float deltaTime)
 {
+
+    if (Velocity.y > 0)
+    {
+        jumpTime += deltaTime;
+
+        if (Translation.y >= 1.0f)
+        {
+            Translation.y = Velocity.y * jumpTime - (GRAVITY / 1.5f * jumpTime * jumpTime) + 1.0f;
+        }
+        else
+        {
+            jumpTime = 0;
+            Velocity.y = 0;
+        }
+    }
 
     hitBox.Center.x = res->getModel(modelID)->collisionBox.Center.x + Translation.x;
     hitBox.Center.y = res->getModel(modelID)->collisionBox.Center.y + Translation.y;
