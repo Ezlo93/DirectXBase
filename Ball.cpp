@@ -20,10 +20,6 @@ Ball::Ball(std::string id, ResourceManager* r, std::vector<PlayableChar*> p)
 
     players = p;
 
-    hitBox.Center.x = Translation.x;
-    hitBox.Center.y = Translation.y;
-    hitBox.Center.z = Translation.z;
-
     hitBox.Radius = 1.f;
 
     Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
@@ -49,17 +45,26 @@ void Ball::Update(float deltaTime)
         {
             bounceTime = 0.f;
             Translation.y = ballHeight;
-            Velocity.y = Velocity.y * 0.75f;
+            Velocity.y = Velocity.y * 0.65f;
 
             if (Velocity.y < 0.1f)
             {
-                ballState = INPLAY;
-                Velocity.y = 0.f;
-                Velocity.z = 25.f;
-                Velocity.x = 17.f;
+                resetBall();
             }
             
         }
+    }
+    else if (ballState == BallState::FREEZE)
+    {
+
+        spawnTime += deltaTime;
+
+        if (spawnTime >= SPAWN_FREEZE)
+        {
+            spawnTime = 0.f;
+            ballState = BallState::INPLAY;
+        }
+
     }
     else if (ballState == BallState::INPLAY)
     {
@@ -137,7 +142,7 @@ void Ball::Update(float deltaTime)
         {
             
             ballState = BallState::RESET;
-
+            distanceV = Translation;
 
         }
 
@@ -157,8 +162,21 @@ void Ball::Update(float deltaTime)
 
         /*move ball back to middle and do random velocity*/
 
+        resetTime += deltaTime;
 
+        if (resetTime > 1.f)
+        {
+            resetBall();
+        }
+        else
+        {
+            /*interpolate to mid position*/
 
+            Translation.x = distanceV.x * (1.f - resetTime);
+            //Translation.y = distanceV.y * (1.f - resetTime) + ballHeight;
+            Translation.z = distanceV.z * (1.f - resetTime);
+            
+        }
 
     }
 
@@ -263,10 +281,24 @@ void Ball::ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, 
             deviceContext->DrawIndexed((UINT)(m->indices.size()), 0, 0);
         }
 
-
-
     }
 
 
 
+}
+
+
+void Ball::resetBall()
+{
+    ballState = BallState::FREEZE;
+    resetTime = 0.f;
+    Velocity.y = 0.f;
+
+    Translation = XMFLOAT3(0.f, ballHeight, 0.f);
+
+    /*random direction*/
+    Velocity.z = 25.f;
+    Velocity.x = 17.f;
+ 
+    resetB = false;
 }

@@ -8,10 +8,11 @@
 
 #define BALL_BORDER 43
 #define MAX_VELOCITY 150
+#define SPAWN_FREEZE 1.25f
 
 enum BallState
 {
-    SPAWN, INPLAY, RESET
+    SPAWN, FREEZE, INPLAY, RESET
 };
 
 class Ball
@@ -40,10 +41,14 @@ private:
     std::vector<PlayableChar*> players;
 
     float bounceFactor;
-    float bounceTime;
+    float bounceTime = 0.f;
+    float resetTime = 0.f;
+    float spawnTime = 0.f;
     float ballHeight;
     bool resetB = false;
+    XMFLOAT3 distanceV;
 
     BallState ballState;
     
+    void resetBall();
 };
