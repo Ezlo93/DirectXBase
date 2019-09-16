@@ -144,17 +144,17 @@ void Ball::Update(float deltaTime)
             ballState = BallState::RESET;
             distanceV = Translation;
 
+            DBOUT("HP LEVEL:\n");
+            for (auto& p : players)
+            {
+                if (p->controllingPlayer != nullptr)
+                    DBOUT("Player " << p->controllingPlayer->pID << ": " << p->controllingPlayer->hp << "\n");
+            }
         }
 
     }
     else if (ballState == BallState::RESET)
     {
-        DBOUT("HP LEVEL:\n");
-        for (auto& p : players)
-        {
-            if(p->controllingPlayer != nullptr)
-            DBOUT("Player " << p->controllingPlayer->pID << ": "<< p->controllingPlayer->hp << "\n");
-        }
 
         /*check if all but one player dead*/
 
@@ -173,9 +173,9 @@ void Ball::Update(float deltaTime)
             /*interpolate to mid position*/
 
             Translation.x = distanceV.x * (1.f - resetTime);
-            //Translation.y = distanceV.y * (1.f - resetTime) + ballHeight;
             Translation.z = distanceV.z * (1.f - resetTime);
-            
+            Translation.y = (-48.f * resetTime * resetTime) + 48.f*resetTime + ballHeight;
+
         }
 
     }

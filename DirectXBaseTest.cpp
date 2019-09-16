@@ -107,8 +107,6 @@ bool DXTest::Initialisation()
 
     input = new InputManager();
     res = new ResourceManager(device, deviceContext);
-    
-    blurStrength = 1;
 
     /*create default cube*/
     res->getModelCollection()->AddModel(DEFAULT_PLANE, res->getModelCollection()->CreatePlaneModel(1.f, 1.f));
@@ -171,6 +169,8 @@ bool DXTest::Initialisation()
     playCharacters[3]->hitBox.Orientation = XMFLOAT4(0.f, 0.f, -0.7071068f, 0.7071068f);
 
     playball = new Ball("defaultSphere", res, playCharacters);
+
+    clearData();
 
     introCamera.setPosition(10.f, 15.f, 10.f);
 
@@ -437,6 +437,49 @@ void DXTest::Update(float deltaTime)
 
         /*ball*/
         playball->Update(deltaTime);
+
+        /*check if player dead*/
+        bool allDead = true;
+        for (auto& i : playCharacters)
+        {
+            if (i->controllingPlayer == nullptr)
+            {
+                continue;
+            }
+
+            if (i->controllingPlayer->hp <= 0)
+            {
+                DBOUT("Player " << i->controllingPlayer->pID << " has died!\n");
+                i->npc = true;
+                i->Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+                i->controllingPlayer = nullptr;
+                
+            }
+            else
+            {
+                allDead = false;
+            }
+
+
+        }
+
+        if (allDead)
+        {
+            DBOUT("Everyone is dead!\n");
+            gameState = MainGameState::END_SCREEN;
+        }
+
+    }
+    else if (gameState == MainGameState::END_SCREEN)
+    {
+        endTimer += deltaTime;
+        
+        if (endTimer >= END_TIME_V)
+        {
+            clearData();
+            gameState = MainGameState::PLAYER_REGISTRATION;
+        }
+
     }
 
     ////handle input
@@ -735,4 +778,24 @@ void DXTest::BuildOffscreenViews()
 
     // View saves a reference to the texture so we can release our reference.
     DXRelease(offscreenTex);
+}
+
+void DXTest::clearData()
+{
+    for (auto& i : players)
+    {
+        delete i;
+    }
+    players.clear();
+
+    for (auto& i : playCharacters)
+    {
+        i->controllingPlayer = nullptr;
+        i->npc = true;
+        i->Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+    }
+
+    playerCount = 0;
+    blurStrength = 1;
+    endTimer = 0.f;
 }

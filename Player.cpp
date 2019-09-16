@@ -3,7 +3,9 @@
 
 Player::Player()
 {
-    hp = 5;
+    hp = MAX_HP;
+    inputID = -1;
+    Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 }
 
 void Player::AssignCharacter(int i)

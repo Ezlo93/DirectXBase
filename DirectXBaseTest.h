@@ -29,10 +29,11 @@
 #define INTROCAMERA_SPEED 0.025f
 
 #define POST_PROCESS
+#define END_TIME_V 5.f
 
 enum MainGameState
 {
-    PLAYER_REGISTRATION, INGAME
+    PLAYER_REGISTRATION, INGAME, END_SCREEN
 };
 
 class DXTest : public DirectXBase
@@ -67,6 +68,9 @@ private:
 
     int playerCount = 0;
     XMFLOAT4 playerColors[4];
+
+    float endTimer = 0.f;
+    void clearData();
 
     /*lighting*/
     DirectionalLight gDirLights;
