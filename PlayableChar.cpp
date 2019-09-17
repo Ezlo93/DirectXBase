@@ -8,7 +8,7 @@ PlayableChar::PlayableChar(std::string id, ResourceManager* r)
     XMStoreFloat4x4(&World, XMMatrixIdentity());
 
 
-    Translation = XMFLOAT3(0.f, 1.01f, 0.f);
+    Translation = XMFLOAT3(0.f, PLAYER_HEIGHT, 0.f);
     Scale = XMFLOAT3(1.f, 1.f, 1.f);
     Rotation = XMFLOAT3(0.f, 0.f, 0.f);
     Velocity = XMFLOAT3(0.f, 0.f, 0.f);

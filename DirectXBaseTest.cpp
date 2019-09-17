@@ -155,19 +155,6 @@ bool DXTest::Initialisation()
     for(int i = 0; i < 4; i++)
         playCharacters.push_back(new PlayableChar("bar", res));
 
-    playCharacters[0]->Translation.z -= PLAYER_DISTANCE;
-    playCharacters[1]->Translation.z += PLAYER_DISTANCE;
-    playCharacters[2]->Translation.x -= PLAYER_DISTANCE;
-    playCharacters[3]->Translation.x += PLAYER_DISTANCE;
-
-    playCharacters[2]->Rotation.z += XM_PIDIV2;
-    playCharacters[3]->Rotation.z -= XM_PIDIV2;
-    playCharacters[2]->Orientation = true;
-    playCharacters[3]->Orientation = true;
-
-    playCharacters[2]->hitBox.Orientation = XMFLOAT4(0.f, 0.f, 0.7071068f, 0.7071068f);
-    playCharacters[3]->hitBox.Orientation = XMFLOAT4(0.f, 0.f, -0.7071068f, 0.7071068f);
-
     playball = new Ball("defaultSphere", res, playCharacters);
 
     clearData();
@@ -798,4 +785,22 @@ void DXTest::clearData()
     playerCount = 0;
     blurStrength = 1;
     endTimer = 0.f;
+
+    playCharacters[0]->Translation = XMFLOAT3(0.f, PLAYER_HEIGHT, 0.f);
+    playCharacters[1]->Translation = XMFLOAT3(0.f, PLAYER_HEIGHT, 0.f);
+    playCharacters[2]->Translation = XMFLOAT3(0.f, PLAYER_HEIGHT, 0.f);
+    playCharacters[3]->Translation = XMFLOAT3(0.f, PLAYER_HEIGHT, 0.f);
+
+    playCharacters[0]->Translation.z = -PLAYER_DISTANCE;
+    playCharacters[1]->Translation.z = PLAYER_DISTANCE;
+    playCharacters[2]->Translation.x = -PLAYER_DISTANCE;
+    playCharacters[3]->Translation.x = PLAYER_DISTANCE;
+
+    playCharacters[2]->Rotation.z = XM_PIDIV2;
+    playCharacters[3]->Rotation.z = -XM_PIDIV2;
+    playCharacters[2]->Orientation = true;
+    playCharacters[3]->Orientation = true;
+
+    playCharacters[2]->hitBox.Orientation = XMFLOAT4(0.f, 0.f, 0.7071068f, 0.7071068f);
+    playCharacters[3]->hitBox.Orientation = XMFLOAT4(0.f, 0.f, -0.7071068f, 0.7071068f);
 }
