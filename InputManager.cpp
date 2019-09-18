@@ -42,42 +42,45 @@ void InputManager::Update(float deltaTime)
 
     //read keyboard
 
-    data[0].type = TYPE_KEYBOARD;
-    data[0].isConnected = true;
-
-    if (data[0].isConnected)
+    if (isUsedInput(0))
     {
-        /*trigger*/
-        data[0].trigger[THUMB_LY] = keyboard[charToVKey('s')] ? -1.f : 0.f;
-        data[0].trigger[THUMB_LY] += keyboard[charToVKey('w')] ? 1.f : 0.f;
-        data[0].trigger[THUMB_LX] = keyboard[charToVKey('a')] ? -1.f : 0.f;
-        data[0].trigger[THUMB_LX] += keyboard[charToVKey('d')]  ? 1.f : 0.f;
-        data[0].trigger[THUMB_RX] = (float)mouseDelta.x * mouseSense;
-        data[0].trigger[THUMB_RY] = (float)mouseDelta.y * mouseSense;
-        data[0].trigger[LEFT_TRIGGER] = keyboard[charToVKey('q')] ? 1.f : 0.f;
-        data[0].trigger[RIGHT_TRIGGER] = keyboard[charToVKey('e')] ? 1.f : 0.f;
 
-        /*buttons*/
-        data[0].buttons[BUTTON_A] = keyboard[VK_SPACE];
-        data[0].buttons[BUTTON_B] = keyboard[VK_CONTROL];
-        data[0].buttons[BUTTON_X] = keyboard[charToVKey('x')];
-        data[0].buttons[BUTTON_Y] = keyboard[charToVKey('y')];
-        data[0].buttons[DPAD_UP] = keyboard[VK_UP];
-        data[0].buttons[DPAD_DOWN] = keyboard[VK_DOWN];
-        data[0].buttons[DPAD_LEFT] = keyboard[VK_LEFT];
-        data[0].buttons[DPAD_RIGHT] = keyboard[VK_RIGHT];
-        data[0].buttons[LEFT_SHOULDER] = 0;
-        data[0].buttons[RIGHT_SHOULDER] = 0;
-        data[0].buttons[START] = keyboard[VK_RETURN];
-        data[0].buttons[BACK] = keyboard[VK_ESCAPE];
-        data[0].buttons[LEFT_THUMB] = 0;
-        data[0].buttons[RIGHT_THUMB] = 0;
+        data[0].type = TYPE_KEYBOARD;
+        data[0].isConnected = true;
+
+        if (data[0].isConnected)
+        {
+            /*trigger*/
+            data[0].trigger[THUMB_LY] = keyboard[charToVKey('s')] ? -1.f : 0.f;
+            data[0].trigger[THUMB_LY] += keyboard[charToVKey('w')] ? 1.f : 0.f;
+            data[0].trigger[THUMB_LX] = keyboard[charToVKey('a')] ? -1.f : 0.f;
+            data[0].trigger[THUMB_LX] += keyboard[charToVKey('d')] ? 1.f : 0.f;
+            data[0].trigger[THUMB_RX] = (float)mouseDelta.x * mouseSense;
+            data[0].trigger[THUMB_RY] = (float)mouseDelta.y * mouseSense;
+            data[0].trigger[LEFT_TRIGGER] = keyboard[charToVKey('q')] ? 1.f : 0.f;
+            data[0].trigger[RIGHT_TRIGGER] = keyboard[charToVKey('e')] ? 1.f : 0.f;
+
+            /*buttons*/
+            data[0].buttons[BUTTON_A] = keyboard[VK_SPACE];
+            data[0].buttons[BUTTON_B] = keyboard[VK_CONTROL];
+            data[0].buttons[BUTTON_X] = keyboard[charToVKey('x')];
+            data[0].buttons[BUTTON_Y] = keyboard[charToVKey('y')];
+            data[0].buttons[DPAD_UP] = keyboard[VK_UP];
+            data[0].buttons[DPAD_DOWN] = keyboard[VK_DOWN];
+            data[0].buttons[DPAD_LEFT] = keyboard[VK_LEFT];
+            data[0].buttons[DPAD_RIGHT] = keyboard[VK_RIGHT];
+            data[0].buttons[LEFT_SHOULDER] = 0;
+            data[0].buttons[RIGHT_SHOULDER] = 0;
+            data[0].buttons[START] = keyboard[VK_RETURN];
+            data[0].buttons[BACK] = keyboard[VK_ESCAPE];
+            data[0].buttons[LEFT_THUMB] = 0;
+            data[0].buttons[RIGHT_THUMB] = 0;
+        }
     }
-
     //read controllers
     for (int c = 0; c < MAX_CONTROLLERS; c++)
     {
-        
+        if (!isUsedInput(c + 1)) continue;
         //skip if not connected
         ControllerState *cs = controller->getState(c);
 
@@ -204,7 +207,28 @@ bool InputManager::ButtonReleased(int index, int button)
     return !data[index].buttons[button] && prevData[index].buttons[button];
 }
 
+void InputManager::addUsedInput(int a)
+{
+    usedInputs.push_back(a);
+}
 
+void InputManager::clearUsedInput()
+{
+    usedInputs.clear();
+}
+
+
+
+bool InputManager::isUsedInput(int a)
+{
+    if (!usedInputActive) return true;
+
+    for (int& i : usedInputs)
+    {
+        if (i == a) return true;
+    }
+    return false;
+}
 
 int InputManager::charToVKey(char c)
 {

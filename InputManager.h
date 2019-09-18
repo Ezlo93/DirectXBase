@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ControllerInput.h"
+#include <vector>
 
 #define BUTTON_COUNT 14
 #define TRIGGER_COUNT 6
@@ -62,12 +63,17 @@ public:
     bool ButtonPressed(int index, int button);
     bool ButtonReleased(int index, int button);
 
+    void addUsedInput(int a);
+    void clearUsedInput();
+    bool usedInputActive = false;
 private:
     ControllerInput* controller;
 
     InputData data[INPUT_MAX];
     InputData prevData[INPUT_MAX];
+    std::vector<int> usedInputs;
 
+    bool isUsedInput(int a);
     int charToVKey(char c);
     POINT mouseDelta;
     float mouseSense;

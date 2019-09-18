@@ -296,6 +296,7 @@ void DXTest::Update(float deltaTime)
 
     if (gameState == MainGameState::PLAYER_REGISTRATION)
     {
+        input->usedInputActive = false;
         activeCamera = &introCamera;
 
         /*set position of introcamera*/
@@ -315,6 +316,7 @@ void DXTest::Update(float deltaTime)
             if (input->ButtonPressed(players[0]->getInput(), START))
             {
                 blurStrength = 0;
+                input->usedInputActive = true;
                 gameState = MainGameState::INGAME;
             }
 
@@ -357,6 +359,7 @@ void DXTest::Update(float deltaTime)
                 playCharacters[p->getCharacter()]->Velocity.y = 8.f;
                 playCharacters[p->getCharacter()]->controllingPlayer = p;
 
+                input->addUsedInput(i);
                 DBOUT("Player " << playerCount << " registered to input " << i << std::endl);
                 break;
             }
