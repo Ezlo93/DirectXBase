@@ -77,6 +77,8 @@ HWND DirectXBase::getWindowHandle()
 
 bool DirectXBase::Initialisation()
 {
+    srand((unsigned)time(NULL));
+
     if (!InitWindow() || !InitDirect3D())
     {
         return false;

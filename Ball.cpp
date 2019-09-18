@@ -14,7 +14,6 @@ Ball::Ball(std::string id, ResourceManager* r, std::vector<PlayableChar*> p)
     
     Rotation = XMFLOAT3(0.f, 0.f, 0.f);
 
-    Velocity.y = 10.f;
     bounceFactor = 0.75f;
     bounceTime = 1.f;
 
@@ -68,8 +67,10 @@ void Ball::Update(float deltaTime)
     }
     else if (ballState == BallState::INPLAY)
     {
-        Translation.x += Velocity.x * deltaTime;
-        Translation.z += Velocity.z * deltaTime;
+        XMFLOAT3 pPos = Translation;
+
+        Translation.x += Velocity.x * Direction.x * deltaTime;
+        Translation.z += Velocity.x * Direction.z * deltaTime;
 
         hitBox.Center.x = Translation.x;
         hitBox.Center.y = Translation.y;
@@ -78,10 +79,8 @@ void Ball::Update(float deltaTime)
         /*inc velocity*/
 
         Velocity.x += Velocity.x * 0.1f * deltaTime;
-        Velocity.z += Velocity.z * 0.1f * deltaTime;
 
         Velocity.x = min(Velocity.x, MAX_VELOCITY);
-        Velocity.z = min(Velocity.z, MAX_VELOCITY);
 
         /*check collision*/
 
@@ -96,16 +95,14 @@ void Ball::Update(float deltaTime)
 
                 if (players[index]->Orientation)
                 {
-                    Translation.x -= Velocity.x * deltaTime;
-                    Translation.z -= Velocity.z * deltaTime;
-                    Velocity.x *= -1;
+                    Translation = pPos;
+                    Direction.x *= -1;
                 }
                 else
                 {
 
-                    Translation.x -= Velocity.x * deltaTime;
-                    Translation.z -= Velocity.z * deltaTime;
-                    Velocity.z *= -1;
+                    Translation = pPos;
+                    Direction.z *= -1;
                 }
             }
         }
@@ -122,7 +119,7 @@ void Ball::Update(float deltaTime)
         {
             resetB = true;
             DBOUT("Player 2 hit by Player " << lastTouch << "\n");
-            players[1]->controllingPlayer->hp--;
+             players[1]->controllingPlayer->hp--;
         }
 
         if (Translation.x <= -BALL_BORDER)
@@ -148,7 +145,10 @@ void Ball::Update(float deltaTime)
             for (auto& p : players)
             {
                 if (p->controllingPlayer != nullptr)
+                {
                     DBOUT("Player " << p->controllingPlayer->pID << ": " << p->controllingPlayer->hp << "\n");
+                }
+                    
             }
         }
 
@@ -287,6 +287,13 @@ void Ball::ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, 
 
 }
 
+void Ball::resetBallFull()
+{
+    resetBall();
+    ballState = BallState::SPAWN;
+    Velocity.y = 10.f;
+}
+
 
 void Ball::resetBall()
 {
@@ -297,8 +304,24 @@ void Ball::resetBall()
     Translation = XMFLOAT3(0.f, ballHeight, 0.f);
 
     /*random direction*/
-    Velocity.z = 25.f;
-    Velocity.x = 17.f;
+    double rDir = rand() / (RAND_MAX + 1.) * 2 * XM_PI;
+
+    Direction.x = (float)cos(rDir);
+    Direction.z = (float)sin(rDir);
+
+    if (rand() % 2 == 0)
+    {
+        Direction.x *= -1;
+    }
+    if (rand() % 2 == 0)
+    {
+        Direction.y *= -1;
+    }
+
+    DBOUT("Direction: " << Direction.x << " | " << Direction.z << "\n");
+
+    Velocity.z = START_VELOCITY;
+    Velocity.x = START_VELOCITY;
  
     resetB = false;
 }

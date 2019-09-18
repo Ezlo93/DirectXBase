@@ -782,6 +782,8 @@ void DXTest::clearData()
         i->Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
     }
 
+    playball->resetBallFull();
+
     playerCount = 0;
     blurStrength = 1;
     endTimer = 0.f;

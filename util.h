@@ -5,6 +5,7 @@
 #include <DirectXMath.h>
 #include <DirectXCollision.h>
 #include <DirectXPackedVector.h>
+#include <time.h>
 #include <stdexcept>
 #include <string>
 #include <sstream>

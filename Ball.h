@@ -6,9 +6,10 @@
 #include "Camera.h"
 #include "PlayableChar.h"
 
-#define BALL_BORDER 43
-#define MAX_VELOCITY 150
-#define SPAWN_FREEZE 1.25f
+#define BALL_BORDER 43.f
+#define MAX_VELOCITY 200.f
+#define START_VELOCITY 35.f
+#define SPAWN_FREEZE .75f
 
 enum BallState
 {
@@ -22,7 +23,7 @@ public:
     Ball(std::string id, ResourceManager* r, std::vector<PlayableChar*> p);
     ~Ball();
 
-    XMFLOAT3 Translation, Rotation, Scale, Velocity;
+    XMFLOAT3 Translation, Rotation, Scale, Velocity, Direction;
     bool Collision = true;
     BoundingSphere hitBox;
     XMFLOAT4 Color;
@@ -32,6 +33,8 @@ public:
 
     void Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX shadowT);
     void ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX lightView, XMMATRIX lightProj);
+
+    void resetBallFull();
 private:
 
     std::string modelID;

@@ -6,7 +6,7 @@
 #include "ResourceManager.h"
 #include "Player.h"
 
-#define PLAYER_HEIGHT 1.01
+#define PLAYER_HEIGHT 1.01f
 
 struct PCHitbox
 {
