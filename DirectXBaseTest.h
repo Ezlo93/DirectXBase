@@ -15,6 +15,7 @@
 #include "Level.h"
 #include "ShadowMap.h"
 #include "Blur.h"
+#include "FadeToBlack.h"
 #include "Ball.h"
 #include "PlayableChar.h"
 #include "Player.h"
@@ -90,6 +91,9 @@ private:
     /*render related*/
     Blur blurEffect;
     int blurStrength = 0;
+
+    FadeToBlack fadeEffect;
+    float fadeValue = 0.f;
 
     Camera* activeCamera = 0;
     ID3D11Buffer* mScreenQuadVB;

@@ -185,6 +185,7 @@ void DXTest::OnWindowResize()
 
     BuildOffscreenViews();
     blurEffect.Init(device, wndWidth, wndHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+    fadeEffect.Init(device, wndWidth, wndHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 
 
     /*recalc camera*/
@@ -317,6 +318,7 @@ void DXTest::Update(float deltaTime)
             {
                 blurStrength = 0;
                 input->usedInputActive = true;
+                fadeValue = 0.5f;
                 gameState = MainGameState::INGAME;
             }
 
@@ -612,7 +614,13 @@ void DXTest::Draw()
         blurEffect.BlurSRV(deviceContext, mOffscreenSRV, mOffscreenUAV, blurStrength);
     }
     
+    /*fade to black*/
 
+    if (fadeValue > 0.f)
+    {
+        DBOUT("FADE: " << fadeValue << "\n");
+        fadeEffect.Fade(deviceContext, mOffscreenSRV, mOffscreenUAV, fadeValue);
+    }
 
     DrawScreenQuad(mOffscreenSRV);
 

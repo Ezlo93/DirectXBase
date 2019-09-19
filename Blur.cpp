@@ -42,19 +42,22 @@ void Blur::Init(ID3D11Device* device, UINT _width, UINT _height, DXGI_FORMAT _fo
     ID3D11Texture2D* blurredTex = 0;
     device->CreateTexture2D(&blurredTexDesc, 0, &blurredTex);
 
-    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-    srvDesc.Format = format;
-    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Texture2D.MostDetailedMip = 0;
-    srvDesc.Texture2D.MipLevels = 1;
-    device->CreateShaderResourceView(blurredTex, &srvDesc, &mBlurredOutputTexSRV);
+    if (blurredTex != nullptr)
+    {
 
-    D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
-    uavDesc.Format = format;
-    uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
-    uavDesc.Texture2D.MipSlice = 0;
-    device->CreateUnorderedAccessView(blurredTex, &uavDesc, &mBlurredOutputTexUAV);
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+        srvDesc.Format = format;
+        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        srvDesc.Texture2D.MipLevels = 1;
+        device->CreateShaderResourceView(blurredTex, &srvDesc, &mBlurredOutputTexSRV);
 
+        D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+        uavDesc.Format = format;
+        uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+        uavDesc.Texture2D.MipSlice = 0;
+        device->CreateUnorderedAccessView(blurredTex, &uavDesc, &mBlurredOutputTexUAV);
+    }
     // Views save a reference to the texture so we can release our reference.
     DXRelease(blurredTex);
 }
