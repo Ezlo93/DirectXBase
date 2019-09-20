@@ -170,23 +170,6 @@ public:
     ID3DX11EffectUnorderedAccessViewVariable* output;
 };
 
-class FadeShader : public Shader
-{
-public:
-    FadeShader(ID3D11Device* device, const std::wstring& filename);
-    ~FadeShader();
-
-    void SetFadeValue(const float v) { fadeValue->SetFloat(v); }
-    void SetInput(ID3D11ShaderResourceView* tex) { input->SetResource(tex); }
-    void SetOutput(ID3D11UnorderedAccessView* tex) { output->SetUnorderedAccessView(tex); }
-
-    ID3DX11EffectTechnique* FadeTech;
-
-    ID3DX11EffectScalarVariable* fadeValue;
-    ID3DX11EffectShaderResourceVariable* input;
-    ID3DX11EffectUnorderedAccessViewVariable* output;
-};
-
 /*debug texture*/
 
 class DebugTexEffect : public Shader
@@ -197,11 +180,13 @@ public:
 
     void SetWorldViewProj(CXMMATRIX M) { WorldViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
     void SetTexture(ID3D11ShaderResourceView* tex) { Texture->SetResource(tex); }
+    void SetFadeValue(const float v) { FadeValue->SetFloat(v); }
 
     ID3DX11EffectTechnique* ViewStandard;
 
     ID3DX11EffectMatrixVariable* WorldViewProj;
     ID3DX11EffectShaderResourceVariable* Texture;
+    ID3DX11EffectScalarVariable* FadeValue;
 };
 
 
@@ -217,5 +202,4 @@ public:
     static ShadowMapShader* shadowMapShader;
     static BlurShader* blurShader;
     static DebugTexEffect* DebugTexFX;
-    static FadeShader* fadeShader;
 };

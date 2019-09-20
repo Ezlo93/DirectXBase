@@ -15,7 +15,6 @@
 #include "Level.h"
 #include "ShadowMap.h"
 #include "Blur.h"
-#include "FadeToBlack.h"
 #include "Ball.h"
 #include "PlayableChar.h"
 #include "Player.h"
@@ -29,6 +28,7 @@
 #define INTROCAMERA_HEIGHT 35.f
 #define INTROCAMERA_SPEED 0.025f
 
+#define TRANSITION_TIME 0.9f
 #define POST_PROCESS
 #define END_TIME_V 5.f
 
@@ -66,10 +66,13 @@ private:
     std::vector<PlayableChar*> playCharacters;
     std::vector<Player*> players;
     MainGameState gameState = PLAYER_REGISTRATION;
+    MainGameState prevGameState = PLAYER_REGISTRATION;
 
     int playerCount = 0;
+    bool transToIngame = false;
     XMFLOAT4 playerColors[4];
 
+    float transitionTimer = 0.f;
     float endTimer = 0.f;
     void clearData();
 
@@ -92,7 +95,8 @@ private:
     Blur blurEffect;
     int blurStrength = 0;
 
-    FadeToBlack fadeEffect;
+    int transitionInProgress = 0;
+    bool UpdateTransition(float deltaTime);
     float fadeValue = 0.f;
 
     Camera* activeCamera = 0;

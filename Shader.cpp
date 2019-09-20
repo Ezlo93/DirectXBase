@@ -9,7 +9,6 @@ NormalMapShader* Shaders::normalMapShader = 0;
 ShadowMapShader* Shaders::shadowMapShader = 0;
 BlurShader* Shaders::blurShader = 0;
 DebugTexEffect* Shaders::DebugTexFX = 0;
-FadeShader* Shaders::fadeShader = 0;
 
 
 void Shaders::Init(ID3D11Device* device)
@@ -20,7 +19,6 @@ void Shaders::Init(ID3D11Device* device)
     shadowMapShader = new ShadowMapShader(device, L"data/shader/shadowmap.fxo");
     blurShader = new BlurShader(device, L"data/shader/blur.fxo");
     DebugTexFX = new DebugTexEffect(device, L"data/shader/DebugTexture.fxo");
-    fadeShader = new FadeShader(device, L"data/shader/fade.fxo");
 }
 
 void Shaders::Destroy()
@@ -31,7 +29,6 @@ void Shaders::Destroy()
     delete shadowMapShader; shadowMapShader = 0;
     delete blurShader; blurShader = 0;
     delete DebugTexFX; DebugTexFX = 0;
-    delete fadeShader; fadeShader = 0;
 }
 
 
@@ -207,24 +204,6 @@ BlurShader::~BlurShader()
 
 }
 
-/*fade to black shader*/
-
-FadeShader::FadeShader(ID3D11Device* device, const std::wstring& filename) : Shader(device, filename)
-{
-    FadeTech = effect->GetTechniqueByName("FadeToBlack");
-
-    fadeValue = effect->GetVariableByName("bValue")->AsScalar();
-    input = effect->GetVariableByName("gInput")->AsShaderResource();
-    output = effect->GetVariableByName("gOutput")->AsUnorderedAccessView();
-
-    DBOUT("finished setting fade shader vars\n");
-}
-
-FadeShader::~FadeShader()
-{
-
-}
-
 /* debug shader*/
 
 DebugTexEffect::DebugTexEffect(ID3D11Device* device, const std::wstring& filename)
@@ -234,6 +213,7 @@ DebugTexEffect::DebugTexEffect(ID3D11Device* device, const std::wstring& filenam
 
     WorldViewProj = effect->GetVariableByName("gWorldViewProj")->AsMatrix();
     Texture = effect->GetVariableByName("gTexture")->AsShaderResource();
+    FadeValue = effect->GetVariableByName("fadeValue")->AsScalar();
 }
 
 DebugTexEffect::~DebugTexEffect()

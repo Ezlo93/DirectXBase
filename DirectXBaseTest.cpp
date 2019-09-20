@@ -185,7 +185,6 @@ void DXTest::OnWindowResize()
 
     BuildOffscreenViews();
     blurEffect.Init(device, wndWidth, wndHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-    fadeEffect.Init(device, wndWidth, wndHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 
 
     /*recalc camera*/
@@ -250,6 +249,24 @@ void DXTest::buildShadowTransform()
 
 }
 
+bool DXTest::UpdateTransition(float deltaTime)
+{
+
+    transitionTimer += deltaTime;
+
+    if (transitionTimer >= TRANSITION_TIME)
+    {
+        transitionTimer = 0;
+        fadeValue = transitionInProgress == 1 ? 1.0f : 0.f;
+        transitionInProgress = 0;
+        return false;
+    }
+
+    fadeValue = transitionInProgress == 1 ? 1.f * (transitionTimer / TRANSITION_TIME) : 1 - 1.f * (transitionTimer / TRANSITION_TIME);
+
+    return true;
+}
+
 
 void DXTest::Update(float deltaTime)
 {
@@ -261,6 +278,13 @@ void DXTest::Update(float deltaTime)
     {
         return;
     }
+
+    if (transitionInProgress > 0)
+    {
+        UpdateTransition(deltaTime);
+    }
+
+    prevGameState = gameState;
 
     /*update input independent of gamestate*/
     int wndCenterX, wndCenterY;
@@ -297,6 +321,12 @@ void DXTest::Update(float deltaTime)
 
     if (gameState == MainGameState::PLAYER_REGISTRATION)
     {
+        if (transToIngame && transitionInProgress == 0)
+        {
+            gameState = MainGameState::INGAME;
+            transitionInProgress = 2;
+        }
+
         input->usedInputActive = false;
         activeCamera = &introCamera;
 
@@ -318,8 +348,8 @@ void DXTest::Update(float deltaTime)
             {
                 blurStrength = 0;
                 input->usedInputActive = true;
-                fadeValue = 0.5f;
-                gameState = MainGameState::INGAME;
+                transitionInProgress = 1;
+                transToIngame = true;
             }
 
         }
@@ -614,13 +644,6 @@ void DXTest::Draw()
         blurEffect.BlurSRV(deviceContext, mOffscreenSRV, mOffscreenUAV, blurStrength);
     }
     
-    /*fade to black*/
-
-    if (fadeValue > 0.f)
-    {
-        DBOUT("FADE: " << fadeValue << "\n");
-        fadeEffect.Fade(deviceContext, mOffscreenSRV, mOffscreenUAV, fadeValue);
-    }
 
     DrawScreenQuad(mOffscreenSRV);
 
@@ -735,6 +758,7 @@ void DXTest::DrawScreenQuad(ID3D11ShaderResourceView* srv)
     {
         Shaders::DebugTexFX->SetWorldViewProj(world);
         Shaders::DebugTexFX->SetTexture(srv);
+        Shaders::DebugTexFX->SetFadeValue(fadeValue);
 
         tech->GetPassByIndex(p)->Apply(0, deviceContext);
         deviceContext->DrawIndexed(6, 0, 0);
@@ -817,3 +841,5 @@ void DXTest::clearData()
     playCharacters[2]->hitBox.Orientation = XMFLOAT4(0.f, 0.f, 0.7071068f, 0.7071068f);
     playCharacters[3]->hitBox.Orientation = XMFLOAT4(0.f, 0.f, -0.7071068f, 0.7071068f);
 }
+
+

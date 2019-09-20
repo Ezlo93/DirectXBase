@@ -5,6 +5,7 @@
 //=============================================================================
  
 float4x4  gWorldViewProj;
+float fadeValue;
 Texture2D gTexture;
 
 SamplerState samLinear
@@ -40,7 +41,7 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-	return gTexture.Sample(samLinear, pin.Tex);
+	return gTexture.Sample(samLinear, pin.Tex) - float4(fadeValue,fadeValue,fadeValue,1.0f);
 }
  
 technique11 Standard
