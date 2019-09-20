@@ -304,10 +304,14 @@ void DXTest::Update(float deltaTime)
     }
 
     SetCursorPos(wndCenterX, wndCenterY);
-    input->UpdateMouse(mousePos);
 
-    input->Update(deltaTime);
-    
+    /*but dont update when in transition*/
+    if (transitionInProgress == 0)
+    {
+        input->UpdateMouse(mousePos);
+        input->Update(deltaTime);
+    }
+
     /*exit always possible*/
     if (input->ButtonReleased(0, BACK))
     {
@@ -325,6 +329,7 @@ void DXTest::Update(float deltaTime)
         {
             gameState = MainGameState::INGAME;
             transitionInProgress = 2;
+            transToIngame = 0;
         }
 
         input->usedInputActive = false;
@@ -408,100 +413,121 @@ void DXTest::Update(float deltaTime)
     else if (gameState == MainGameState::INGAME)
     {
 
-        activeCamera = playCharacters[players.front()->getCharacter()]->getCamera();
-
-        /*update players and then the ball*/
-
-        /*player input*/
-        for (auto& i : players)
+        if (transToEndScreen && transitionInProgress == 0)
         {
-
-            int playerCharID = i->getCharacter();
-            int inputID = i->getInput();
-
-            InputData* in = input->getInput(inputID);
-
-            float leftJoystickX = in->trigger[THUMB_LX];
-            float leftJoystickY = in->trigger[THUMB_RX];
-
-            playCharacters[playerCharID]->Translation.x += leftJoystickX * playCharacters[0]->Speed* deltaTime;
-
-            if (playCharacters[playerCharID]->Translation.x <= -PLAYER_MAX_MOVEMENT)
-            {
-                playCharacters[playerCharID]->Translation.x = -PLAYER_MAX_MOVEMENT;
-            }
-            else if (playCharacters[playerCharID]->Translation.x >= PLAYER_MAX_MOVEMENT)
-            {
-                playCharacters[playerCharID]->Translation.x = PLAYER_MAX_MOVEMENT;
-            }
-
-            playCharacters[playerCharID]->Update(deltaTime);
+            gameState = MainGameState::END_SCREEN;
+            transitionInProgress = 2;
+            transToEndScreen = false;
         }
-
-        /*bot*/
-        for (auto& i : playCharacters)
+        else if(!allDead)
         {
-            
-            if (i->npc)
+
+            activeCamera = playCharacters[players.front()->getCharacter()]->getCamera();
+
+            /*update players and then the ball*/
+
+            /*player input*/
+            for (auto& i : players)
             {
-                if (i->Orientation)
+
+                int playerCharID = i->getCharacter();
+                int inputID = i->getInput();
+
+                InputData* in = input->getInput(inputID);
+
+                float leftJoystickX = in->trigger[THUMB_LX];
+                float leftJoystickY = in->trigger[THUMB_RX];
+
+                playCharacters[playerCharID]->Translation.x += leftJoystickX * playCharacters[0]->Speed * deltaTime;
+
+                if (playCharacters[playerCharID]->Translation.x <= -PLAYER_MAX_MOVEMENT)
                 {
-                    i->Translation.z = playball->Translation.z;
+                    playCharacters[playerCharID]->Translation.x = -PLAYER_MAX_MOVEMENT;
+                }
+                else if (playCharacters[playerCharID]->Translation.x >= PLAYER_MAX_MOVEMENT)
+                {
+                    playCharacters[playerCharID]->Translation.x = PLAYER_MAX_MOVEMENT;
+                }
+
+                playCharacters[playerCharID]->Update(deltaTime);
+            }
+
+            /*bot*/
+            for (auto& i : playCharacters)
+            {
+
+                if (i->npc)
+                {
+                    if (i->Orientation)
+                    {
+                        i->Translation.z = playball->Translation.z;
+                    }
+                    else
+                    {
+                        i->Translation.x = playball->Translation.x;
+                    }
+                    i->Update(deltaTime);
+                }
+
+            }
+
+            /*ball*/
+            playball->Update(deltaTime);
+
+            /*check if player dead*/
+            allDead = true;
+            for (auto& i : playCharacters)
+            {
+                if (i->controllingPlayer == nullptr)
+                {
+                    continue;
+                }
+
+                if (i->controllingPlayer->hp <= 0)
+                {
+                    DBOUT("Player " << i->controllingPlayer->pID << " has died!\n");
+                    i->npc = true;
+                    i->Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+                    i->controllingPlayer = nullptr;
+
                 }
                 else
                 {
-                    i->Translation.x = playball->Translation.x;
+                    allDead = false;
                 }
-                i->Update(deltaTime);
+
+
             }
 
-        }
-
-        /*ball*/
-        playball->Update(deltaTime);
-
-        /*check if player dead*/
-        bool allDead = true;
-        for (auto& i : playCharacters)
-        {
-            if (i->controllingPlayer == nullptr)
+            if (allDead)
             {
-                continue;
+                DBOUT("Everyone is dead!\n");
+                transToEndScreen = true;
+                transitionInProgress = 1;
             }
-
-            if (i->controllingPlayer->hp <= 0)
-            {
-                DBOUT("Player " << i->controllingPlayer->pID << " has died!\n");
-                i->npc = true;
-                i->Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-                i->controllingPlayer = nullptr;
-                
-            }
-            else
-            {
-                allDead = false;
-            }
-
-
         }
-
-        if (allDead)
-        {
-            DBOUT("Everyone is dead!\n");
-            gameState = MainGameState::END_SCREEN;
-        }
-
     }
     else if (gameState == MainGameState::END_SCREEN)
     {
-        endTimer += deltaTime;
-        
-        if (endTimer >= END_TIME_V)
+
+        if (transToRegistration && transitionInProgress == 0)
         {
             clearData();
             gameState = MainGameState::PLAYER_REGISTRATION;
+            transitionInProgress = 2;
+            transToRegistration = false;
         }
+        else
+        {
 
+            endTimer += deltaTime;
+
+            if (endTimer >= END_TIME_V)
+            { 
+                transToRegistration = true;
+                transitionInProgress = 1;
+            }
+        }
     }
 
     ////handle input
@@ -819,6 +845,7 @@ void DXTest::clearData()
     playball->resetBallFull();
 
     playerCount = 0;
+    allDead = false;
     blurStrength = 1;
     endTimer = 0.f;
 

@@ -69,7 +69,10 @@ private:
     MainGameState prevGameState = PLAYER_REGISTRATION;
 
     int playerCount = 0;
+    bool allDead = false;
     bool transToIngame = false;
+    bool transToRegistration = false;
+    bool transToEndScreen = false;
     XMFLOAT4 playerColors[4];
 
     float transitionTimer = 0.f;

@@ -318,6 +318,10 @@ void Ball::resetBall()
         Direction.y *= -1;
     }
 
+#ifdef _DEBUG
+    Direction.x = 0.f;
+    Direction.z = -1.f;
+#endif
     DBOUT("Direction: " << Direction.x << " | " << Direction.z << "\n");
 
     Velocity.z = START_VELOCITY;
