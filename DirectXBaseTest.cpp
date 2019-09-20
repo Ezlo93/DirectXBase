@@ -750,15 +750,15 @@ void DXTest::DrawScreenQuad(ID3D11ShaderResourceView* srv)
     // Scale and shift quad to lower-right corner.
     XMMATRIX world = XMMatrixIdentity();
 
-    ID3DX11EffectTechnique* tech = Shaders::DebugTexFX->ViewStandard;
+    ID3DX11EffectTechnique* tech = Shaders::fullscreenShader->ViewStandard;
     D3DX11_TECHNIQUE_DESC techDesc;
 
     tech->GetDesc(&techDesc);
     for (UINT p = 0; p < techDesc.Passes; ++p)
     {
-        Shaders::DebugTexFX->SetWorldViewProj(world);
-        Shaders::DebugTexFX->SetTexture(srv);
-        Shaders::DebugTexFX->SetFadeValue(fadeValue);
+        Shaders::fullscreenShader->SetWorldViewProj(world);
+        Shaders::fullscreenShader->SetTexture(srv);
+        Shaders::fullscreenShader->SetFadeValue(fadeValue);
 
         tech->GetPassByIndex(p)->Apply(0, deviceContext);
         deviceContext->DrawIndexed(6, 0, 0);
@@ -769,8 +769,7 @@ void DXTest::DrawScreenQuad(ID3D11ShaderResourceView* srv)
 
 void DXTest::BuildOffscreenViews()
 {
-    // We call this function everytime the window is resized so that the render target is a quarter
-    // the client area dimensions.  So Release the previous views before we create new ones.
+
     DXRelease(mOffscreenSRV);
     DXRelease(mOffscreenRTV);
     DXRelease(mOffscreenUAV);

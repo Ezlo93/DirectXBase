@@ -170,13 +170,13 @@ public:
     ID3DX11EffectUnorderedAccessViewVariable* output;
 };
 
-/*debug texture*/
+/*fullscreen quad texture*/
 
-class DebugTexEffect : public Shader
+class FullscreenShader : public Shader
 {
 public:
-    DebugTexEffect(ID3D11Device* device, const std::wstring& filename);
-    ~DebugTexEffect();
+    FullscreenShader(ID3D11Device* device, const std::wstring& filename);
+    ~FullscreenShader();
 
     void SetWorldViewProj(CXMMATRIX M) { WorldViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
     void SetTexture(ID3D11ShaderResourceView* tex) { Texture->SetResource(tex); }
@@ -201,5 +201,5 @@ public:
     static NormalMapShader* normalMapShader;
     static ShadowMapShader* shadowMapShader;
     static BlurShader* blurShader;
-    static DebugTexEffect* DebugTexFX;
+    static FullscreenShader* fullscreenShader;
 };

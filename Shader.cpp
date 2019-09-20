@@ -8,7 +8,7 @@ BasicTextureShader* Shaders::basicTextureShader = 0;
 NormalMapShader* Shaders::normalMapShader = 0;
 ShadowMapShader* Shaders::shadowMapShader = 0;
 BlurShader* Shaders::blurShader = 0;
-DebugTexEffect* Shaders::DebugTexFX = 0;
+FullscreenShader* Shaders::fullscreenShader = 0;
 
 
 void Shaders::Init(ID3D11Device* device)
@@ -18,7 +18,7 @@ void Shaders::Init(ID3D11Device* device)
     normalMapShader = new NormalMapShader(device, L"data/shader/normalmap.fxo");
     shadowMapShader = new ShadowMapShader(device, L"data/shader/shadowmap.fxo");
     blurShader = new BlurShader(device, L"data/shader/blur.fxo");
-    DebugTexFX = new DebugTexEffect(device, L"data/shader/DebugTexture.fxo");
+    fullscreenShader = new FullscreenShader(device, L"data/shader/fullScreenQuad.fxo");
 }
 
 void Shaders::Destroy()
@@ -28,7 +28,7 @@ void Shaders::Destroy()
     delete normalMapShader; normalMapShader = 0;
     delete shadowMapShader; shadowMapShader = 0;
     delete blurShader; blurShader = 0;
-    delete DebugTexFX; DebugTexFX = 0;
+    delete fullscreenShader; fullscreenShader = 0;
 }
 
 
@@ -206,7 +206,7 @@ BlurShader::~BlurShader()
 
 /* debug shader*/
 
-DebugTexEffect::DebugTexEffect(ID3D11Device* device, const std::wstring& filename)
+FullscreenShader::FullscreenShader(ID3D11Device* device, const std::wstring& filename)
     : Shader(device, filename)
 {
     ViewStandard = effect->GetTechniqueByName("Standard");
@@ -216,7 +216,7 @@ DebugTexEffect::DebugTexEffect(ID3D11Device* device, const std::wstring& filenam
     FadeValue = effect->GetVariableByName("fadeValue")->AsScalar();
 }
 
-DebugTexEffect::~DebugTexEffect()
+FullscreenShader::~FullscreenShader()
 {
 
 }
