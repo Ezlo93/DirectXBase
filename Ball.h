@@ -6,11 +6,6 @@
 #include "Camera.h"
 #include "PlayableChar.h"
 
-#define BALL_BORDER 43.f
-#define MAX_VELOCITY 200.f
-#define START_VELOCITY 35.f
-#define SPAWN_FREEZE .75f
-
 enum BallState
 {
     SPAWN, FREEZE, INPLAY, RESET

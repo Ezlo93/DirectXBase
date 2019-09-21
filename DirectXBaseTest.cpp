@@ -64,7 +64,7 @@ DXTest::~DXTest()
     delete input; input = 0;
     delete skybox; skybox = 0;
     delete res; res = 0;
-    delete testLevel;
+    delete gameLevel; delete endLevel;
 
     for (auto& i : playCharacters)
         delete i;
@@ -139,11 +139,13 @@ bool DXTest::Initialisation()
     sceneBounds.Radius = sqrtf(4000);
 
     /*add static models for testing*/
-    testLevel = new Level(res);
-    testLevel->LoadLevel("test.lvl");
+    gameLevel = new Level(res);
+    gameLevel->LoadLevel("game.lvl");
 
-    //ASSERT(modelsStatic.size() == 3);
+    endLevel = new Level(res);
+    endLevel->LoadLevel("end.lvl");
 
+    activeLevel = gameLevel;
 
     /*player character and ball*/
 
@@ -334,6 +336,7 @@ void DXTest::Update(float deltaTime)
 
         input->usedInputActive = false;
         activeCamera = &introCamera;
+        activeLevel = gameLevel;
 
         /*set position of introcamera*/
 
@@ -509,7 +512,7 @@ void DXTest::Update(float deltaTime)
     }
     else if (gameState == MainGameState::END_SCREEN)
     {
-
+        activeLevel = endLevel;
         if (transToRegistration && transitionInProgress == 0)
         {
             clearData();
@@ -584,8 +587,8 @@ void DXTest::Draw()
     deviceContext->IASetInputLayout(InputLayouts::Standard);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    std::map<int, ModelInstanceStatic*>::iterator it = testLevel->modelsStatic.begin();
-    while (it != testLevel->modelsStatic.end())
+    std::map<int, ModelInstanceStatic*>::iterator it = activeLevel->modelsStatic.begin();
+    while (it != activeLevel->modelsStatic.end())
     {
         it->second->ShadowDraw(device, deviceContext, activeCamera, lview, lproj);
         it++;
@@ -641,8 +644,8 @@ void DXTest::Draw()
     /*draw static models*/
     XMMATRIX st = XMLoadFloat4x4(&shadowTransform);
 
-    it = testLevel->modelsStatic.begin();
-    while(it != testLevel->modelsStatic.end()){
+    it = activeLevel->modelsStatic.begin();
+    while(it != activeLevel->modelsStatic.end()){
          it->second->Draw(device, deviceContext, activeCamera, st);
         it++;
     }

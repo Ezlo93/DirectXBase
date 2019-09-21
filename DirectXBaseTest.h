@@ -19,19 +19,6 @@
 #include "PlayableChar.h"
 #include "Player.h"
 
-#define MODEL_PATH "data/models"
-#define TEXTURE_PATH "data/textures"
-#define PLAYER_DISTANCE 40.f
-#define PLAYER_MAX_MOVEMENT 35.f
-
-#define INTROCAMERA_RADIUS 80.f
-#define INTROCAMERA_HEIGHT 35.f
-#define INTROCAMERA_SPEED 0.025f
-
-#define TRANSITION_TIME 0.9f
-#define POST_PROCESS
-#define END_TIME_V 5.f
-
 enum MainGameState
 {
     PLAYER_REGISTRATION, INGAME, END_SCREEN
@@ -55,7 +42,7 @@ private:
     InputManager* input;
 
     ResourceManager* res;
-    Level* testLevel;
+    Level* activeLevel, *gameLevel, *endLevel;
     float clearColor[4], clearColorSec[4];
     Skybox* skybox;
     Camera introCamera;

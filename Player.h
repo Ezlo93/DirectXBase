@@ -1,8 +1,6 @@
 #pragma once
 #include "util.h"
 
-#define MAX_HP 3
-
 class Player
 {
 public:

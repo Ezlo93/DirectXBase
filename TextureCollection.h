@@ -2,8 +2,6 @@
 
 #include "util.h"
 
-#define DEFAULT_NONE "!none!"
-
 class TextureCollection
 {
 public:

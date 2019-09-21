@@ -3,8 +3,6 @@
 #include "util.h"
 #include "ModelLoader.h"
 
-#define DEFAULT_NONE "!none!"
-
 class ModelCollection
 {
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#define CAMERA_RESTRICTION_ANGLE 10.f
-
 #include "util.h"
 
 class Camera

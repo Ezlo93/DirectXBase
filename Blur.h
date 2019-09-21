@@ -3,8 +3,6 @@
 #include "util.h"
 #include "Shader.h"
 
-#define NUM_THREADS 256.f
-
 class Blur
 {
 public:

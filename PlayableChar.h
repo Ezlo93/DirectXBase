@@ -6,8 +6,6 @@
 #include "ResourceManager.h"
 #include "Player.h"
 
-#define PLAYER_HEIGHT 1.01f
-
 struct PCHitbox
 {
     XMFLOAT3 x,y;

@@ -4,8 +4,6 @@
 #include "ModelInstanceStatic.h"
 #include <fstream>
 
-#define LEVEL_PATH "data/levels/"
-
 class Level
 {
 public:

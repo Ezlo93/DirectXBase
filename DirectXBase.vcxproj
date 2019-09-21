@@ -169,6 +169,7 @@
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Blur.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="constants.h" />
     <ClInclude Include="ControllerInput.h" />
     <ClInclude Include="d3dx11effect.h" />
     <ClInclude Include="DDSTextureLoader.h" />
