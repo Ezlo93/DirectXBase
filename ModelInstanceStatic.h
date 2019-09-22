@@ -38,6 +38,9 @@ public:
 
     /*public properties*/
     XMFLOAT3 Translation, Rotation, Scale;
+    bool hasCollision = false;
+    bool isInvisible = false;
+    bool castsShadow = true;
     XMFLOAT4X4 TextureTransform;
 
     UShader::UsedShader usedShader;

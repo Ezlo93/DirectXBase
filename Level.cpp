@@ -55,6 +55,19 @@ void Level::ReadStaticModels(json& j)
     
     for (auto& i : j["static"])
     {
+        /*check double id*/
+        if (!exists(i, "id"))
+        {
+            throw std::exception("static model without id");
+            return;
+        }
+
+        if (modelsStatic.find(i["id"]) != modelsStatic.end())
+        {
+            throw std::exception("id already exists");
+            return;
+        }
+
         ModelInstanceStatic* mis = new ModelInstanceStatic(res, i["model"]);
 
         /*shader*/
@@ -98,18 +111,14 @@ void Level::ReadStaticModels(json& j)
         mis->Rotation.z = XMConvertToRadians(i["rotation"][2]);
 
         /*overwrites*/
-        std::string ovwr = i["overwriteTexture"];
-
-        if (ovwr != "none")
+        if (exists(i, "overwriteTexture"))
         {
-            mis->OverwriteDiffuseMap(ovwr);
+            mis->OverwriteDiffuseMap(i["overwriteTexture"]);
         }
 
-        ovwr = i["overwriteNormal"];
-
-        if (ovwr != "none")
+        if (exists(i, "overwriteNormal"))
         {
-            mis->OverwriteNormalMap(ovwr);
+            mis->OverwriteNormalMap(i["overwriteNormal"]);
         }
 
         if (mis->GetModelID() == DEFAULT_PLANE || mis->GetModelID() == DEFAULT_CUBE)
@@ -118,6 +127,22 @@ void Level::ReadStaticModels(json& j)
             XMMATRIX _t = XMMatrixTranslation(0, 0, 0);
             XMMATRIX _s = XMMatrixScaling(mis->Scale.x / 4, mis->Scale.z / 4, 1.f);
             XMStoreFloat4x4(&mis->TextureTransform, _r * _s * _t);
+        }
+
+        /*other*/
+        if (exists(i, "hasCollision"))
+        {
+            mis->hasCollision = i["hasCollision"];
+        }
+
+        if (exists(i, "isInvisible"))
+        {
+            mis->isInvisible = i["isInvisible"];
+        }
+
+        if (exists(i, "castsShadow"))
+        {
+            mis->castsShadow = i["castsShadow"];
         }
 
         modelsStatic.insert(std::make_pair(i["id"], mis));

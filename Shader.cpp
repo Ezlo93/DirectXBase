@@ -214,6 +214,8 @@ FullscreenShader::FullscreenShader(ID3D11Device* device, const std::wstring& fil
     WorldViewProj = effect->GetVariableByName("gWorldViewProj")->AsMatrix();
     Texture = effect->GetVariableByName("gTexture")->AsShaderResource();
     FadeValue = effect->GetVariableByName("fadeValue")->AsScalar();
+
+    DBOUT("finished setting fullscreen quad shader vars\n");
 }
 
 FullscreenShader::~FullscreenShader()

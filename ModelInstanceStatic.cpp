@@ -25,6 +25,8 @@ ModelInstanceStatic::~ModelInstanceStatic()
 
 void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX shadowT)
 {
+    if (isInvisible) return;
+
     Model* model = resources->getModel(modelID);
 
     XMMATRIX _r = XMMatrixRotationRollPitchYaw(Rotation.x, Rotation.y, Rotation.z);
@@ -347,6 +349,8 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
 void ModelInstanceStatic::ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c,
                                      XMMATRIX lightView, XMMATRIX lightProj)
 {
+    if (!castsShadow) return;
+
     Model* model = resources->getModel(modelID);
 
     XMMATRIX _r = XMMatrixRotationRollPitchYaw(Rotation.x, Rotation.y, Rotation.z);

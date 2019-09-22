@@ -22,3 +22,8 @@ private:
     ResourceManager* res = 0;
 
 };
+
+static bool exists(const nlohmann::json& j, const std::string& key)
+{
+    return j.find(key) != j.end();
+}

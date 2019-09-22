@@ -63,8 +63,8 @@
             0,
             0
          ],
-         "overwriteTexture":"none",
-         "overwriteNormal":"none"
+         "isInvisible": false,
+         "castsShadow": true
       }
    ]
 }
