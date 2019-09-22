@@ -2,7 +2,10 @@
 
 #include "util.h"
 #include "ModelInstanceStatic.h"
+#include "json.hpp"
 #include <fstream>
+
+using json = nlohmann::json;
 
 class Level
 {
@@ -15,7 +18,7 @@ public:
     std::map<int, ModelInstanceStatic*> modelsStatic;
 
 private:
-    void ReadStaticModels(std::ifstream& fin);
+    void ReadStaticModels(json& j);
     ResourceManager* res = 0;
 
 };

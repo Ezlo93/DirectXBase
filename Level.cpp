@@ -30,54 +30,51 @@ bool Level::LoadLevel(std::string fileName)
         return false;
     }
 
-    /*load static models*/
-    fin >> buf;
-
-    ASSERT(buf.compare("[static]") == 0);
-    ReadStaticModels(fin);
-
-
+    json lvl;
+    try
+    {
+        lvl = json::parse(fin);
+    }
+    catch (json::parse_error& e)
+    {
+        throw std::exception(e.what());
+        return false;
+    }
     fin.close();
+
+    /*read different parts*/
+    ReadStaticModels(lvl);
+
+   
 
     return true;
 }
 
-void Level::ReadStaticModels(std::ifstream& fin)
+void Level::ReadStaticModels(json& j)
 {
-    int objCount, objID;
-    std::string mID, diff, norm, effectID;
-
-    fin >> objCount;
-
-    ASSERT(objCount > 0);
-
-
-    for (int i = 0; i < objCount; i++)
+    
+    for (auto& i : j["static"])
     {
-        mID.clear(); effectID.clear();
-        fin >> objID;
-        fin >> mID; //modelID
+        ModelInstanceStatic* mis = new ModelInstanceStatic(res, i["model"]);
 
-        ModelInstanceStatic* mis = new ModelInstanceStatic(res, mID);
-
-        fin >> effectID;
-
-        if (effectID == "basictexture")
+        /*shader*/
+        std::string shaderString = i["shader"];
+        if (shaderString == "basictexture")
         {
             mis->usedShader = UShader::Basic;
             mis->usedTechnique = UTech::Basic;
         }
-        else if (effectID == "basicnotexture")
+        else if (shaderString == "basicnotexture")
         {
             mis->usedShader = UShader::Basic;
             mis->usedTechnique = UTech::BasicNoTexture;
         }
-        else if (effectID == "basicnolighting")
+        else if (shaderString == "basicnolighting")
         {
             mis->usedShader = UShader::Basic;
             mis->usedTechnique = UTech::BasicNoLighting;
         }
-        else if (effectID == "normalmap")
+        else if (shaderString == "normalmap")
         {
             mis->usedShader = UShader::Normal;
             mis->usedTechnique = UTech::NormalTech;
@@ -86,46 +83,44 @@ void Level::ReadStaticModels(std::ifstream& fin)
         {
             throw std::exception("unknown shader type");
         }
-        
-        /*transformation*/
-        float rx, ry, rz;
-        fin >> mis->Translation.x >> mis->Translation.y >> mis->Translation.z;
-        fin >> mis->Scale.x >> mis->Scale.y >> mis->Scale.z;
-        fin >> rx;
-        fin >> ry;
-        fin >> rz;
-        mis->Rotation.x = XMConvertToRadians(rx);
-        mis->Rotation.y = XMConvertToRadians(ry);
-        mis->Rotation.z = XMConvertToRadians(rz);
 
-        /*tex overwrite*/
-        fin >> diff; //diffuse
+        /*transforms*/
+        mis->Translation.x = i["position"][0];
+        mis->Translation.y = i["position"][1];
+        mis->Translation.z = i["position"][2];
 
-        if (diff != "none")
+        mis->Scale.x = i["scale"][0];
+        mis->Scale.y = i["scale"][1];
+        mis->Scale.z = i["scale"][2];
+
+        mis->Rotation.x = XMConvertToRadians(i["rotation"][0]);
+        mis->Rotation.y = XMConvertToRadians(i["rotation"][1]);
+        mis->Rotation.z = XMConvertToRadians(i["rotation"][2]);
+
+        /*overwrites*/
+        std::string ovwr = i["overwriteTexture"];
+
+        if (ovwr != "none")
         {
-            mis->OverwriteDiffuseMap(diff);
+            mis->OverwriteDiffuseMap(ovwr);
         }
 
-        fin >> norm; //normal
+        ovwr = i["overwriteNormal"];
 
-        if (norm != "none")
+        if (ovwr != "none")
         {
-            mis->OverwriteNormalMap(norm);
+            mis->OverwriteNormalMap(ovwr);
         }
 
-        /*auto tex transform for plane, cube*/
-        /*error:  x y z depending on rotation?*/
-        /*probably delete later*/
         if (mis->GetModelID() == DEFAULT_PLANE || mis->GetModelID() == DEFAULT_CUBE)
         {
             XMMATRIX _r = XMMatrixRotationRollPitchYaw(0, 0, 0);
             XMMATRIX _t = XMMatrixTranslation(0, 0, 0);
-            XMMATRIX _s = XMMatrixScaling(mis->Scale.x/4, mis->Scale.z/4, 1.f);
+            XMMATRIX _s = XMMatrixScaling(mis->Scale.x / 4, mis->Scale.z / 4, 1.f);
             XMStoreFloat4x4(&mis->TextureTransform, _r * _s * _t);
         }
 
-        modelsStatic.insert(std::make_pair(objID, mis));
-
+        modelsStatic.insert(std::make_pair(i["id"], mis));
     }
 
 }

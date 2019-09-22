@@ -178,6 +178,7 @@
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="InputLayout.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelInstanceStatic.h">
