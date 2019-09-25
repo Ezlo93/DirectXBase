@@ -32,8 +32,8 @@
             2.5
          ],
          "scale":[
-            1.2,
-            1.2,
+            5.2,
+            5.2,
             1.2
          ],
          "rotation":[
@@ -63,8 +63,8 @@
             0,
             0
          ],
-         "isInvisible": false,
-         "castsShadow": true
+         "overwriteTexture":"none",
+         "overwriteNormal":"none"
       }
    ]
 }

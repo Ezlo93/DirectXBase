@@ -3,7 +3,7 @@
       {
          "id":10001,
          "model":"defaultPlane",
-         "shader":"basictexture",
+         "shader":"normalmap",
          "position":[
             0,
             0,
@@ -21,28 +21,6 @@
          ],
          "overwriteTexture":"floor",
          "overwriteNormal":"floor_nmap"
-      },
-      {
-         "id":10002,
-         "model":"defaultCube",
-         "shader":"basictexture",
-         "position":[
-            -18.5,
-            0.61,
-            2.5
-         ],
-         "scale":[
-            5.2,
-            5.2,
-            1.2
-         ],
-         "rotation":[
-            0,
-            10,
-            0
-         ],
-         "overwriteTexture":"bricks",
-         "overwriteNormal":"bricks_nmap"
       },
       {
          "id":10003,
@@ -63,8 +41,244 @@
             0,
             0
          ],
-         "overwriteTexture":"none",
-         "overwriteNormal":"none"
+         "isInvisible": true,
+         "castsShadow": false
+      },
+	  {
+         "id":10004,
+         "model":"podium_1",
+         "shader":"normalmap",
+         "position":[
+            0,
+            0,
+            0
+         ],
+         "scale":[
+            3,
+            3,
+            3
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": true,
+		 "overwriteTexture":"bricks",
+         "overwriteNormal":"bricks_nmap"
+      },
+      {
+         "id":10005,
+         "model":"podium_1",
+         "shader":"normalmap",
+         "position":[
+            9,
+            0,
+            -2
+         ],
+         "scale":[
+            3,
+            3,
+            2.5
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": true,
+		 "overwriteTexture":"bricks",
+         "overwriteNormal":"bricks_nmap"
+      },
+      {
+         "id":10006,
+         "model":"podium_1",
+         "shader":"normalmap",
+         "position":[
+            -9,
+            0,
+            -2
+         ],
+         "scale":[
+            3,
+            3,
+            2
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": true,
+		 "overwriteTexture":"bricks",
+         "overwriteNormal":"bricks_nmap"
+      },
+      {
+         "id":10007,
+         "model":"defaultCube",
+         "shader":"normalmap",
+         "position":[
+            0,
+            16,
+            12
+         ],
+         "scale":[
+            48,
+            32,
+            1
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": false,
+		 "overwriteTexture":"wallstone",
+         "overwriteNormal":"wallstone_nmap"
+      },
+      {
+         "id":10008,
+         "model":"defaultCube",
+         "shader":"normalmap",
+         "position":[
+            -22,
+            16,
+            0
+         ],
+         "scale":[
+            1,
+            32,
+            48
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": false,
+		 "overwriteTexture":"wallstone",
+         "overwriteNormal":"wallstone_nmap"
+      },
+      {
+         "id":10009,
+         "model":"defaultCube",
+         "shader":"normalmap",
+         "position":[
+            22,
+            16,
+            0
+         ],
+         "scale":[
+            1,
+            32,
+            48
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": false,
+		 "overwriteTexture":"wallstone",
+         "overwriteNormal":"wallstone_nmap"
+      },
+            {
+         "id":10012,
+         "model":"plant",
+         "shader":"normalmap",
+         "position":[
+            -16,
+            0,
+            0
+         ],
+         "scale":[
+            2,
+            2,
+            2
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": true
+      },
+      {
+         "id":10011,
+         "model":"plant",
+         "shader":"normalmap",
+         "position":[
+            16,
+            0,
+            0
+         ],
+         "scale":[
+            2,
+            2,
+            2
+         ],
+         "rotation":[
+            0,
+            70,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": true
+      },
+      {
+         "id":10013,
+         "model":"torch",
+         "shader":"basictexture",
+         "position":[
+            -5.25,
+            -0.5,
+            2
+         ],
+         "scale":[
+            1,
+            1,
+            1
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": true,
+		   "overwriteTexture":"wallstone",
+         "overwriteNormal":"wallstone_nmap"
+      },
+      {
+         "id":10014,
+         "model":"torch",
+         "shader":"basictexture",
+         "position":[
+            5.25,
+            -0.5,
+            2
+         ],
+         "scale":[
+            1,
+            1,
+            1
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": true,
+		   "overwriteTexture":"wallstone",
+         "overwriteNormal":"wallstone_nmap"
       }
    ]
 }
