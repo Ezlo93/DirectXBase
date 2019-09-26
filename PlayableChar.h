@@ -20,6 +20,7 @@ public:
 
     XMFLOAT3 Translation, Rotation, Scale, Velocity;
     float Speed;
+    float BaseHeight;
 
     void Update(float deltaTime);
 

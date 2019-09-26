@@ -92,6 +92,11 @@ void Level::ReadStaticModels(json& j)
             mis->usedShader = UShader::Normal;
             mis->usedTechnique = UTech::NormalTech;
         }
+        else if (shaderString == "onlyshadow")
+        {
+            mis->usedShader = UShader::Basic;
+            mis->usedTechnique = UTech::BasicOnlyShadow;
+        }
         else
         {
             throw std::exception("unknown shader type");

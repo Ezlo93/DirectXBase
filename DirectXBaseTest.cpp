@@ -1,4 +1,4 @@
-/*DirectXBaseTest.cpp 
+/*DirectXBaseTest.cpp
     minimum template for directx11 application
 
     extends DirectXBase class
@@ -32,7 +32,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     auto end = chrono::system_clock::now();
     chrono::duration<double> elapsed = end - start;
 
-    DBOUT("Loading finished in " << elapsed.count() << " seconds"<< std::endl);
+    DBOUT("Loading finished in " << elapsed.count() << " seconds" << std::endl);
 
     return dxbase.Run();
 }
@@ -154,7 +154,7 @@ bool DXTest::Initialisation()
     playerColors[2] = XMFLOAT4(1.f, 0.8f, 0.22f, 1.0f);
     playerColors[3] = XMFLOAT4(0.f, 0.5f, 0.2f, 1.0f);
 
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
         playCharacters.push_back(new PlayableChar("bar", res));
 
     playball = new Ball("defaultSphere", res, playCharacters);
@@ -162,6 +162,12 @@ bool DXTest::Initialisation()
     clearData();
 
     introCamera.setPosition(10.f, 15.f, 10.f);
+
+    gCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
+    introCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
+    endScreenCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
+
+    activeCamera = &introCamera;
 
     /*test light values*/
     gDirLights.Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
@@ -190,14 +196,19 @@ void DXTest::OnWindowResize()
 
 
     /*recalc camera*/
+
+    activeCamera->setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
+
+    /*
     gCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
+    introCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
+    endScreenCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
+    */
 
     for (auto& i : playCharacters)
     {
         i->getCamera()->setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
     }
-
-    introCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
 }
 
 bool DXTest::goFullscreen(bool s)
@@ -348,6 +359,7 @@ void DXTest::Update(float deltaTime)
         introPos.z = INTROCAMERA_RADIUS * sin(2 * XM_PI * introCameraTime * INTROCAMERA_SPEED);
 
         introCamera.lookAt(introPos, XMFLOAT3(0.f, 0.f, 0.f), XMFLOAT3(0.f, 1.0f, 0.f));
+
         /*first player press start to continue*/
         if (playerCount > 0)
         {
@@ -418,11 +430,12 @@ void DXTest::Update(float deltaTime)
 
         if (transToEndScreen && transitionInProgress == 0)
         {
+            setupEndScreen();
             gameState = MainGameState::END_SCREEN;
             transitionInProgress = 2;
             transToEndScreen = false;
         }
-        else if(!allDead)
+        else if (!allDead)
         {
 
             activeCamera = playCharacters[players.front()->getCharacter()]->getCamera();
@@ -490,9 +503,9 @@ void DXTest::Update(float deltaTime)
                 {
                     DBOUT("Player " << i->controllingPlayer->pID << " has died!\n");
                     i->npc = true;
-                    i->Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+                    winOrder.push_back(i->controllingPlayer);
+                    DBOUT("Player " << i->controllingPlayer->pID << " added to win order\n");
                     i->controllingPlayer = nullptr;
-
                 }
                 else
                 {
@@ -525,11 +538,40 @@ void DXTest::Update(float deltaTime)
 
             endTimer += deltaTime;
 
+            /*jump on podium*/
+            for (auto& i : players)
+            {
+                if (playCharacters[i->getCharacter()]->Velocity.y <= 0.f && input->ButtonPressed(i->getInput(), BUTTON_A))
+                {
+                    playCharacters[i->getCharacter()]->Velocity.y = 5.f;
+                }
+
+            }
+
+            /*move camera*/
+            /*start @ XMFLOAT3(-13.f, 22.f, -30.f)*/
+            endCameraTime += deltaTime;
+
+            XMFLOAT3 endPos;
+            endPos.y = ENDCAMERA_Y - (.8f * endCameraTime);
+            endPos.x = ENDCAMERA_X + (2.0f * endCameraTime);
+            endPos.z = ENDCAMERA_Z;
+
+            endScreenCamera.lookAt(endPos, XMFLOAT3(0.0,6.0,0.0),XMFLOAT3(0.0,1.0,0.0));
+
+
+            for (auto& p : playCharacters)
+            {
+                p->Update(deltaTime);
+            }
+
+            /*init switch back to player reg*/
             if (endTimer >= END_TIME_V)
-            { 
+            {
                 transToRegistration = true;
                 transitionInProgress = 1;
             }
+
         }
     }
 
@@ -556,7 +598,7 @@ void DXTest::Update(float deltaTime)
     //gCamera.yaw(yaw);
     //gCamera.pitch(pitch);
 
-    
+
 
     /*rotate light*/
     lightRotationAngle += 0.1f * deltaTime;
@@ -569,14 +611,17 @@ void DXTest::Update(float deltaTime)
     buildShadowTransform();
 
     /*update camera position*/
-    gCamera.UpdateViewMatrix();
+    activeCamera->UpdateViewMatrix();
+
+    /*gCamera.UpdateViewMatrix();
     introCamera.UpdateViewMatrix();
+    endScreenCamera.UpdateViewMatrix();*/
 }
 
 
 void DXTest::Draw()
 {
-  
+
     /*draw to shadow map*/
     shadowMap->BindDsvAndSetNullRenderTarget(deviceContext);
 
@@ -607,7 +652,7 @@ void DXTest::Draw()
 
     /*reset to offscreen texture rendertarget*/
     /*clear buffers*/
-    
+
     //ID3D11RenderTargetView* renderTargets[1] = { renderTargetView };
     ID3D11RenderTargetView* renderTargets[1] = { mOffscreenRTV };
     deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
@@ -626,7 +671,7 @@ void DXTest::Draw()
     {
         deviceContext->RSSetState(RenderStates::wireFrame);
     }
-    
+
     /*set shader constants that are not object dependant*/
     /*basic shader*/
     Shaders::basicTextureShader->SetEyePosW(activeCamera->getPosition());
@@ -645,8 +690,9 @@ void DXTest::Draw()
     XMMATRIX st = XMLoadFloat4x4(&shadowTransform);
 
     it = activeLevel->modelsStatic.begin();
-    while(it != activeLevel->modelsStatic.end()){
-         it->second->Draw(device, deviceContext, activeCamera, st);
+    while (it != activeLevel->modelsStatic.end())
+    {
+        it->second->Draw(device, deviceContext, activeCamera, st);
         it++;
     }
 
@@ -672,7 +718,7 @@ void DXTest::Draw()
     {
         blurEffect.BlurSRV(deviceContext, mOffscreenSRV, mOffscreenUAV, blurStrength);
     }
-    
+
 
     DrawScreenQuad(mOffscreenSRV);
 
@@ -708,28 +754,28 @@ void DXTest::BuildScreenQuadGeometryBuffers()
         0.0f, 1.0f,
         0.0f, 0.0f, -1.0f,
         1.0f, 0.0f, 0.0f
-        );
+    );
 
     Vertices[1] = Vertex::Standard(
         -1.0f, +1.0f, 0.0f,
         0.0f, 0.0f,
         0.0f, 0.0f, -1.0f,
         1.0f, 0.0f, 0.0f
-        );
+    );
 
     Vertices[2] = Vertex::Standard(
         +1.0f, +1.0f, 0.0f,
         1.0f, 0.0f,
         0.0f, 0.0f, -1.0f,
         1.0f, 0.0f, 0.0f
-        );
+    );
 
     Vertices[3] = Vertex::Standard(
         +1.0f, -1.0f, 0.0f,
         1.0f, 1.0f,
         0.0f, 0.0f, -1.0f,
         1.0f, 0.0f, 0.0f
-       );
+    );
 
     indices[0] = 0;
     indices[1] = 1;
@@ -741,7 +787,7 @@ void DXTest::BuildScreenQuadGeometryBuffers()
 
     D3D11_BUFFER_DESC vbd;
     vbd.Usage = D3D11_USAGE_IMMUTABLE;
-    vbd.ByteWidth = (UINT)( sizeof(Vertex::Standard) * Vertices.size());
+    vbd.ByteWidth = (UINT)(sizeof(Vertex::Standard) * Vertices.size());
     vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     vbd.CPUAccessFlags = 0;
     vbd.MiscFlags = 0;
@@ -832,6 +878,8 @@ void DXTest::BuildOffscreenViews()
 
 void DXTest::clearData()
 {
+    winOrder.clear();
+
     for (auto& i : players)
     {
         delete i;
@@ -843,6 +891,7 @@ void DXTest::clearData()
         i->controllingPlayer = nullptr;
         i->npc = true;
         i->Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+        i->BaseHeight = 1.f;
     }
 
     playball->resetBallFull();
@@ -869,6 +918,77 @@ void DXTest::clearData()
 
     playCharacters[2]->hitBox.Orientation = XMFLOAT4(0.f, 0.f, 0.7071068f, 0.7071068f);
     playCharacters[3]->hitBox.Orientation = XMFLOAT4(0.f, 0.f, -0.7071068f, 0.7071068f);
+}
+
+void DXTest::setupEndScreen()
+{
+
+    /*place camera*/
+    endCameraTime = 0;
+    endScreenCamera.lookAt(XMFLOAT3(ENDCAMERA_X, ENDCAMERA_Y, ENDCAMERA_Z), XMFLOAT3(0.f, 6.f, 0.f), XMFLOAT3(0.f, 1.0f, 0.f));
+
+
+    activeCamera = &endScreenCamera;
+
+    /*place players in right order*/
+    DBOUT(winOrder.size() << " in the win order\n");
+    ASSERT(winOrder.size() <= 4);
+
+
+    int counter = 4 - (int)winOrder.size();
+
+    for (auto& i : winOrder)
+    {
+
+        if (counter == 0)
+        {
+            playCharacters[i->getCharacter()]->Translation.x = 0;
+            playCharacters[i->getCharacter()]->Translation.y = -10;
+            playCharacters[i->getCharacter()]->Translation.z = 0;
+        }
+        else if (counter == 1)
+        {
+            playCharacters[i->getCharacter()]->Translation.x = -8.75;
+            playCharacters[i->getCharacter()]->Translation.y = 7;
+            playCharacters[i->getCharacter()]->Translation.z = -2;
+
+            playCharacters[i->getCharacter()]->BaseHeight = 7;
+
+            if (playCharacters[i->getCharacter()]->Orientation)
+            {
+                playCharacters[i->getCharacter()]->Rotation.z = 0;
+            }
+        }
+        else if (counter == 2)
+        {
+            playCharacters[i->getCharacter()]->Translation.x = 8.75;
+            playCharacters[i->getCharacter()]->Translation.y = 8.5;
+            playCharacters[i->getCharacter()]->Translation.z = -2;
+
+            playCharacters[i->getCharacter()]->BaseHeight = 8.5;
+
+            if (playCharacters[i->getCharacter()]->Orientation)
+            {
+                playCharacters[i->getCharacter()]->Rotation.z = 0;
+            }
+        }
+        else
+        {
+            playCharacters[i->getCharacter()]->Translation.x = 0;
+            playCharacters[i->getCharacter()]->Translation.y = 10;
+            playCharacters[i->getCharacter()]->Translation.z = 0;
+
+            playCharacters[i->getCharacter()]->BaseHeight = 10;
+
+            if (playCharacters[i->getCharacter()]->Orientation)
+            {
+                playCharacters[i->getCharacter()]->Rotation.z = 0;
+            }
+        }
+
+        counter++;
+    }
+
 }
 
 

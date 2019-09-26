@@ -119,7 +119,7 @@
       {
          "id":10007,
          "model":"defaultCube",
-         "shader":"normalmap",
+         "shader":"onlyshadow",
          "position":[
             0,
             16,
@@ -143,7 +143,7 @@
       {
          "id":10008,
          "model":"defaultCube",
-         "shader":"normalmap",
+         "shader":"onlyshadow",
          "position":[
             -22,
             16,
@@ -167,7 +167,7 @@
       {
          "id":10009,
          "model":"defaultCube",
-         "shader":"normalmap",
+         "shader":"onlyshadow",
          "position":[
             22,
             16,

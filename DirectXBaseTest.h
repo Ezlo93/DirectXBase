@@ -46,14 +46,17 @@ private:
     float clearColor[4], clearColorSec[4];
     Skybox* skybox;
     Camera introCamera;
+    Camera endScreenCamera;
     float introCameraTime = 0;
+    float endCameraTime = 0;
 
     /*gameplay related*/
     Ball* playball;
     std::vector<PlayableChar*> playCharacters;
     std::vector<Player*> players;
-    MainGameState gameState = PLAYER_REGISTRATION;
-    MainGameState prevGameState = PLAYER_REGISTRATION;
+    std::vector<Player*> winOrder;
+    MainGameState gameState = MainGameState::PLAYER_REGISTRATION;
+    MainGameState prevGameState = MainGameState::PLAYER_REGISTRATION;
 
     int playerCount = 0;
     bool allDead = false;
@@ -65,6 +68,7 @@ private:
     float transitionTimer = 0.f;
     float endTimer = 0.f;
     void clearData();
+    void setupEndScreen();
 
     /*lighting*/
     DirectionalLight gDirLights;

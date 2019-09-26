@@ -79,7 +79,7 @@ VertexOut VS(VertexIn vin)
 	return vout;
 }
  
-float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting, uniform bool gUseStaticColor) : SV_Target
+float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting, uniform bool gUseStaticColor, uniform bool gOnlyShadow) : SV_Target
 {
 
 	// Interpolating normal can unnormalize it, so normalize it.
@@ -105,6 +105,13 @@ float4 PS(VertexOut pin, uniform bool gUseTexture, uniform bool gUseLighting, un
 
 	if(!gUseLighting){
 		texColor.a = gMaterial.Diffuse.a;
+
+		if(gOnlyShadow){
+				float3 shadow = float3(1.0f, 1.0f, 1.0f);
+				shadow[0] = CalcShadowFactor(samShadow, gShadowMap, pin.ShadowPosH);
+				texColor *= shadow[0];
+		}
+
 		return texColor;
 	}
 
@@ -154,7 +161,7 @@ technique11 BasicTextureTech
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(true,  true, false) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS(true,  true, false,false) ) );
     }
 }
 
@@ -164,7 +171,7 @@ technique11 BasicNoTextureTech
 	{
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(false, true, false) ) );	
+        SetPixelShader( CompileShader( ps_5_0, PS(false, true, false,false) ) );	
 	}
 }
 
@@ -174,7 +181,7 @@ technique11 BasicTextureNoLighting
 	{
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(true, false,false) ) );	
+        SetPixelShader( CompileShader( ps_5_0, PS(true, false,false,false) ) );	
 	}
 }
 
@@ -184,6 +191,16 @@ technique11 BasicStaticColor
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(false,  true, true) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS(false,  true, true, false) ) );
+    }
+}
+
+technique11 BasicOnlyShadow
+{
+    pass P0
+    {
+        SetVertexShader( CompileShader( vs_5_0, VS() ) );
+		SetGeometryShader( NULL );
+        SetPixelShader( CompileShader( ps_5_0, PS(true,  false, false, true) ) );
     }
 }

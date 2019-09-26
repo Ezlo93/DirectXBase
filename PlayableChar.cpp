@@ -39,14 +39,15 @@ void PlayableChar::Update(float deltaTime)
     {
         jumpTime += deltaTime;
 
-        if (Translation.y >= 1.0f)
+        if (Translation.y >= BaseHeight)
         {
-            Translation.y = Velocity.y * jumpTime - (GRAVITY / 1.5f * jumpTime * jumpTime) + 1.0f;
+            Translation.y = Velocity.y * jumpTime - (GRAVITY / 1.5f * jumpTime * jumpTime) + BaseHeight;
         }
         else
         {
-            jumpTime = 0;
-            Velocity.y = 0;
+            jumpTime = 0.f;
+            Velocity.y = 0.f;
+            Translation.y = BaseHeight;
         }
     }
 

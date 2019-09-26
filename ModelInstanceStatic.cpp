@@ -58,6 +58,7 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                 case UTech::Basic: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
                 case UTech::BasicNoTexture: tech = Shaders::basicTextureShader->BasicNoTextureTechnique; break;
                 case UTech::BasicNoLighting: tech = Shaders::basicTextureShader->BasicTextureNoLighting; break;
+                case UTech::BasicOnlyShadow: tech = Shaders::basicTextureShader->BasicOnlyShadow; break;
                 default: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
             }
             break;
@@ -88,6 +89,25 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                     {
                         case UTech::Basic:
                             
+                            Shaders::basicTextureShader->SetWorld(world);
+                            Shaders::basicTextureShader->SetWorldViewProj(wvp);
+                            Shaders::basicTextureShader->SetWorldInvTranspose(wit);
+                            Shaders::basicTextureShader->SetMaterial(m->material);
+
+                            if (useOverwriteDiffuse)
+                            {
+                                Shaders::basicTextureShader->SetTexture(resources->getTexture(ovrwrTex));
+                            }
+                            else
+                            {
+                                Shaders::basicTextureShader->SetTexture(resources->getTexture(m->diffuseMapID));
+                            }
+
+                            Shaders::basicTextureShader->SetTexTransform(XMLoadFloat4x4(&TextureTransform));
+                            Shaders::basicTextureShader->SetShadowTransform(world * shadowT);
+                            break;
+
+                        case UTech::BasicOnlyShadow:
                             Shaders::basicTextureShader->SetWorld(world);
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
                             Shaders::basicTextureShader->SetWorldInvTranspose(wit);

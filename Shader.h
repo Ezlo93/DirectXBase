@@ -19,6 +19,7 @@ namespace UTech {
         BasicNoTexture,
         BasicNoLighting,
         BasicStaticColor,
+        BasicOnlyShadow,
         NormalTech
     };
 }
@@ -67,6 +68,7 @@ public:
     ID3DX11EffectTechnique* BasicNoTextureTechnique;
     ID3DX11EffectTechnique* BasicTextureNoLighting;
     ID3DX11EffectTechnique* BasicStaticColor;
+    ID3DX11EffectTechnique* BasicOnlyShadow;
 
     ID3DX11EffectMatrixVariable* WorldViewProj;
     ID3DX11EffectMatrixVariable* World;
