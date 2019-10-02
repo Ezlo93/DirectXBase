@@ -8,6 +8,7 @@ class InputLayoutDesc
 public:
     static const D3D11_INPUT_ELEMENT_DESC Pos[1];
     static const D3D11_INPUT_ELEMENT_DESC Standard[4];
+    static const D3D11_INPUT_ELEMENT_DESC Particle[5];
     static const D3D11_INPUT_ELEMENT_DESC StandardSkinned[6];
 };
 
@@ -19,5 +20,6 @@ public:
 
     static ID3D11InputLayout* Pos;
     static ID3D11InputLayout* Standard;
+    static ID3D11InputLayout* Particle;
     static ID3D11InputLayout* StandardSkinned;
 };

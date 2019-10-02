@@ -30,6 +30,15 @@ namespace Vertex
         XMFLOAT3 Weights;
         BYTE BoneIndices[4];
     };
+
+    struct Particle
+    {
+        XMFLOAT3 InitialPos;
+        XMFLOAT3 InitialVel;
+        XMFLOAT2 Size;
+        float Age;
+        unsigned int Type;
+    };
 }
 
 namespace Material {

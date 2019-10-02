@@ -9,6 +9,7 @@ NormalMapShader* Shaders::normalMapShader = 0;
 ShadowMapShader* Shaders::shadowMapShader = 0;
 BlurShader* Shaders::blurShader = 0;
 FullscreenShader* Shaders::fullscreenShader = 0;
+ParticleEffect* Shaders::fireShader = 0;
 
 
 void Shaders::Init(ID3D11Device* device)
@@ -19,6 +20,8 @@ void Shaders::Init(ID3D11Device* device)
     shadowMapShader = new ShadowMapShader(device, L"data/shader/shadowmap.fxo");
     blurShader = new BlurShader(device, L"data/shader/blur.fxo");
     fullscreenShader = new FullscreenShader(device, L"data/shader/fullScreenQuad.fxo");
+    fireShader = new ParticleEffect(device, L"data/shader/fire.fxo");
+
 }
 
 void Shaders::Destroy()
@@ -29,6 +32,7 @@ void Shaders::Destroy()
     delete shadowMapShader; shadowMapShader = 0;
     delete blurShader; blurShader = 0;
     delete fullscreenShader; fullscreenShader = 0;
+    delete fireShader; fireShader = 0;
 }
 
 
@@ -186,6 +190,30 @@ ShadowMapShader::~ShadowMapShader()
     DXRelease(ViewProj);
 }
 
+/*particle shader*/
+
+ParticleEffect::ParticleEffect(ID3D11Device* device, const std::wstring& filename)
+    : Shader(device, filename)
+{
+    StreamOutTech = effect->GetTechniqueByName("StreamOutTech");
+    DrawTech = effect->GetTechniqueByName("DrawTech");
+
+    ViewProj = effect->GetVariableByName("gViewProj")->AsMatrix();
+    GameTime = effect->GetVariableByName("gGameTime")->AsScalar();
+    TimeStep = effect->GetVariableByName("gTimeStep")->AsScalar();
+    EyePosW = effect->GetVariableByName("gEyePosW")->AsVector();
+    EmitPosW = effect->GetVariableByName("gEmitPosW")->AsVector();
+    EmitDirW = effect->GetVariableByName("gEmitDirW")->AsVector();
+    TexArray = effect->GetVariableByName("gTexArray")->AsShaderResource();
+    RandomTex = effect->GetVariableByName("gRandomTex")->AsShaderResource();
+}
+
+ParticleEffect::~ParticleEffect()
+{
+    DXRelease(StreamOutTech);
+    DXRelease(DrawTech);
+}
+
 
 /*blur shader*/
 
@@ -203,7 +231,8 @@ BlurShader::BlurShader(ID3D11Device* device, const std::wstring& filename) : Sha
 
 BlurShader::~BlurShader()
 {
-
+    DXRelease(HorizontalBlur);
+    DXRelease(VerticalBlur);
 }
 
 /* debug shader*/
@@ -222,5 +251,5 @@ FullscreenShader::FullscreenShader(ID3D11Device* device, const std::wstring& fil
 
 FullscreenShader::~FullscreenShader()
 {
-
+    DXRelease(ViewStandard);
 }
