@@ -18,6 +18,7 @@
 #include "Ball.h"
 #include "PlayableChar.h"
 #include "Player.h"
+#include "ParticleSystem.h"
 
 enum MainGameState
 {
@@ -86,6 +87,11 @@ private:
     void buildShadowTransform();
 
     /*render related*/
+
+    /*particle system*/
+    ParticleSystem mFire;
+    float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
     Blur blurEffect;
     int blurStrength = 0;
 

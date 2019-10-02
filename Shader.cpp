@@ -41,8 +41,14 @@ Shader::Shader(ID3D11Device* device, const std::wstring& filename)
 {
     std::ifstream fin(filename.c_str(), std::ios::binary);
 
+    if (!fin)
+    {
+        throw std::runtime_error("missing shader file!");
+    }
+
     fin.seekg(0, std::ios_base::end);
     int size = (int)fin.tellg();
+
     fin.seekg(0, std::ios_base::beg);
     std::vector<char> compiledShader(size);
 

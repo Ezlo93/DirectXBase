@@ -147,6 +147,15 @@ bool DXTest::Initialisation()
 
     activeLevel = gameLevel;
 
+    /*particle system*/
+
+    std::vector<std::wstring> flares;
+    flares.push_back(L"data/textures/flare0.dds");
+    ID3D11ShaderResourceView* mFlare = CreateTexture2DArraySRV(device, deviceContext, flares);
+
+    mFire.init(device, Shaders::fireShader, mFlare, CreateRandomTexture1DSRV(device), 500);
+    mFire.setEmitPosition(XMFLOAT3(0.0f, 1.0f, 3.0f));
+
     /*player character and ball*/
 
     playerColors[0] = XMFLOAT4(0.3f, 0.55f, 1.f, 1.0f);
@@ -598,6 +607,8 @@ void DXTest::Update(float deltaTime)
     //gCamera.yaw(yaw);
     //gCamera.pitch(pitch);
 
+    /*particle system*/
+    mFire.update(deltaTime, gTime.getTotalTime());
 
 
     /*rotate light*/
@@ -704,6 +715,12 @@ void DXTest::Draw()
     {
         i->Draw(device, deviceContext, activeCamera, st);
     }
+
+    /*particle system*/
+    mFire.setEyePos(activeCamera->getPosition());
+    mFire.draw(deviceContext, *activeCamera);
+    deviceContext->OMSetBlendState(0, blendFactor, 0xffffffff); // restore default
+
 
     //render sky box last
     skybox->Draw(deviceContext, *activeCamera);

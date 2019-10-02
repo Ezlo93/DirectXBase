@@ -12,6 +12,7 @@
 #include <vector>
 #include <map>
 #include "constants.h"
+#include "DDSTextureLoader.h"
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -106,3 +107,144 @@ public:
     }
 
 };
+
+static ID3D11ShaderResourceView* CreateRandomTexture1DSRV(ID3D11Device* device)
+{
+    // 
+    // Create the random data.
+    //
+    XMFLOAT4 randomValues[1024];
+
+    for (int i = 0; i < 1024; ++i)
+    {
+        randomValues[i].x = DXMath::RandF(-1.0f, 1.0f);
+        randomValues[i].y = DXMath::RandF(-1.0f, 1.0f);
+        randomValues[i].z = DXMath::RandF(-1.0f, 1.0f);
+        randomValues[i].w = DXMath::RandF(-1.0f, 1.0f);
+    }
+
+    D3D11_SUBRESOURCE_DATA initData;
+    initData.pSysMem = randomValues;
+    initData.SysMemPitch = 1024 * sizeof(XMFLOAT4);
+    initData.SysMemSlicePitch = 0;
+
+    //
+    // Create the texture.
+    //
+    D3D11_TEXTURE1D_DESC texDesc;
+    texDesc.Width = 1024;
+    texDesc.MipLevels = 1;
+    texDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    texDesc.Usage = D3D11_USAGE_IMMUTABLE;
+    texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    texDesc.CPUAccessFlags = 0;
+    texDesc.MiscFlags = 0;
+    texDesc.ArraySize = 1;
+
+    ID3D11Texture1D* randomTex = 0;
+    device->CreateTexture1D(&texDesc, &initData, &randomTex);
+
+    //
+    // Create the resource view.
+    //
+    D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+    viewDesc.Format = texDesc.Format;
+    viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
+    viewDesc.Texture1D.MipLevels = texDesc.MipLevels;
+    viewDesc.Texture1D.MostDetailedMip = 0;
+
+    ID3D11ShaderResourceView* randomTexSRV = 0;
+    device->CreateShaderResourceView(randomTex, &viewDesc, &randomTexSRV);
+
+    DXRelease(randomTex);
+
+    return randomTexSRV;
+}
+
+static ID3D11ShaderResourceView* CreateTexture2DArraySRV(ID3D11Device* device, ID3D11DeviceContext* context, std::vector<std::wstring>& filenames)
+{
+
+
+    UINT size = (UINT)filenames.size();
+    std::vector<ID3D11Texture2D*> srcTex(size);
+
+    ID3D11ShaderResourceView* texArraySRV = 0;
+
+    /*load all texture in vector*/
+
+    for (UINT i = 0; i < size; i++)
+    {
+
+
+        CreateDDSTextureFromFileEx(device,
+           filenames[i].c_str(),
+           0,
+           D3D11_USAGE_STAGING,
+           0,
+           D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ,
+           0,
+           false,
+           (ID3D11Resource**)&srcTex[i],
+           nullptr,
+           nullptr)        ;
+    }
+
+    /*Create texture array*/
+    D3D11_TEXTURE2D_DESC texElemDesc;
+    srcTex[0]->GetDesc(&texElemDesc);
+
+    D3D11_TEXTURE2D_DESC texArrDesc;
+    texArrDesc.Width = texElemDesc.Width;
+    texArrDesc.Height = texElemDesc.Height;
+    texArrDesc.MipLevels = texElemDesc.MipLevels;
+    texArrDesc.ArraySize = size;
+    texArrDesc.Format = texElemDesc.Format;
+    texArrDesc.SampleDesc.Count = 1;
+    texArrDesc.SampleDesc.Quality = 0;
+    texArrDesc.Usage = D3D11_USAGE_DEFAULT;
+    texArrDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    texArrDesc.CPUAccessFlags = 0;
+    texArrDesc.MiscFlags = 0;
+
+    ID3D11Texture2D* texArray = 0;
+    device->CreateTexture2D(&texArrDesc, 0, &texArray);
+
+    /* copy textures to array */
+
+    for (UINT i = 0; i < size; i++)
+    {
+
+        for (UINT m = 0; m < texElemDesc.MipLevels; m++)
+        {
+            D3D11_MAPPED_SUBRESOURCE mappedTex;
+
+            context->Map(srcTex[i], m, D3D11_MAP_READ, 0, &mappedTex);
+            context->UpdateSubresource(texArray, D3D11CalcSubresource(m, i, texElemDesc.MipLevels), 0,
+                                       mappedTex.pData, mappedTex.RowPitch, mappedTex.DepthPitch);
+            context->Unmap(srcTex[i], m);
+        }
+
+    }
+
+    /* create srv for tex array*/
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+
+    srvDesc.Format = texArrDesc.Format;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+    srvDesc.Texture2DArray.MostDetailedMip = 0;
+    srvDesc.Texture2DArray.MipLevels = texArrDesc.MipLevels;
+    srvDesc.Texture2DArray.FirstArraySlice = 0;
+    srvDesc.Texture2DArray.ArraySize = size;
+
+    device->CreateShaderResourceView(texArray, &srvDesc, &texArraySRV);
+
+    DXRelease(texArray);
+
+    for (UINT i = 0; i < size; i++)
+    {
+        DXRelease(srcTex[i]);
+    }
+
+    return texArraySRV;
+}
