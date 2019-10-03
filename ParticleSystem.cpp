@@ -3,6 +3,10 @@
 
 ParticleSystem::ParticleSystem()
 {
+    firstRun = true;
+    mStreamVB = 0;
+    mTexArraySRV = 0;
+    mRandomSRV = 0;
     mEyePosW = XMFLOAT3(0.0f, 0.0f, 0.0f);
     mEmitPositionW = XMFLOAT3(0.0f, 0.0f, 0.0f);
     mEmitDirectionW = XMFLOAT3(0.0f, 1.0f, 0.0f);
@@ -38,9 +42,9 @@ void ParticleSystem::setEmitDirection(const XMFLOAT3& emitDirW)
 
 
 void ParticleSystem::init(ID3D11Device* device, ParticleEffect* fx, ID3D11ShaderResourceView* texArraySRV,
-                          ID3D11ShaderResourceView* randomTexSRV, UINT maxParticles)
+                          ID3D11ShaderResourceView* randomTexSRV, UINT maxP)
 {
-    maxParticles = maxParticles;
+    maxParticles = maxP;
 
     effect = fx;
 
@@ -56,9 +60,9 @@ void ParticleSystem::reset()
     age = 0.0f;
 }
 
-void ParticleSystem::update(float dt, float gameTime)
+void ParticleSystem::update(float dt, float gt)
 {
-    gameTime = gameTime;
+    gameTime = gt;
     timeStep = dt;
 
     age += dt;

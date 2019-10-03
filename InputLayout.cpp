@@ -55,8 +55,8 @@ void InputLayouts::Init(ID3D11Device* device)
     device->CreateInputLayout(InputLayoutDesc::Standard, 4, passDesc.pIAInputSignature,
        passDesc.IAInputSignatureSize, &Standard);
 
-    //Shaders::fireShader->StreamOutTech->GetPassByIndex(0)->GetDesc(&passDesc);
-    //device->CreateInputLayout(InputLayoutDesc::Particle, 5, passDesc.pIAInputSignature, passDesc.IAInputSignatureSize, &Particle);
+    Shaders::fireShader->StreamOutTech->GetPassByIndex(0)->GetDesc(&passDesc);
+    device->CreateInputLayout(InputLayoutDesc::Particle, 5, passDesc.pIAInputSignature, passDesc.IAInputSignatureSize, &Particle);
 }
 
 void InputLayouts::Destroy()

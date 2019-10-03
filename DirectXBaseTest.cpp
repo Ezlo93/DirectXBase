@@ -130,7 +130,7 @@ bool DXTest::Initialisation()
     res->getModelCollection()->SetDefaultModel("defaultCube");
 
     /*create 100 unit radius sized skysphere*/
-    skybox = new Skybox(device, L"data/skybox/sunsetcube1024.dds", 100.f);
+    skybox = new Skybox(device, L"data/skybox/grasscube1024.dds", 100.f);
 
     /*create shadow map*/
     shadowMap = new ShadowMap(device, SHADOW_HIGH);
@@ -154,7 +154,7 @@ bool DXTest::Initialisation()
     ID3D11ShaderResourceView* mFlare = CreateTexture2DArraySRV(device, deviceContext, flares);
 
     mFire.init(device, Shaders::fireShader, mFlare, CreateRandomTexture1DSRV(device), 500);
-    mFire.setEmitPosition(XMFLOAT3(0.0f, 1.0f, 3.0f));
+    mFire.setEmitPosition(XMFLOAT3(0.0f, 4.0f, 3.0f));
 
     /*player character and ball*/
 
@@ -697,6 +697,7 @@ void DXTest::Draw()
     Shaders::normalMapShader->SetShadowMap(shadowMap->DepthMapSRV());
 
 
+
     /*draw static models*/
     XMMATRIX st = XMLoadFloat4x4(&shadowTransform);
 
@@ -716,15 +717,16 @@ void DXTest::Draw()
         i->Draw(device, deviceContext, activeCamera, st);
     }
 
-    /*particle system*/
-    mFire.setEyePos(activeCamera->getPosition());
-    mFire.draw(deviceContext, *activeCamera);
-    deviceContext->OMSetBlendState(0, blendFactor, 0xffffffff); // restore default
-
 
     //render sky box last
     skybox->Draw(deviceContext, *activeCamera);
 
+    /*particle system*/
+    mFire.setEyePos(activeCamera->getPosition());
+    mFire.draw(deviceContext, *activeCamera);
+    deviceContext->RSSetState(0);
+    deviceContext->OMSetDepthStencilState(0, 0);
+    deviceContext->OMSetBlendState(0, blendFactor, 0xffffffff);
 
     /*blur*/
 

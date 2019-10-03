@@ -18,7 +18,7 @@ public:
               ID3D11ShaderResourceView* randomSRV, UINT maxP);
 
     void reset();
-    void update(float deltaTime, float gameTime);
+    void update(float deltaTime, float gt);
     void draw(ID3D11DeviceContext* context, Camera& cam);
 
 private:

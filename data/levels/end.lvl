@@ -1,4 +1,26 @@
 {
+   "dynamic":[
+      {
+         "id":20001,
+         "type":"particle",
+         "shader":"fire",
+         "position":[
+            -5.25,
+            4,
+            2
+         ],
+         "scale":[
+            1,
+            1,
+            1
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ]
+      }
+   ],
    "static":[
       {
          "id":10001,

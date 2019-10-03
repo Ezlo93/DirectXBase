@@ -43,7 +43,7 @@
 
 /*player.h*/
 #ifdef _DEBUG
-#define MAX_HP 0
+#define MAX_HP 1
 #else
 #define MAX_HP 3
 #endif
