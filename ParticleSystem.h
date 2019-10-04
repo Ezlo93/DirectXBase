@@ -13,6 +13,8 @@ public:
     void setEyePos(const XMFLOAT3& eyePosW);
     void setEmitPosition(const XMFLOAT3& emitPosW);
     void setEmitDirection(const XMFLOAT3& emitDirW);
+    void setAcceleration(const XMFLOAT3& acc);
+    void setSizeParticle(const XMFLOAT2& size);
 
     void init(ID3D11Device* device, ParticleEffect* fx, ID3D11ShaderResourceView* texArraySRV,
               ID3D11ShaderResourceView* randomSRV, UINT maxP);
@@ -34,6 +36,8 @@ private:
     XMFLOAT3 mEyePosW;
     XMFLOAT3 mEmitPositionW;
     XMFLOAT3 mEmitDirectionW;
+    XMFLOAT3 mAcceleration;
+    XMFLOAT2 mSizeParticle;
 
     ParticleEffect* effect = 0;
 

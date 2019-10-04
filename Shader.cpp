@@ -210,6 +210,8 @@ ParticleEffect::ParticleEffect(ID3D11Device* device, const std::wstring& filenam
     EyePosW = effect->GetVariableByName("gEyePosW")->AsVector();
     EmitPosW = effect->GetVariableByName("gEmitPosW")->AsVector();
     EmitDirW = effect->GetVariableByName("gEmitDirW")->AsVector();
+    AccelerationW = effect->GetVariableByName("gAccelerationW")->AsVector();
+    SizeParticle = effect->GetVariableByName("gSizeParticle")->AsVector();
     TexArray = effect->GetVariableByName("gTexArray")->AsShaderResource();
     RandomTex = effect->GetVariableByName("gRandomTex")->AsShaderResource();
 }

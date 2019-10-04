@@ -189,7 +189,7 @@ bool DXTest::Initialisation()
     BuildScreenQuadGeometryBuffers();
 
     OnWindowResize();
-    goFullscreen(true);
+    //goFullscreen(true);
 
     return true;
 }
@@ -269,6 +269,13 @@ void DXTest::buildShadowTransform()
     XMStoreFloat4x4(&lightProj, P);
     XMStoreFloat4x4(&shadowTransform, S);
 
+}
+
+void DXTest::switchLevel(Level& lvl)
+{
+    if (activeLevel == &lvl) return;
+    lvl.Reset();
+    activeLevel = &lvl;
 }
 
 bool DXTest::UpdateTransition(float deltaTime)
@@ -356,7 +363,7 @@ void DXTest::Update(float deltaTime)
 
         input->usedInputActive = false;
         activeCamera = &introCamera;
-        activeLevel = gameLevel;
+        switchLevel(*gameLevel);
 
         /*set position of introcamera*/
 
@@ -534,7 +541,7 @@ void DXTest::Update(float deltaTime)
     }
     else if (gameState == MainGameState::END_SCREEN)
     {
-        activeLevel = endLevel;
+        switchLevel(*endLevel);
         if (transToRegistration && transitionInProgress == 0)
         {
             clearData();

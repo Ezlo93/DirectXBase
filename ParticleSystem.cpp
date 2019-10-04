@@ -39,6 +39,16 @@ void ParticleSystem::setEmitDirection(const XMFLOAT3& emitDirW)
     mEmitDirectionW = emitDirW;
 }
 
+void ParticleSystem::setAcceleration(const XMFLOAT3& acc)
+{
+    mAcceleration = acc;
+}
+
+void ParticleSystem::setSizeParticle(const XMFLOAT2& size)
+{
+    mSizeParticle = size;
+}
+
 
 
 void ParticleSystem::init(ID3D11Device* device, ParticleEffect* fx, ID3D11ShaderResourceView* texArraySRV,
@@ -50,6 +60,9 @@ void ParticleSystem::init(ID3D11Device* device, ParticleEffect* fx, ID3D11Shader
 
     mTexArraySRV = texArraySRV;
     mRandomSRV = randomTexSRV;
+
+    mSizeParticle = XMFLOAT2(1.f, 1.f);
+    mAcceleration = XMFLOAT3(0.f, 8.f, 0.f);
 
     buildVertexBuffer(device);
 }
@@ -81,6 +94,8 @@ void ParticleSystem::draw(ID3D11DeviceContext* dc, Camera& cam)
     effect->SetEyePosW(mEyePosW);
     effect->SetEmitPosW(mEmitPositionW);
     effect->SetEmitDirW(mEmitDirectionW);
+    effect->SetAccelerationW(mAcceleration);
+    effect->SetSizeParticle(mSizeParticle);
     effect->SetTexArray(mTexArraySRV);
     effect->SetRandomTex(mRandomSRV);
 

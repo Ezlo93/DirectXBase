@@ -16,7 +16,8 @@ cbuffer cbPerFrame
 	// for when the emit position/direction is varying
 	float3 gEmitPosW;
 	float3 gEmitDirW;
-	
+	float2 gSizeParticle;
+	float3 gAccelW;
 	float gGameTime;
 	float gTimeStep;
 	float4x4 gViewProj; 
@@ -25,7 +26,7 @@ cbuffer cbPerFrame
 cbuffer cbFixed
 {
 	// Net constant acceleration used to accerlate the particles.
-	float3 gAccelW = {0.0f, 7.8f, 0.0f};
+	
 	
 	// Texture coordinates used to stretch texture over quad 
 	// when we expand point particle into a quad.
@@ -135,7 +136,7 @@ void StreamOutGS(point Particle gin[1],
 			Particle p;
 			p.InitialPosW = gEmitPosW.xyz;
 			p.InitialVelW = 4.0f*vRandom;
-			p.SizeW       = float2(3.0f, 3.0f);
+			p.SizeW       = gSizeParticle;
 			p.Age         = 0.0f;
 			p.Type        = PT_FLARE;
 			

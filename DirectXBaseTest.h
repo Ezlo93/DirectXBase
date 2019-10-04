@@ -92,6 +92,8 @@ private:
     ParticleSystem mFire;
     float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
+    void switchLevel(Level& lvl);
+
     Blur blurEffect;
     int blurStrength = 0;
 
