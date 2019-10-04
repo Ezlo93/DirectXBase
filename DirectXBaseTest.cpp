@@ -139,22 +139,22 @@ bool DXTest::Initialisation()
     sceneBounds.Radius = sqrtf(4000);
 
     /*add static models for testing*/
-    gameLevel = new Level(res);
+    gameLevel = new Level(res, device, deviceContext);
     gameLevel->LoadLevel("game.lvl");
 
-    endLevel = new Level(res);
+    endLevel = new Level(res, device, deviceContext);
     endLevel->LoadLevel("end.lvl");
 
     activeLevel = gameLevel;
 
     /*particle system*/
 
-    std::vector<std::wstring> flares;
-    flares.push_back(L"data/textures/flare0.dds");
-    ID3D11ShaderResourceView* mFlare = CreateTexture2DArraySRV(device, deviceContext, flares);
+    //std::vector<std::wstring> flares;
+    //flares.push_back(L"data/textures/flare0.dds");
+    //ID3D11ShaderResourceView* mFlare = CreateTexture2DArraySRV(device, deviceContext, flares);
 
-    mFire.init(device, Shaders::fireShader, mFlare, CreateRandomTexture1DSRV(device), 500);
-    mFire.setEmitPosition(XMFLOAT3(0.0f, 4.0f, 3.0f));
+    //mFire.init(device, Shaders::fireShader, mFlare, CreateRandomTexture1DSRV(device), 500);
+    //mFire.setEmitPosition(XMFLOAT3(0.0f, 4.0f, 3.0f));
 
     /*player character and ball*/
 
@@ -189,7 +189,7 @@ bool DXTest::Initialisation()
     BuildScreenQuadGeometryBuffers();
 
     OnWindowResize();
-    //goFullscreen(true);
+    goFullscreen(true);
 
     return true;
 }
@@ -608,8 +608,8 @@ void DXTest::Update(float deltaTime)
     //gCamera.pitch(pitch);
 
     /*particle system*/
-    mFire.update(deltaTime, gTime.getTotalTime());
-
+    //mFire.update(deltaTime, gTime.getTotalTime());
+    activeLevel->Update(deltaTime);
 
     /*rotate light*/
     lightRotationAngle += 0.1f * deltaTime;
@@ -722,8 +722,15 @@ void DXTest::Draw()
     skybox->Draw(deviceContext, *activeCamera);
 
     /*particle system*/
-    mFire.setEyePos(activeCamera->getPosition());
-    mFire.draw(deviceContext, *activeCamera);
+
+    for (auto& i : activeLevel->particleSystems)
+    {
+        i.second->setEyePos(activeCamera->getPosition());
+        i.second->draw(deviceContext, *activeCamera);
+    }
+
+    //mFire.setEyePos(activeCamera->getPosition());
+    //mFire.draw(deviceContext, *activeCamera);
     deviceContext->RSSetState(0);
     deviceContext->OMSetDepthStencilState(0, 0);
     deviceContext->OMSetBlendState(0, blendFactor, 0xffffffff);

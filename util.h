@@ -156,6 +156,7 @@ static ID3D11ShaderResourceView* CreateRandomTexture1DSRV(ID3D11Device* device)
     ID3D11ShaderResourceView* randomTexSRV = 0;
     device->CreateShaderResourceView(randomTex, &viewDesc, &randomTexSRV);
 
+
     DXRelease(randomTex);
 
     return randomTexSRV;

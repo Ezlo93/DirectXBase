@@ -20,7 +20,7 @@
 #include "Player.h"
 #include "ParticleSystem.h"
 
-enum MainGameState
+enum class MainGameState
 {
     PLAYER_REGISTRATION, INGAME, END_SCREEN
 };

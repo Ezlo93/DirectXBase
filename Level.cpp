@@ -1,15 +1,27 @@
 #include "Level.h"
 
 
-Level::Level(ResourceManager* r)
+Level::Level(ResourceManager* r, ID3D11Device* d, ID3D11DeviceContext* c)
 {
     res = r;
+    device = d;
+    context = c;
 }
 
 Level::~Level()
 {
     /*clear pointer maps*/
+    for (auto& i : modelsStatic)
+    {
+        delete i.second;
+    }
+    modelsStatic.clear();
 
+    for (auto& i : particleSystems)
+    {
+        delete i.second;
+    }
+    particleSystems.clear();
 
 }
 
@@ -44,13 +56,24 @@ bool Level::LoadLevel(std::string fileName)
 
     /*read different parts*/
     ReadStaticModels(lvl);
-
+    ReadParticleSystems(lvl);
    
-
     return true;
 }
 
-void Level::ReadStaticModels(json& j)
+void Level::Update(float deltaTime)
+{
+    totalTime += deltaTime;
+
+    for (auto& i : particleSystems)
+    {
+        i.second->update(deltaTime, totalTime);
+    }
+
+
+}
+
+void Level::ReadStaticModels(const json& j)
 {
     
     for (auto& i : j["static"])
@@ -64,7 +87,7 @@ void Level::ReadStaticModels(json& j)
 
         if (modelsStatic.find(i["id"]) != modelsStatic.end())
         {
-            throw std::exception("id already exists");
+            throw std::exception("id for static model already exists");
             return;
         }
 
@@ -155,3 +178,65 @@ void Level::ReadStaticModels(json& j)
 
 }
 
+void Level::ReadParticleSystems(const json& j)
+{
+    if (!exists(j, "dynamic"))
+    {
+        return;
+    }
+
+    for (auto& i : j["dynamic"])
+    {
+        /*check double id*/
+        if (!exists(i, "id"))
+        {
+            throw std::exception("particle system without id");
+            return;
+        }
+
+        /*check if particle system*/
+        if (exists(i, "type"))
+        {
+            std::string t = i["type"];
+            if (t.compare("particle"))
+            {
+                continue;
+            }
+        }
+        else
+        {
+            DBOUT("skipping incomplete dynamic element");
+            continue;
+        }
+
+        if (particleSystems.find(i["id"]) != particleSystems.end())
+        {
+            throw std::exception("id for particle system already exists");
+            return;
+        }
+
+        ParticleSystem* p = new ParticleSystem();
+
+        std::vector<std::wstring> texture;
+
+        std::wstringstream s;
+        std::string m = i["texture"];
+        s << L"data/textures/";
+        size_t len = m.length() + 1;
+        std::wstring ret = std::wstring(len, 0);
+        int size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, &m[0], m.size(), &ret[0], len);
+        s << ret;
+
+        texture.push_back(s.str());
+        ID3D11ShaderResourceView* mTArr = CreateTexture2DArraySRV(device, context, texture);
+
+
+        p->init(device, Shaders::fireShader, mTArr, CreateRandomTexture1DSRV(device), i["maxParticles"]);
+        p->setEmitPosition(XMFLOAT3(i["position"][0], i["position"][1], i["position"][2]));
+        p->setEmitDirection(XMFLOAT3(i["direction"][0], i["direction"][1], i["direction"][2]));
+
+        particleSystems.insert(std::make_pair(i["id"], p));
+    }
+
+
+}

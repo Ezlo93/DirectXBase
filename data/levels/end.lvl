@@ -4,9 +4,11 @@
          "id":20001,
          "type":"particle",
          "shader":"fire",
+         "texture":"flare0.dds",
+         "maxParticles":500,
          "position":[
             -5.25,
-            4,
+            9.5,
             2
          ],
          "scale":[
@@ -14,7 +16,29 @@
             1,
             1
          ],
-         "rotation":[
+         "direction":[
+            0,
+            0,
+            0
+         ]
+      },
+      {
+         "id":20002,
+         "type":"particle",
+         "shader":"fire",
+         "texture":"flare0.dds",
+         "maxParticles":500,
+         "position":[
+            5.25,
+            9.5,
+            2
+         ],
+         "scale":[
+            1,
+            1,
+            1
+         ],
+         "direction":[
             0,
             0,
             0
