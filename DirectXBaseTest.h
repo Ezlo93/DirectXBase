@@ -89,7 +89,7 @@ private:
     /*render related*/
 
     /*particle system*/
-    ParticleSystem mFire;
+    ParticleSystem mRain;
     float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
     void switchLevel(Level& lvl);

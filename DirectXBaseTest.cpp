@@ -149,12 +149,13 @@ bool DXTest::Initialisation()
 
     /*particle system*/
 
-    //std::vector<std::wstring> flares;
-    //flares.push_back(L"data/textures/flare0.dds");
-    //ID3D11ShaderResourceView* mFlare = CreateTexture2DArraySRV(device, deviceContext, flares);
+    std::vector<std::wstring> raindrop;
+    raindrop.push_back(L"data/textures/raindrop.dds");
+    ID3D11ShaderResourceView* mDrop = CreateTexture2DArraySRV(device, deviceContext, raindrop);
 
-    //mFire.init(device, Shaders::fireShader, mFlare, CreateRandomTexture1DSRV(device), 500);
-    //mFire.setEmitPosition(XMFLOAT3(0.0f, 4.0f, 3.0f));
+    mRain.init(device, Shaders::rainShader, mDrop, CreateRandomTexture1DSRV(device), 10000);
+    mRain.setAcceleration(XMFLOAT3(-1.f, -9.8f, 0.f));
+    mRain.setSizeParticle(XMFLOAT2(1.f, 1.f));
 
     /*player character and ball*/
 
@@ -617,6 +618,7 @@ void DXTest::Update(float deltaTime)
     /*particle system*/
     //mFire.update(deltaTime, gTime.getTotalTime());
     activeLevel->Update(deltaTime);
+    mRain.update(deltaTime, gTime.getTotalTime());
 
     /*rotate light*/
     lightRotationAngle += 0.1f * deltaTime;
@@ -735,9 +737,14 @@ void DXTest::Draw()
         i.second->setEyePos(activeCamera->getPosition());
         i.second->draw(deviceContext, *activeCamera);
     }
+    deviceContext->OMSetBlendState(0, blendFactor, 0xffffffff);
 
-    //mFire.setEyePos(activeCamera->getPosition());
-    //mFire.draw(deviceContext, *activeCamera);
+    /*rain*/
+    mRain.setEyePos(activeCamera->getPosition());
+    mRain.setEmitPosition(activeCamera->getPosition());
+
+    mRain.draw(deviceContext, *activeCamera);
+
     deviceContext->RSSetState(0);
     deviceContext->OMSetDepthStencilState(0, 0);
     deviceContext->OMSetBlendState(0, blendFactor, 0xffffffff);

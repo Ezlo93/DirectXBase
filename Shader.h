@@ -241,4 +241,5 @@ public:
     static BlurShader* blurShader;
     static FullscreenShader* fullscreenShader;
     static ParticleEffect* fireShader;
+    static ParticleEffect* rainShader;
 };
