@@ -450,6 +450,7 @@ void DXTest::Update(float deltaTime)
             setupEndScreen();
             gameState = MainGameState::END_SCREEN;
             transitionInProgress = 2;
+            lightRotationAngle = XM_PIDIV4;
             transToEndScreen = false;
         }
         else if (!allDead)
@@ -740,10 +741,14 @@ void DXTest::Draw()
     deviceContext->OMSetBlendState(0, blendFactor, 0xffffffff);
 
     /*rain*/
-    mRain.setEyePos(activeCamera->getPosition());
-    mRain.setEmitPosition(activeCamera->getPosition());
 
-    mRain.draw(deviceContext, *activeCamera);
+    if (gameState == MainGameState::PLAYER_REGISTRATION)
+    {
+        mRain.setEyePos(activeCamera->getPosition());
+        mRain.setEmitPosition(activeCamera->getPosition());
+
+        mRain.draw(deviceContext, *activeCamera);
+    }
 
     deviceContext->RSSetState(0);
     deviceContext->OMSetDepthStencilState(0, 0);
