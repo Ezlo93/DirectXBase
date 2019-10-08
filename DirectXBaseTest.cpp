@@ -155,7 +155,7 @@ bool DXTest::Initialisation()
 
     mRain.init(device, Shaders::rainShader, mDrop, CreateRandomTexture1DSRV(device), 10000);
     mRain.setAcceleration(XMFLOAT3(-1.f, -9.8f, 0.f));
-    mRain.setSizeParticle(XMFLOAT2(1.f, 1.f));
+    mRain.setSizeParticle(XMFLOAT2(12.5f, 12.5f));
 
     /*player character and ball*/
 
