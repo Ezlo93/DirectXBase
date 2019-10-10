@@ -242,4 +242,5 @@ public:
     static FullscreenShader* fullscreenShader;
     static ParticleEffect* fireShader;
     static ParticleEffect* rainShader;
+    static ParticleEffect* celebrationShader;
 };

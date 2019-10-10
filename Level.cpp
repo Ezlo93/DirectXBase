@@ -234,14 +234,22 @@ void Level::ReadParticleSystems(const json& j)
         s << L"data/textures/";
         size_t len = m.length() + 1;
         std::wstring ret = std::wstring(len, 0);
-        int size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, &m[0], m.size(), &ret[0], len);
+        int size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, &m[0], (int)m.size(), &ret[0], (int)len);
         s << ret;
 
         texture.push_back(s.str());
         ID3D11ShaderResourceView* mTArr = CreateTexture2DArraySRV(device, context, texture);
 
+        std::string shaderString = i["shader"];
+        if (shaderString == "fire")
+        {
+            p->init(device, Shaders::fireShader, mTArr, CreateRandomTexture1DSRV(device), i["maxParticles"]);
+        }
+        else if (shaderString == "celebration")
+        {
+            p->init(device, Shaders::celebrationShader, mTArr, CreateRandomTexture1DSRV(device), i["maxParticles"]);
+        }
 
-        p->init(device, Shaders::fireShader, mTArr, CreateRandomTexture1DSRV(device), i["maxParticles"]);
         p->setEmitPosition(XMFLOAT3(i["position"][0], i["position"][1], i["position"][2]));
         p->setEmitDirection(XMFLOAT3(i["direction"][0], i["direction"][1], i["direction"][2]));
         p->setEmitDirection(XMFLOAT3(i["acceleration"][0], i["acceleration"][1], i["acceleration"][2]));

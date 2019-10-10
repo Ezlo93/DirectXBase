@@ -22,7 +22,7 @@ using namespace std;
 
 /*release Dx11 COMs*/
 #define DXRelease(x) { if(x && x != nullptr){x->Release(); x = 0; }}
-
+#define SDelete(x) { delete x; x = 0;}
 
 /*print to vs output, only in debug mode*/
 #ifdef _DEBUG

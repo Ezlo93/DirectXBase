@@ -11,6 +11,7 @@ BlurShader* Shaders::blurShader = 0;
 FullscreenShader* Shaders::fullscreenShader = 0;
 ParticleEffect* Shaders::fireShader = 0;
 ParticleEffect* Shaders::rainShader = 0;
+ParticleEffect* Shaders::celebrationShader = 0;
 
 
 void Shaders::Init(ID3D11Device* device)
@@ -23,6 +24,7 @@ void Shaders::Init(ID3D11Device* device)
     fullscreenShader = new FullscreenShader(device, L"data/shader/fullScreenQuad.fxo");
     fireShader = new ParticleEffect(device, L"data/shader/fire.fxo");
     rainShader = new ParticleEffect(device, L"data/shader/rain.fxo");
+    celebrationShader = new ParticleEffect(device, L"data/shader/celebration.fxo");
 }
 
 void Shaders::Destroy()
@@ -35,6 +37,7 @@ void Shaders::Destroy()
     delete fullscreenShader; fullscreenShader = 0;
     delete fireShader; fireShader = 0;
     delete rainShader; rainShader = 0;
+    SDelete(celebrationShader);
 }
 
 
