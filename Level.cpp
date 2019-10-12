@@ -229,15 +229,36 @@ void Level::ReadParticleSystems(const json& j)
 
         std::vector<std::wstring> texture;
 
-        std::wstringstream s;
-        std::string m = i["texture"];
-        s << L"data/textures/";
-        size_t len = m.length() + 1;
-        std::wstring ret = std::wstring(len, 0);
-        int size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, &m[0], (int)m.size(), &ret[0], (int)len);
-        s << ret;
+        if (i["texture"].is_string())
+        {
+            std::wstringstream s;
+            std::string m = i["texture"];
+            s << L"data/textures/";
+            size_t len = m.length() + 1;
+            std::wstring ret = std::wstring(len, 0);
+            int size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, &m[0], (int)m.size(), &ret[0], (int)len);
+            s << ret;
+            texture.push_back(s.str());
+        }
+        else if (i["texture"].is_array())
+        {
+            for (std::string t : i["texture"])
+            {
+                std::wstringstream s;
+                s << L"data/textures/";
+                size_t len = t.length() + 1;
+                std::wstring ret = std::wstring(len, 0);
+                int size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, &t[0], (int)t.size(), &ret[0], (int)len);
+                s << ret;
+                texture.push_back(s.str());
+            }
 
-        texture.push_back(s.str());
+        }
+        else
+        {
+            throw std::exception("illegal format");
+        }
+
         ID3D11ShaderResourceView* mTArr = CreateTexture2DArraySRV(device, context, texture);
 
         std::string shaderString = i["shader"];
