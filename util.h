@@ -154,8 +154,10 @@ static ID3D11ShaderResourceView* CreateRandomTexture1DSRV(ID3D11Device* device)
     viewDesc.Texture1D.MostDetailedMip = 0;
 
     ID3D11ShaderResourceView* randomTexSRV = 0;
-    device->CreateShaderResourceView(randomTex, &viewDesc, &randomTexSRV);
-
+    if (randomTex != 0)
+    {
+        device->CreateShaderResourceView(randomTex, &viewDesc, &randomTexSRV);
+    }
 
     DXRelease(randomTex);
 
@@ -220,8 +222,11 @@ static ID3D11ShaderResourceView* CreateTexture2DArraySRV(ID3D11Device* device, I
             D3D11_MAPPED_SUBRESOURCE mappedTex;
 
             context->Map(srcTex[i], m, D3D11_MAP_READ, 0, &mappedTex);
-            context->UpdateSubresource(texArray, D3D11CalcSubresource(m, i, texElemDesc.MipLevels), 0,
-                                       mappedTex.pData, mappedTex.RowPitch, mappedTex.DepthPitch);
+            if (texArray != 0)
+            {
+                context->UpdateSubresource(texArray, D3D11CalcSubresource(m, i, texElemDesc.MipLevels), 0,
+                                           mappedTex.pData, mappedTex.RowPitch, mappedTex.DepthPitch);
+            }
             context->Unmap(srcTex[i], m);
         }
 
@@ -238,7 +243,10 @@ static ID3D11ShaderResourceView* CreateTexture2DArraySRV(ID3D11Device* device, I
     srvDesc.Texture2DArray.FirstArraySlice = 0;
     srvDesc.Texture2DArray.ArraySize = size;
 
-    device->CreateShaderResourceView(texArray, &srvDesc, &texArraySRV);
+    if (texArray != 0)
+    {
+        device->CreateShaderResourceView(texArray, &srvDesc, &texArraySRV);
+    }
 
     DXRelease(texArray);
 

@@ -5,15 +5,12 @@
 #include "Model.h"
 
 namespace UShader {
-    enum UsedShader
+    enum class UsedShader
     {
         Basic,
         Normal
     };
-}
-
-namespace UTech {
-    enum UsedTechnique
+    enum class UsedTechnique
     {
         Basic,
         BasicNoTexture,

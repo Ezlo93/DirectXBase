@@ -107,28 +107,28 @@ void Level::ReadStaticModels(const json& j)
         std::string shaderString = i["shader"];
         if (shaderString == "basictexture")
         {
-            mis->usedShader = UShader::Basic;
-            mis->usedTechnique = UTech::Basic;
+            mis->usedShader = UShader::UsedShader::Basic;
+            mis->usedTechnique = UShader::UsedTechnique::Basic;
         }
         else if (shaderString == "basicnotexture")
         {
-            mis->usedShader = UShader::Basic;
-            mis->usedTechnique = UTech::BasicNoTexture;
+            mis->usedShader = UShader::UsedShader::Basic;
+            mis->usedTechnique = UShader::UsedTechnique::BasicNoTexture;
         }
         else if (shaderString == "basicnolighting")
         {
-            mis->usedShader = UShader::Basic;
-            mis->usedTechnique = UTech::BasicNoLighting;
+            mis->usedShader = UShader::UsedShader::Basic;
+            mis->usedTechnique = UShader::UsedTechnique::BasicNoLighting;
         }
         else if (shaderString == "normalmap")
         {
-            mis->usedShader = UShader::Normal;
-            mis->usedTechnique = UTech::NormalTech;
+            mis->usedShader = UShader::UsedShader::Normal;
+            mis->usedTechnique = UShader::UsedTechnique::NormalTech;
         }
         else if (shaderString == "onlyshadow")
         {
-            mis->usedShader = UShader::Basic;
-            mis->usedTechnique = UTech::BasicOnlyShadow;
+            mis->usedShader = UShader::UsedShader::Basic;
+            mis->usedTechnique = UShader::UsedTechnique::BasicOnlyShadow;
         }
         else
         {

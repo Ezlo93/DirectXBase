@@ -44,7 +44,7 @@ public:
     XMFLOAT4X4 TextureTransform;
 
     UShader::UsedShader usedShader;
-    UTech::UsedTechnique usedTechnique;
+    UShader::UsedTechnique usedTechnique;
 private:
 
     bool useOverwriteDiffuse;

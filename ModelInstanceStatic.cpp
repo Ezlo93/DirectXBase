@@ -11,8 +11,8 @@ ModelInstanceStatic::ModelInstanceStatic(ResourceManager* r, std::string id)
     Translation = XMFLOAT3(0.f, 0.f, 0.f);
     modelID = id;
     resources = r;
-    usedShader = UShader::Basic;
-    usedTechnique = UTech::BasicNoTexture;
+    usedShader = UShader::UsedShader::Basic;
+    usedTechnique = UShader::UsedTechnique::BasicNoTexture;
     ovrwrTex = "";
     ovrwrNrm = "";
     useOverwriteDiffuse = false;
@@ -52,20 +52,20 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
     
     switch (usedShader)
     {
-        case UShader::Basic:
+        case UShader::UsedShader::Basic:
             switch (usedTechnique)
             {
-                case UTech::Basic: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
-                case UTech::BasicNoTexture: tech = Shaders::basicTextureShader->BasicNoTextureTechnique; break;
-                case UTech::BasicNoLighting: tech = Shaders::basicTextureShader->BasicTextureNoLighting; break;
-                case UTech::BasicOnlyShadow: tech = Shaders::basicTextureShader->BasicOnlyShadow; break;
+                case UShader::UsedTechnique::Basic: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
+                case UShader::UsedTechnique::BasicNoTexture: tech = Shaders::basicTextureShader->BasicNoTextureTechnique; break;
+                case UShader::UsedTechnique::BasicNoLighting: tech = Shaders::basicTextureShader->BasicTextureNoLighting; break;
+                case UShader::UsedTechnique::BasicOnlyShadow: tech = Shaders::basicTextureShader->BasicOnlyShadow; break;
                 default: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
             }
             break;
-        case UShader::Normal:
+        case UShader::UsedShader::Normal:
             switch (usedTechnique)
             {
-                case UTech::NormalTech: tech = Shaders::normalMapShader->NormalMapTech; break;
+                case UShader::UsedTechnique::NormalTech: tech = Shaders::normalMapShader->NormalMapTech; break;
                 default: tech = Shaders::normalMapShader->NormalMapTech; break;
             }
     }
@@ -84,10 +84,10 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
 
             switch (usedShader)
             {
-                case UShader::Basic:
+                case UShader::UsedShader::Basic:
                     switch (usedTechnique)
                     {
-                        case UTech::Basic:
+                        case UShader::UsedTechnique::Basic:
                             
                             Shaders::basicTextureShader->SetWorld(world);
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
@@ -107,7 +107,7 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                             Shaders::basicTextureShader->SetShadowTransform(world * shadowT);
                             break;
 
-                        case UTech::BasicOnlyShadow:
+                        case UShader::UsedTechnique::BasicOnlyShadow:
                             Shaders::basicTextureShader->SetWorld(world);
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
                             Shaders::basicTextureShader->SetWorldInvTranspose(wit);
@@ -126,7 +126,7 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                             Shaders::basicTextureShader->SetShadowTransform(world * shadowT);
                             break;
 
-                        case UTech::BasicNoLighting:
+                        case UShader::UsedTechnique::BasicNoLighting:
 
                             Shaders::basicTextureShader->SetWorld(world);
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
@@ -146,7 +146,7 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                             Shaders::basicTextureShader->SetShadowTransform(world * shadowT);
                             break;
 
-                        case UTech::BasicNoTexture:
+                        case UShader::UsedTechnique::BasicNoTexture:
                             Shaders::basicTextureShader->SetWorld(world);
                             Shaders::basicTextureShader->SetWorldInvTranspose(wit);
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
@@ -157,10 +157,10 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
 
                     }
                     break;
-                case UShader::Normal:
+                case UShader::UsedShader::Normal:
                     switch (usedTechnique)
                     {
-                        case UTech::NormalTech:
+                        case UShader::UsedTechnique::NormalTech:
                             Shaders::normalMapShader->SetWorld(world);
                             Shaders::normalMapShader->SetWorldViewProj(wvp);
                             Shaders::normalMapShader->SetWorldInvTranspose(wit);
@@ -234,19 +234,19 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
 
     switch (usedShader)
     {
-        case UShader::Basic:
+        case UShader::UsedShader::Basic:
             switch (usedTechnique)
             {
-                case UTech::Basic: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
-                case UTech::BasicNoTexture: tech = Shaders::basicTextureShader->BasicNoTextureTechnique; break;
-                case UTech::BasicNoLighting: tech = Shaders::basicTextureShader->BasicTextureNoLighting; break;
+                case UShader::UsedTechnique::Basic: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
+                case UShader::UsedTechnique::BasicNoTexture: tech = Shaders::basicTextureShader->BasicNoTextureTechnique; break;
+                case UShader::UsedTechnique::BasicNoLighting: tech = Shaders::basicTextureShader->BasicTextureNoLighting; break;
                 default: tech = Shaders::basicTextureShader->BasicTextureTechnique; break;
             }
             break;
-        case UShader::Normal:
+        case UShader::UsedShader::Normal:
             switch (usedTechnique)
             {
-                case UTech::NormalTech: tech = Shaders::normalMapShader->NormalMapTech; break;
+                case UShader::UsedTechnique::NormalTech: tech = Shaders::normalMapShader->NormalMapTech; break;
                 default: tech = Shaders::normalMapShader->NormalMapTech; break;
             }
     }
@@ -265,10 +265,10 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
 
             switch (usedShader)
             {
-                case UShader::Basic:
+                case UShader::UsedShader::Basic:
                     switch (usedTechnique)
                     {
-                        case UTech::Basic:
+                        case UShader::UsedTechnique::Basic:
 
                             Shaders::basicTextureShader->SetWorld(world);
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
@@ -288,7 +288,7 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                             Shaders::basicTextureShader->SetShadowTransform(world * shadowT);
                             break;
 
-                        case UTech::BasicNoLighting:
+                        case UShader::UsedTechnique::BasicNoLighting:
 
                             Shaders::basicTextureShader->SetWorld(world);
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
@@ -308,7 +308,7 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
                             Shaders::basicTextureShader->SetShadowTransform(world * shadowT);
                             break;
 
-                        case UTech::BasicNoTexture:
+                        case UShader::UsedTechnique::BasicNoTexture:
                             Shaders::basicTextureShader->SetWorld(world);
                             Shaders::basicTextureShader->SetWorldInvTranspose(wit);
                             Shaders::basicTextureShader->SetWorldViewProj(wvp);
@@ -319,10 +319,10 @@ void ModelInstanceStatic::Draw(ID3D11Device* device, ID3D11DeviceContext* device
 
                     }
                     break;
-                case UShader::Normal:
+                case UShader::UsedShader::Normal:
                     switch (usedTechnique)
                     {
-                        case UTech::NormalTech:
+                        case UShader::UsedTechnique::NormalTech:
                             Shaders::normalMapShader->SetWorld(world);
                             Shaders::normalMapShader->SetWorldViewProj(wvp);
                             Shaders::normalMapShader->SetWorldInvTranspose(wit);

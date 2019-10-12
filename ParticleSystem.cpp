@@ -10,6 +10,8 @@ ParticleSystem::ParticleSystem()
     mEyePosW = XMFLOAT3(0.0f, 0.0f, 0.0f);
     mEmitPositionW = XMFLOAT3(0.0f, 0.0f, 0.0f);
     mEmitDirectionW = XMFLOAT3(0.0f, 1.0f, 0.0f);
+    mAcceleration = XMFLOAT3(0.f, -9.8f, 0.f);
+    mSizeParticle = XMFLOAT2(1.0f, 1.0f);
 }
 
 ParticleSystem::~ParticleSystem()
