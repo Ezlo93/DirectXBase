@@ -64,7 +64,6 @@ void ParticleSystem::init(ID3D11Device* device, ParticleEffect* fx, ID3D11Shader
     mRandomSRV = randomTexSRV;
 
     mSizeParticle = XMFLOAT2(1.f, 1.f);
-    mAcceleration = XMFLOAT3(0.f, 8.f, 0.f);
 
     buildVertexBuffer(device);
 }
@@ -150,6 +149,7 @@ void ParticleSystem::draw(ID3D11DeviceContext* dc, Camera& cam)
     //
     // Draw the updated particle system we just streamed-out. 
     //
+
     dc->IASetVertexBuffers(0, 1, &mDrawVB, &stride, &offset);
 
     effect->DrawTech->GetDesc(&techDesc);

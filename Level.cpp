@@ -273,7 +273,7 @@ void Level::ReadParticleSystems(const json& j)
 
         p->setEmitPosition(XMFLOAT3(i["position"][0], i["position"][1], i["position"][2]));
         p->setEmitDirection(XMFLOAT3(i["direction"][0], i["direction"][1], i["direction"][2]));
-        p->setEmitDirection(XMFLOAT3(i["acceleration"][0], i["acceleration"][1], i["acceleration"][2]));
+        p->setAcceleration(XMFLOAT3(i["acceleration"][0], i["acceleration"][1], i["acceleration"][2]));
         p->setSizeParticle(XMFLOAT2(i["size"][0], i["size"][1]));
 
         particleSystems.insert(std::make_pair(i["id"], p));
