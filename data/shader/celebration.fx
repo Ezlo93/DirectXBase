@@ -23,17 +23,22 @@ cbuffer cbPerObject
 
 cbuffer cbFixed
 {
-	// Net constant acceleration used to accerlate the particles.
-	
-	
-	// Texture coordinates used to stretch texture over quad 
-	// when we expand point particle into a quad.
+	//Texture coordinates for quad
 	float2 gQuadTexC[4] = 
 	{
 		float2(0.0f, 1.0f),
 		float2(1.0f, 1.0f),
 		float2(0.0f, 0.0f),
 		float2(1.0f, 0.0f)
+	};
+
+	//Konfetti colors
+	float4 gColor[4] = 
+	{
+		float4(1.0f,0.f,0.f,1.f),
+		float4(0.f,1.0f,0.f,1.f),
+		float4(0.f,0.f,1.f,1.f),
+		float4(1.f,1.f,0.f,1.f)
 	};
 };
 
@@ -271,7 +276,7 @@ void DrawGS(point VertexOut gin[1],
 
 float4 DrawPS(GeoOut pin) : SV_TARGET
 {
-	return gTexArray.Sample(samLinear, float3(pin.Tex,pin.Type-1));
+	return gColor[pin.Type-1];// gTexArray.Sample(samLinear, float3(pin.Tex,pin.Type-1));
 }
 
 technique11 DrawTech

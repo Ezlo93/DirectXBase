@@ -56,7 +56,7 @@
          "id":20003,
          "type":"particle",
          "shader":"celebration",
-         "texture":["celeb1.dds","celeb2.dds","celeb3.dds","celeb4.dds"],
+         "texture":["raindrop.dds"],
          "maxParticles":20000,
          "position":[
             -5,
