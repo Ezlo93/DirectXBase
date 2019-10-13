@@ -413,6 +413,10 @@ void DXTest::Update(float deltaTime)
             {
                 if (p->getInput() == i)
                 {
+                    if (playCharacters[p->getCharacter()]->Velocity.y == 0.f && input->ButtonPressed(i, BUTTON_A))
+                    {
+                        playCharacters[p->getCharacter()]->Velocity.y = 8.f;
+                    }
                     goto cnt;
                 }
             }
