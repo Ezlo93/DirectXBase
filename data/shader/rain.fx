@@ -12,8 +12,8 @@ cbuffer cbPerFrame
 	
 	float gGameTime;
 	float gTimeStep;
-	float2 gSize;
-	float3 gAccelW = {-1.0f, -9.8f, 0.0f};
+	float2 gSizeParticle;
+	float3 gAccelerationW = {-1.0f, -9.8f, 0.0f};
 	float4x4 gViewProj; 
 };
 
@@ -116,7 +116,7 @@ void StreamOutGS(point Particle gin[1],
 				Particle p;
 				p.InitialPosW = gEmitPosW.xyz + vRandom;
 				p.InitialVelW = float3(0.0f, 0.0f, 0.0f);
-				p.SizeW       = gSize;
+				p.SizeW       = gSizeParticle;
 				p.Age         = 0.0f;
 				p.Type        = PT_FLARE;
 			
@@ -174,7 +174,7 @@ VertexOut DrawVS(Particle vin)
 	float t = vin.Age;
 	
 	// constant acceleration equation
-	vout.PosW = 0.5f*t*t*gAccelW + t*vin.InitialVelW + vin.InitialPosW;
+	vout.PosW = 0.5f*t*t*gAccelerationW + t*vin.InitialVelW + vin.InitialPosW;
 	
 	vout.Type  = vin.Type;
 	
@@ -197,7 +197,7 @@ void DrawGS(point VertexOut gin[1],
 	{
 		// Slant line in acceleration direction.
 		float3 p0 = gin[0].PosW;
-		float3 p1 = gin[0].PosW + 0.07f*gAccelW;
+		float3 p1 = gin[0].PosW + 0.07f*gAccelerationW;
 		
 		GeoOut v0;
 		v0.PosH = mul(float4(p0, 1.0f), gViewProj);

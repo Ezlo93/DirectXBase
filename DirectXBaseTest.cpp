@@ -190,7 +190,10 @@ bool DXTest::Initialisation()
     BuildScreenQuadGeometryBuffers();
 
     OnWindowResize();
-    //goFullscreen(true);
+
+#ifndef _DEBUG
+    goFullscreen(true);
+#endif
 
     return true;
 }

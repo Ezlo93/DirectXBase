@@ -25,32 +25,6 @@
             8,
             0
          ]
-      },
-      {
-         "id":20002,
-         "type":"particle",
-         "shader":"celebration",
-         "texture":["celeb1.dds","celeb2.dds","celeb3.dds","celeb4.dds"],
-         "maxParticles":10000,
-         "position":[
-            0,
-            2,
-            -40
-         ],
-         "size":[
-            1.0,
-            1.0
-         ],
-         "direction":[
-            0,
-            0,
-            0
-         ],
-         "acceleration":[
-            5,
-            9.8,
-            0
-         ]
       }
    ],
    "static":[

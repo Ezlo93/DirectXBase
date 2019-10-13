@@ -17,8 +17,8 @@ cbuffer cbPerFrame
 
 cbuffer cbPerObject
 {
-	float2 gSize = {.1f,.1f};
-	float3 gAccelW = {0.0f, 9.8f, 0.0f};
+	float2 gSizeParticle = {.1f,.1f};
+	float3 gAccelerationW = {1.0f, -4.9f, 0.0f};
 }
 
 cbuffer cbFixed
@@ -134,15 +134,15 @@ void StreamOutGS(point Particle gin[1],
 			{
 				// Spread rain drops out above the camera.
 				float3 r = RandVec3((float)i/5.0f);
-				float3 vRandom = 2.0f*r;
-				vRandom.y = 0.0f;
+				float3 vRandom = 15.0f*r;
+				vRandom.y = 12.0f;
 			
 				Particle p;
 				p.InitialPosW = gEmitPosW.xyz + vRandom;
 				p.InitialVelW = float3(0.f,0.f,0.f);//float3(r.x, 0.0f, r.z);
 				p.SizeW       = float2(1.f,1.f);
 				p.Age         = 0.0f;
-				p.Type        = i%5+1;
+				p.Type        = i+1;
 			
 				ptStream.Append(p);
 			}
@@ -199,8 +199,8 @@ VertexOut DrawVS(Particle vin)
 	float t = vin.Age;
 	
 	// constant acceleration equation
-	vout.PosW = 0.5f*t*t*gAccelW + t*vin.InitialVelW + vin.InitialPosW;
-	vout.SizeW = gSize;
+	vout.PosW = 0.5f*t*t*gAccelerationW + t*vin.InitialVelW + vin.InitialPosW;
+	vout.SizeW = gSizeParticle;
 	vout.Type  = vin.Type;
 	
 	return vout;

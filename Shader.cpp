@@ -206,6 +206,7 @@ ShadowMapShader::~ShadowMapShader()
 ParticleEffect::ParticleEffect(ID3D11Device* device, const std::wstring& filename)
     : Shader(device, filename)
 {
+    DBOUT("initializing particle system " << filename << "\n");
     StreamOutTech = effect->GetTechniqueByName("StreamOutTech");
     DrawTech = effect->GetTechniqueByName("DrawTech");
 

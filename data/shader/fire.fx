@@ -17,7 +17,7 @@ cbuffer cbPerFrame
 	float3 gEmitPosW;
 	float3 gEmitDirW;
 	float2 gSizeParticle;
-	float3 gAccelW;
+	float3 gAccelerationW;
 	float gGameTime;
 	float gTimeStep;
 	float4x4 gViewProj; 
@@ -152,7 +152,7 @@ void StreamOutGS(point Particle gin[1],
 	else
 	{
 		// Specify conditions to keep particle; this may vary from system to system.
-		if( gin[0].Age <= 1.0f )
+		if( gin[0].Age <= 6.0f )
 			ptStream.Append(gin[0]);
 	}		
 }
@@ -195,7 +195,7 @@ VertexOut DrawVS(Particle vin)
 	float t = vin.Age;
 	
 	// constant acceleration equation
-	vout.PosW = 0.5f*t*t*gAccelW + t*vin.InitialVelW + vin.InitialPosW;
+	vout.PosW = 0.5f*t*t*gAccelerationW + t*vin.InitialVelW + vin.InitialPosW;
 	
 	// fade color with time
 	float opacity = 1.0f - smoothstep(0.0f, 1.0f, t/1.0f);
