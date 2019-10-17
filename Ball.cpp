@@ -89,20 +89,62 @@ void Ball::Update(float deltaTime)
             if (hitBox.Intersects(players[index]->hitBox))
             {
                 DBOUT("Player " << index << " touched the ball\n");
+                bool skip = false;
 
-                Color = players[index]->Color;
-                lastTouch = index;
-
-                if (players[index]->Orientation)
+                switch (index)
                 {
-                    Translation = pPos;
-                    Direction.x *= -1;
+                    case 0:
+                        if (hitBox.Center.z < players[index]->hitBox.Center.z + players[index]->hitBox.Extents.z)
+                        {
+                            skip = true;
+                            Translation = pPos;
+                            Direction.x *= -1;
+                        }
+                        break;
+                    case 1:
+                        if (hitBox.Center.z > players[index]->hitBox.Center.z - players[index]->hitBox.Extents.z)
+                        {
+                            skip = true;
+                            Translation = pPos;
+                            Direction.x *= -1;
+                        }
+                        break;
+                    case 2:
+                        if (hitBox.Center.x < players[index]->hitBox.Center.x + players[index]->hitBox.Extents.z)
+                        {
+                            skip = true;
+                            Translation = pPos;
+                            Direction.z *= -1;
+                        }
+                        break;
+                    case 3:
+                        if (hitBox.Center.x > players[index]->hitBox.Center.x - players[index]->hitBox.Extents.z)
+                        {
+                            skip = true;
+                            Translation = pPos;
+                            Direction.z *= -1;
+                        }
+                        break;
                 }
-                else
+                
+                if(!skip)
                 {
 
-                    Translation = pPos;
-                    Direction.z *= -1;
+                    Color = players[index]->Color;
+                    lastTouch = index;
+
+                    if (players[index]->Orientation)
+                    {
+                        Translation = pPos;
+                        Direction.x *= -1;
+                    }
+                    else
+                    {
+
+                        Translation = pPos;
+                        Direction.z *= -1;
+                    }
+
                 }
             }
         }
@@ -292,6 +334,7 @@ void Ball::resetBallFull()
     resetBall();
     ballState = BallState::SPAWN;
     Velocity.y = 10.f;
+    Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
 }
 
 
@@ -318,10 +361,10 @@ void Ball::resetBall()
         Direction.y *= -1;
     }
 
-#ifdef _DEBUG
-    Direction.x = 0.f;
-    Direction.z = -1.f;
-#endif
+//#ifdef _DEBUG
+//    Direction.x = 0.f;
+//    Direction.z = -1.f;
+//#endif
     DBOUT("Direction: " << Direction.x << " | " << Direction.z << "\n");
 
     Velocity.z = START_VELOCITY;
