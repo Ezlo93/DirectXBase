@@ -31,12 +31,17 @@ public:
     Camera* getCamera();
     bool Orientation = false;
     bool npc = true;
+    int metaPosition = -1;
     XMFLOAT4 Color;
     Player* controllingPlayer = 0;
+    ID3D11RenderTargetView* splitScreenView;
+    ID3D11ShaderResourceView* splitScreenSRV;
+    ID3D11UnorderedAccessView* splitScreenUAV;
+
 private:
     string modelID;
     ResourceManager* res = 0;
-    XMFLOAT4X4 World;
+    XMFLOAT4X4 World, CamWorld;
     Camera* cam;
     float jumpTime = 0.f;
 };

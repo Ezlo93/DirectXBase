@@ -28,8 +28,10 @@ PlayableChar::PlayableChar(std::string id, ResourceManager* r)
 
 PlayableChar::~PlayableChar()
 {
-
     delete cam;
+    DXRelease(splitScreenSRV);
+    DXRelease(splitScreenUAV);
+    DXRelease(splitScreenView);
 }
 
 void PlayableChar::Update(float deltaTime)
@@ -55,7 +57,14 @@ void PlayableChar::Update(float deltaTime)
     hitBox.Center.y = res->getModel(modelID)->collisionBox.Center.y + Translation.y;
     hitBox.Center.z = res->getModel(modelID)->collisionBox.Center.z + Translation.z;
 
-    cam->setPosition(Translation.x, Translation.y + 4.0f, Translation.z - 25);
+    switch (metaPosition)
+    {
+        case 0: cam->lookAt(XMFLOAT3(Translation.x, Translation.y + 4.0f, Translation.z - 25), XMFLOAT3(Translation.x, 0, 0), XMFLOAT3(0, 1, 0)); break;
+        case 1: cam->lookAt(XMFLOAT3(Translation.x, Translation.y + 4.0f, Translation.z + 25), XMFLOAT3(Translation.x, 0, 0), XMFLOAT3(0, 1, 0)); break;
+        case 2: cam->lookAt(XMFLOAT3(Translation.x -25, Translation.y + 4.0f, Translation.z), XMFLOAT3(0, 0, Translation.z), XMFLOAT3(0, 1, 0)); break;
+        case 3: cam->lookAt(XMFLOAT3(Translation.x +25, Translation.y + 4.0f, Translation.z), XMFLOAT3(0, 0, Translation.z), XMFLOAT3(0, 1, 0)); break;
+    }
+
     cam->UpdateViewMatrix();
 }
 

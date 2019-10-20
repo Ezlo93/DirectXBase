@@ -165,7 +165,10 @@ bool DXTest::Initialisation()
     playerColors[3] = XMFLOAT4(0.f, 0.5f, 0.2f, 1.0f);
 
     for (int i = 0; i < 4; i++)
+    {
         playCharacters.push_back(new PlayableChar("bar", res));
+        playCharacters[i]->metaPosition = i;
+    }
 
     playball = new Ball("defaultSphere", res, playCharacters);
 
@@ -192,7 +195,7 @@ bool DXTest::Initialisation()
     OnWindowResize();
 
 #ifndef _DEBUG
-    goFullscreen(true);
+    //goFullscreen(true);
 #endif
 
     return true;
@@ -479,16 +482,64 @@ void DXTest::Update(float deltaTime)
                 float leftJoystickX = in->trigger[THUMB_LX];
                 float leftJoystickY = in->trigger[THUMB_RX];
 
-                playCharacters[playerCharID]->Translation.x += leftJoystickX * playCharacters[0]->Speed * deltaTime;
+                if (playCharacters[playerCharID]->metaPosition == 0)
+                {
+                    playCharacters[playerCharID]->Translation.x += leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
 
-                if (playCharacters[playerCharID]->Translation.x <= -PLAYER_MAX_MOVEMENT)
-                {
-                    playCharacters[playerCharID]->Translation.x = -PLAYER_MAX_MOVEMENT;
+                    /*limit movement*/
+                    if (playCharacters[playerCharID]->Translation.x <= -PLAYER_MAX_MOVEMENT)
+                    {
+                        playCharacters[playerCharID]->Translation.x = -PLAYER_MAX_MOVEMENT;
+                    }
+                    else if (playCharacters[playerCharID]->Translation.x >= PLAYER_MAX_MOVEMENT)
+                    {
+                        playCharacters[playerCharID]->Translation.x = PLAYER_MAX_MOVEMENT;
+                    }
                 }
-                else if (playCharacters[playerCharID]->Translation.x >= PLAYER_MAX_MOVEMENT)
+                else if (playCharacters[playerCharID]->metaPosition == 1)
                 {
-                    playCharacters[playerCharID]->Translation.x = PLAYER_MAX_MOVEMENT;
+                    playCharacters[playerCharID]->Translation.x -= leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
+
+                    /*limit movement*/
+                    if (playCharacters[playerCharID]->Translation.x <= -PLAYER_MAX_MOVEMENT)
+                    {
+                        playCharacters[playerCharID]->Translation.x = -PLAYER_MAX_MOVEMENT;
+                    }
+                    else if (playCharacters[playerCharID]->Translation.x >= PLAYER_MAX_MOVEMENT)
+                    {
+                        playCharacters[playerCharID]->Translation.x = PLAYER_MAX_MOVEMENT;
+                    }
                 }
+                else if (playCharacters[playerCharID]->metaPosition == 2)
+                {
+                    playCharacters[playerCharID]->Translation.z -= leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
+
+                    /*limit movement*/
+                    if (playCharacters[playerCharID]->Translation.z <= -PLAYER_MAX_MOVEMENT)
+                    {
+                        playCharacters[playerCharID]->Translation.z = -PLAYER_MAX_MOVEMENT;
+                    }
+                    else if (playCharacters[playerCharID]->Translation.z >= PLAYER_MAX_MOVEMENT)
+                    {
+                        playCharacters[playerCharID]->Translation.z = PLAYER_MAX_MOVEMENT;
+                    }
+                }
+                else if (playCharacters[playerCharID]->metaPosition == 3)
+                {
+                    playCharacters[playerCharID]->Translation.z += leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
+
+                    /*limit movement*/
+                    if (playCharacters[playerCharID]->Translation.z <= -PLAYER_MAX_MOVEMENT)
+                    {
+                        playCharacters[playerCharID]->Translation.z = -PLAYER_MAX_MOVEMENT;
+                    }
+                    else if (playCharacters[playerCharID]->Translation.z >= PLAYER_MAX_MOVEMENT)
+                    {
+                        playCharacters[playerCharID]->Translation.z = PLAYER_MAX_MOVEMENT;
+                    }
+                }
+
+
 
                 playCharacters[playerCharID]->Update(deltaTime);
             }
@@ -649,138 +700,166 @@ void DXTest::Update(float deltaTime)
 
 void DXTest::Draw()
 {
+    ID3D11ShaderResourceView* tResourceView = 0;
+    ID3D11UnorderedAccessView* tUAView = 0;
+    ID3D11RenderTargetView* tRenderTargetView = 0;
 
-    /*draw to shadow map*/
-    shadowMap->BindDsvAndSetNullRenderTarget(deviceContext);
-
-    XMMATRIX lview = XMLoadFloat4x4(&lightView);
-    XMMATRIX lproj = XMLoadFloat4x4(&lightProj);
-
-    /*draw shadow of static models*/
-    deviceContext->IASetInputLayout(InputLayouts::Standard);
-    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    std::map<int, ModelInstanceStatic*>::iterator it = activeLevel->modelsStatic.begin();
-    while (it != activeLevel->modelsStatic.end())
+    for (int f = 0; f < (gameState == MainGameState::INGAME ? 4 : 1); f++)
     {
-        it->second->ShadowDraw(device, deviceContext, activeCamera, lview, lproj);
-        it++;
-    }
+        if (gameState == MainGameState::PLAYER_REGISTRATION)
+        {
+            activeCamera = &introCamera;
+            tResourceView = mOffscreenSRV;
+            tUAView = mOffscreenUAV;
+            tRenderTargetView = mOffscreenRTV;
+        }
+        else if (gameState == MainGameState::END_SCREEN)
+        {
+            activeCamera = &endScreenCamera;
+            tResourceView = mOffscreenSRV;
+            tUAView = mOffscreenUAV;
+            tRenderTargetView = mOffscreenRTV;
+        }
+        else
+        {
+            activeCamera = playCharacters[f]->getCamera();
+            tResourceView = playCharacters[f]->splitScreenSRV;
+            tUAView = playCharacters[f]->splitScreenUAV;
+            tRenderTargetView = playCharacters[f]->splitScreenView;
+        }
 
-    playball->ShadowDraw(device, deviceContext, activeCamera, lview, lproj);
+        /*draw to shadow map*/
+        shadowMap->BindDsvAndSetNullRenderTarget(deviceContext);
 
-    for (auto& i : playCharacters)
-    {
-        i->ShadowDraw(device, deviceContext, activeCamera, lview, lproj);
-    }
+        XMMATRIX lview = XMLoadFloat4x4(&lightView);
+        XMMATRIX lproj = XMLoadFloat4x4(&lightProj);
 
-    deviceContext->RSSetState(0);
-    /*end of shadow map*/
+        /*draw shadow of static models*/
+        deviceContext->IASetInputLayout(InputLayouts::Standard);
+        deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+        std::map<int, ModelInstanceStatic*>::iterator it = activeLevel->modelsStatic.begin();
+        while (it != activeLevel->modelsStatic.end())
+        {
+            it->second->ShadowDraw(device, deviceContext, activeCamera, lview, lproj);
+            it++;
+        }
 
-    /*reset to offscreen texture rendertarget*/
-    /*clear buffers*/
+        playball->ShadowDraw(device, deviceContext, activeCamera, lview, lproj);
 
-    //ID3D11RenderTargetView* renderTargets[1] = { renderTargetView };
-    ID3D11RenderTargetView* renderTargets[1] = { mOffscreenRTV };
-    deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
-    deviceContext->RSSetViewports(1, &mainViewport);
+        for (auto& i : playCharacters)
+        {
+            i->ShadowDraw(device, deviceContext, activeCamera, lview, lproj);
+        }
 
-    //deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
-    deviceContext->ClearRenderTargetView(mOffscreenRTV, clearColor);
-    deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-
-    if (!renderWireFrame)
-    {
         deviceContext->RSSetState(0);
+        /*end of shadow map*/
+
+
+        /*reset to offscreen texture rendertarget*/
+        /*clear buffers*/
+
+        //ID3D11RenderTargetView* renderTargets[1] = { renderTargetView };
+        ID3D11RenderTargetView* renderTargets[1] = { tRenderTargetView };
+        deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
+        deviceContext->RSSetViewports(1, &mainViewport);
+
+        //deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
+        deviceContext->ClearRenderTargetView(tRenderTargetView, clearColor);
+        deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+
+        if (!renderWireFrame)
+        {
+            deviceContext->RSSetState(0);
+        }
+        else
+        {
+            deviceContext->RSSetState(RenderStates::wireFrame);
+        }
+
+        /*set shader constants that are not object dependant*/
+        /*basic shader*/
+        Shaders::basicTextureShader->SetEyePosW(activeCamera->getPosition());
+        Shaders::basicTextureShader->SetDirLights(gDirLights);
+
+        Shaders::basicTextureShader->SetShadowMap(shadowMap->DepthMapSRV());
+
+        /*normal shader*/
+        Shaders::normalMapShader->SetEyePosW(activeCamera->getPosition());
+        Shaders::normalMapShader->SetDirLights(gDirLights);
+
+        Shaders::normalMapShader->SetShadowMap(shadowMap->DepthMapSRV());
+
+
+
+        /*draw static models*/
+        XMMATRIX st = XMLoadFloat4x4(&shadowTransform);
+
+        it = activeLevel->modelsStatic.begin();
+        while (it != activeLevel->modelsStatic.end())
+        {
+            it->second->Draw(device, deviceContext, activeCamera, st);
+            it++;
+        }
+
+        //draw ball
+        playball->Draw(device, deviceContext, activeCamera, st);
+
+        //play characters
+        for (auto& i : playCharacters)
+        {
+            i->Draw(device, deviceContext, activeCamera, st);
+        }
+
+
+        //render sky box last
+        skybox->Draw(deviceContext, *activeCamera);
+
+        /*particle system*/
+
+        for (auto& i : activeLevel->particleSystems)
+        {
+            i.second->setEyePos(activeCamera->getPosition());
+            i.second->draw(deviceContext, *activeCamera);
+        }
+        deviceContext->OMSetBlendState(0, blendFactor, 0xffffffff);
+
+        /*rain*/
+
+        if (gameState == MainGameState::PLAYER_REGISTRATION)
+        {
+            mRain.setEyePos(activeCamera->getPosition());
+            mRain.setEmitPosition(activeCamera->getPosition());
+
+            mRain.draw(deviceContext, *activeCamera);
+        }
+
+        deviceContext->RSSetState(0);
+        deviceContext->OMSetDepthStencilState(0, 0);
+        deviceContext->OMSetBlendState(0, blendFactor, 0xffffffff);
+
+        /*blur*/
+
+        renderTargets[0] = renderTargetView;
+        deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
+
+        if (blurStrength > 0)
+        {
+            blurEffect.BlurSRV(deviceContext, tResourceView, tUAView, blurStrength);
+        }
+
+
+        DrawScreenQuad(tResourceView);
+
+
+        /*default*/
+        deviceContext->RSSetState(0);
+        deviceContext->OMSetDepthStencilState(0, 0);
+        ID3D11ShaderResourceView* nullSRV[16] = { 0 };
+        deviceContext->PSSetShaderResources(0, 16, nullSRV);
+
     }
-    else
-    {
-        deviceContext->RSSetState(RenderStates::wireFrame);
-    }
-
-    /*set shader constants that are not object dependant*/
-    /*basic shader*/
-    Shaders::basicTextureShader->SetEyePosW(activeCamera->getPosition());
-    Shaders::basicTextureShader->SetDirLights(gDirLights);
-
-    Shaders::basicTextureShader->SetShadowMap(shadowMap->DepthMapSRV());
-
-    /*normal shader*/
-    Shaders::normalMapShader->SetEyePosW(activeCamera->getPosition());
-    Shaders::normalMapShader->SetDirLights(gDirLights);
-
-    Shaders::normalMapShader->SetShadowMap(shadowMap->DepthMapSRV());
-
-
-
-    /*draw static models*/
-    XMMATRIX st = XMLoadFloat4x4(&shadowTransform);
-
-    it = activeLevel->modelsStatic.begin();
-    while (it != activeLevel->modelsStatic.end())
-    {
-        it->second->Draw(device, deviceContext, activeCamera, st);
-        it++;
-    }
-
-    //draw ball
-    playball->Draw(device, deviceContext, activeCamera, st);
-
-    //play characters
-    for (auto& i : playCharacters)
-    {
-        i->Draw(device, deviceContext, activeCamera, st);
-    }
-
-
-    //render sky box last
-    skybox->Draw(deviceContext, *activeCamera);
-
-    /*particle system*/
-
-    for (auto& i : activeLevel->particleSystems)
-    {
-        i.second->setEyePos(activeCamera->getPosition());
-        i.second->draw(deviceContext, *activeCamera);
-    }
-    deviceContext->OMSetBlendState(0, blendFactor, 0xffffffff);
-
-    /*rain*/
-
-    if (gameState == MainGameState::PLAYER_REGISTRATION)
-    {
-        mRain.setEyePos(activeCamera->getPosition());
-        mRain.setEmitPosition(activeCamera->getPosition());
-
-        mRain.draw(deviceContext, *activeCamera);
-    }
-
-    deviceContext->RSSetState(0);
-    deviceContext->OMSetDepthStencilState(0, 0);
-    deviceContext->OMSetBlendState(0, blendFactor, 0xffffffff);
-
-    /*blur*/
-
-    renderTargets[0] = renderTargetView;
-    deviceContext->OMSetRenderTargets(1, renderTargets, depthStencilView);
-
-    if (blurStrength > 0)
-    {
-        blurEffect.BlurSRV(deviceContext, mOffscreenSRV, mOffscreenUAV, blurStrength);
-    }
-
-
-    DrawScreenQuad(mOffscreenSRV);
-
-
-    /*default*/
-    deviceContext->RSSetState(0);
-    deviceContext->OMSetDepthStencilState(0, 0);
-    ID3D11ShaderResourceView* nullSRV[16] = { 0 };
-    deviceContext->PSSetShaderResources(0, 16, nullSRV);
-
 
     //show backbuffer
                      //this value is vsync => 0 is off, 1 - 4 sync intervalls
@@ -865,32 +944,85 @@ void DXTest::BuildScreenQuadGeometryBuffers()
 
 void DXTest::DrawScreenQuad(ID3D11ShaderResourceView* srv)
 {
-
-    UINT stride = sizeof(Vertex::Standard);
-    UINT offset = 0;
-
-    deviceContext->IASetInputLayout(InputLayouts::Standard);
-    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    deviceContext->IASetVertexBuffers(0, 1, &mScreenQuadVB, &stride, &offset);
-    deviceContext->IASetIndexBuffer(mScreenQuadIB, DXGI_FORMAT_R32_UINT, 0);
-
-    // Scale and shift quad to lower-right corner.
-    XMMATRIX world = XMMatrixIdentity();
-
-    ID3DX11EffectTechnique* tech = Shaders::fullscreenShader->ViewStandard;
-    D3DX11_TECHNIQUE_DESC techDesc;
-
-    tech->GetDesc(&techDesc);
-    for (UINT p = 0; p < techDesc.Passes; ++p)
+    
+    for (int k = 0; k < (gameState == MainGameState::INGAME ? 4 : 1); k++)
     {
-        Shaders::fullscreenShader->SetWorldViewProj(world);
-        Shaders::fullscreenShader->SetTexture(srv);
-        Shaders::fullscreenShader->SetFadeValue(fadeValue);
+        UINT stride = sizeof(Vertex::Standard);
+        UINT offset = 0;
 
-        tech->GetPassByIndex(p)->Apply(0, deviceContext);
-        deviceContext->DrawIndexed(6, 0, 0);
+        deviceContext->IASetInputLayout(InputLayouts::Standard);
+        deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        deviceContext->IASetVertexBuffers(0, 1, &mScreenQuadVB, &stride, &offset);
+        deviceContext->IASetIndexBuffer(mScreenQuadIB, DXGI_FORMAT_R32_UINT, 0);
+
+        // 
+       // XMMATRIX world = XMMatrixIdentity();
+        XMMATRIX world;
+
+        //splitscreen
+        if (gameState == MainGameState::INGAME)
+        {
+            if (k == 0)
+            {
+                world = XMMATRIX(
+                    0.5f, 0.0f, 0.0f, 0.0f,
+                    0.0f, 0.5f, 0.0f, 0.0f,
+                    0.0f, 0.0f, 1.0f, 0.0f,
+                    0.5f, 0.5f, 0.0f, 1.0f);
+            }
+            else if (k == 1)
+            {
+                world = XMMATRIX(
+                    0.5f, 0.0f, 0.0f, 0.0f,
+                    0.0f, 0.5f, 0.0f, 0.0f,
+                    0.0f, 0.0f, 1.0f, 0.0f,
+                    0.5f, -0.5f, 0.0f, 1.0f);
+            }
+            else if (k == 2)
+            {
+                world = XMMATRIX(
+                    0.5f, 0.0f, 0.0f, 0.0f,
+                    0.0f, 0.5f, 0.0f, 0.0f,
+                    0.0f, 0.0f, 1.0f, 0.0f,
+                    -0.5f, -0.5f, 0.0f, 1.0f);
+            }
+            else
+            {
+                world = XMMATRIX(
+                    0.5f, 0.0f, 0.0f, 0.0f,
+                    0.0f, 0.5f, 0.0f, 0.0f,
+                    0.0f, 0.0f, 1.0f, 0.0f,
+                    -0.5f, 0.5f, 0.0f, 1.0f);
+            }
+        }
+        //one screen
+        else
+        {
+            world = XMMatrixIdentity();
+        }
+        ID3DX11EffectTechnique* tech = Shaders::fullscreenShader->ViewStandard;
+        D3DX11_TECHNIQUE_DESC techDesc;
+
+        tech->GetDesc(&techDesc);
+        for (UINT p = 0; p < techDesc.Passes; ++p)
+        {
+            Shaders::fullscreenShader->SetWorldViewProj(world);
+
+            if (gameState == MainGameState::INGAME)
+            {
+                Shaders::fullscreenShader->SetTexture(playCharacters[k]->splitScreenSRV);
+            }
+            else
+            {
+                Shaders::fullscreenShader->SetTexture(srv);
+            }
+
+            Shaders::fullscreenShader->SetFadeValue(fadeValue);
+
+            tech->GetPassByIndex(p)->Apply(0, deviceContext);
+            deviceContext->DrawIndexed(6, 0, 0);
+        }
     }
-
 }
 
 
@@ -901,6 +1033,12 @@ void DXTest::BuildOffscreenViews()
     DXRelease(mOffscreenRTV);
     DXRelease(mOffscreenUAV);
 
+    for (auto& i : playCharacters)
+    {
+        DXRelease(i->splitScreenView);
+    }
+
+    /*main offscreen view*/
     D3D11_TEXTURE2D_DESC texDesc;
 
     texDesc.Width = wndWidth;
@@ -926,6 +1064,34 @@ void DXTest::BuildOffscreenViews()
 
     // View saves a reference to the texture so we can release our reference.
     DXRelease(offscreenTex);
+
+
+    /*split screen views*/
+    for (auto& i : playCharacters)
+    {
+        D3D11_TEXTURE2D_DESC texDesc;
+
+        texDesc.Width = wndWidth;
+        texDesc.Height = wndHeight;
+        texDesc.MipLevels = 1;
+        texDesc.ArraySize = 1;
+        texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        texDesc.SampleDesc.Count = 1;
+        texDesc.SampleDesc.Quality = 0;
+        texDesc.Usage = D3D11_USAGE_DEFAULT;
+        texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+        texDesc.CPUAccessFlags = 0;
+        texDesc.MiscFlags = 0;
+
+        ID3D11Texture2D* offscreenTex = 0;
+        device->CreateTexture2D(&texDesc, 0, &offscreenTex);
+
+        device->CreateShaderResourceView(offscreenTex, 0, &(i->splitScreenSRV));
+        device->CreateRenderTargetView(offscreenTex, 0, &(i->splitScreenView));
+        device->CreateUnorderedAccessView(offscreenTex, 0, &(i->splitScreenUAV));
+
+        DXRelease(offscreenTex);
+    }
 }
 
 void DXTest::clearData()

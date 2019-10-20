@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "PlayableChar.h"
 
-enum BallState
+enum class BallState
 {
     SPAWN, FREEZE, INPLAY, RESET
 };
@@ -43,6 +43,7 @@ private:
     float resetTime = 0.f;
     float spawnTime = 0.f;
     float ballHeight;
+    bool collisionOn = true;
     bool resetB = false;
     XMFLOAT3 distanceV;
 

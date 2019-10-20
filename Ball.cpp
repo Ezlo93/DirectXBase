@@ -3,7 +3,7 @@
 
 Ball::Ball(std::string id, ResourceManager* r, std::vector<PlayableChar*> p)
 {
-    ballState = SPAWN;
+    ballState = BallState::SPAWN;
     res = r;
     modelID = id;
     XMStoreFloat4x4(&World, XMMatrixIdentity());
@@ -86,6 +86,9 @@ void Ball::Update(float deltaTime)
 
         for (int index = 0; index < players.size(); ++index)
         {
+            if (!collisionOn)
+                break;
+
             if (hitBox.Intersects(players[index]->hitBox))
             {
                 DBOUT("Player " << index << " touched the ball\n");
@@ -96,7 +99,7 @@ void Ball::Update(float deltaTime)
                     case 0:
                         if (hitBox.Center.z < players[index]->hitBox.Center.z + players[index]->hitBox.Extents.z)
                         {
-                            skip = true;
+                            skip = true; collisionOn = false;
                             Translation = pPos;
                             Direction.x *= -1;
                         }
@@ -104,7 +107,7 @@ void Ball::Update(float deltaTime)
                     case 1:
                         if (hitBox.Center.z > players[index]->hitBox.Center.z - players[index]->hitBox.Extents.z)
                         {
-                            skip = true;
+                            skip = true; collisionOn = false;
                             Translation = pPos;
                             Direction.x *= -1;
                         }
@@ -112,7 +115,7 @@ void Ball::Update(float deltaTime)
                     case 2:
                         if (hitBox.Center.x < players[index]->hitBox.Center.x + players[index]->hitBox.Extents.z)
                         {
-                            skip = true;
+                            skip = true; collisionOn = false;
                             Translation = pPos;
                             Direction.z *= -1;
                         }
@@ -120,7 +123,7 @@ void Ball::Update(float deltaTime)
                     case 3:
                         if (hitBox.Center.x > players[index]->hitBox.Center.x - players[index]->hitBox.Extents.z)
                         {
-                            skip = true;
+                            skip = true; collisionOn = false;
                             Translation = pPos;
                             Direction.z *= -1;
                         }
@@ -155,26 +158,38 @@ void Ball::Update(float deltaTime)
         {
             resetB = true;
             DBOUT("Player 1 hit by Player " << lastTouch << "\n");
-            players[0]->controllingPlayer->hp--;
+            if (players[0]->controllingPlayer)
+            {
+                players[0]->controllingPlayer->hp--;
+            }
         }
         else if (Translation.z >= BALL_BORDER)
         {
             resetB = true;
             DBOUT("Player 2 hit by Player " << lastTouch << "\n");
-             players[1]->controllingPlayer->hp--;
+            if (players[1]->controllingPlayer)
+            {
+                players[1]->controllingPlayer->hp--;
+            }
         }
 
         if (Translation.x <= -BALL_BORDER)
         {
             resetB = true;
             DBOUT("Player 3 hit by Player " << lastTouch << "\n");
-            players[2]->controllingPlayer->hp--;
+            if (players[2]->controllingPlayer)
+            {
+                players[2]->controllingPlayer->hp--;
+            }
         }
         else if (Translation.x >= BALL_BORDER)
         {
             resetB = true;
             DBOUT("Player 4 hit by Player " << lastTouch << "\n");
-            players[3]->controllingPlayer->hp--;
+            if (players[3]->controllingPlayer)
+            {
+                players[3]->controllingPlayer->hp--;
+            }
         }
 
         if (resetB)
@@ -250,7 +265,7 @@ void Ball::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera
 
     for (auto& m : model->meshes)
     {
-
+         
         for (UINT p = 0; p < techDesc.Passes; p++)
         {
             deviceContext->IASetVertexBuffers(0, 1, &m->vertex, &stride, &offset);
@@ -370,5 +385,6 @@ void Ball::resetBall()
     Velocity.z = START_VELOCITY;
     Velocity.x = START_VELOCITY;
  
+    collisionOn = true;
     resetB = false;
 }
