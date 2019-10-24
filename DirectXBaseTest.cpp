@@ -169,7 +169,7 @@ bool DXTest::Initialisation()
         playCharacters.push_back(new PlayableChar("bar", res));
         playCharacters[i]->metaPosition = i;
     }
-
+    PLAYER_MAX_MOVEMENT = PLAYER_DISTANCE - playCharacters[0]->hitBox.Extents.x - playCharacters[0]->hitBox.Extents.y;
     playball = new Ball("defaultSphere", res, playCharacters);
 
     clearData();
@@ -485,63 +485,21 @@ void DXTest::Update(float deltaTime)
                 if (playCharacters[playerCharID]->metaPosition == 0)
                 {
                     playCharacters[playerCharID]->Translation.x += leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
-
-                    /*limit movement*/
-                    if (playCharacters[playerCharID]->Translation.x <= -PLAYER_MAX_MOVEMENT)
-                    {
-                        playCharacters[playerCharID]->Translation.x = -PLAYER_MAX_MOVEMENT;
-                    }
-                    else if (playCharacters[playerCharID]->Translation.x >= PLAYER_MAX_MOVEMENT)
-                    {
-                        playCharacters[playerCharID]->Translation.x = PLAYER_MAX_MOVEMENT;
-                    }
                 }
                 else if (playCharacters[playerCharID]->metaPosition == 1)
                 {
                     playCharacters[playerCharID]->Translation.x -= leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
-
-                    /*limit movement*/
-                    if (playCharacters[playerCharID]->Translation.x <= -PLAYER_MAX_MOVEMENT)
-                    {
-                        playCharacters[playerCharID]->Translation.x = -PLAYER_MAX_MOVEMENT;
-                    }
-                    else if (playCharacters[playerCharID]->Translation.x >= PLAYER_MAX_MOVEMENT)
-                    {
-                        playCharacters[playerCharID]->Translation.x = PLAYER_MAX_MOVEMENT;
-                    }
                 }
                 else if (playCharacters[playerCharID]->metaPosition == 2)
                 {
                     playCharacters[playerCharID]->Translation.z -= leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
-
-                    /*limit movement*/
-                    if (playCharacters[playerCharID]->Translation.z <= -PLAYER_MAX_MOVEMENT)
-                    {
-                        playCharacters[playerCharID]->Translation.z = -PLAYER_MAX_MOVEMENT;
-                    }
-                    else if (playCharacters[playerCharID]->Translation.z >= PLAYER_MAX_MOVEMENT)
-                    {
-                        playCharacters[playerCharID]->Translation.z = PLAYER_MAX_MOVEMENT;
-                    }
                 }
                 else if (playCharacters[playerCharID]->metaPosition == 3)
                 {
                     playCharacters[playerCharID]->Translation.z += leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
-
-                    /*limit movement*/
-                    if (playCharacters[playerCharID]->Translation.z <= -PLAYER_MAX_MOVEMENT)
-                    {
-                        playCharacters[playerCharID]->Translation.z = -PLAYER_MAX_MOVEMENT;
-                    }
-                    else if (playCharacters[playerCharID]->Translation.z >= PLAYER_MAX_MOVEMENT)
-                    {
-                        playCharacters[playerCharID]->Translation.z = PLAYER_MAX_MOVEMENT;
-                    }
                 }
 
 
-
-                playCharacters[playerCharID]->Update(deltaTime);
             }
 
             /*bot*/
@@ -558,10 +516,61 @@ void DXTest::Update(float deltaTime)
                     {
                         i->Translation.x = playball->Translation.x;
                     }
-                    i->Update(deltaTime);
                 }
 
             }
+
+            /*limit movement of all playable chars*/
+            for (auto& i : playCharacters)
+            {
+                if (i->metaPosition == 0)
+                {
+                    if (i->Translation.x <= -PLAYER_MAX_MOVEMENT)
+                    {
+                        i->Translation.x = -PLAYER_MAX_MOVEMENT;
+                    }
+                    else if (i->Translation.x >= PLAYER_MAX_MOVEMENT)
+                    {
+                        i->Translation.x = PLAYER_MAX_MOVEMENT;
+                    }
+                }
+                else if (i->metaPosition == 0)
+                {
+                    if (i->Translation.x <= -PLAYER_MAX_MOVEMENT)
+                    {
+                        i->Translation.x = -PLAYER_MAX_MOVEMENT;
+                    }
+                    else if (i->Translation.x >= PLAYER_MAX_MOVEMENT)
+                    {
+                        i->Translation.x = PLAYER_MAX_MOVEMENT;
+                    }
+                }
+                else if (i->metaPosition == 1)
+                {
+                    if (i->Translation.z <= -PLAYER_MAX_MOVEMENT)
+                    {
+                        i->Translation.z = -PLAYER_MAX_MOVEMENT;
+                    }
+                    else if (i->Translation.z >= PLAYER_MAX_MOVEMENT)
+                    {
+                        i->Translation.z = PLAYER_MAX_MOVEMENT;
+                    }
+                }
+                else
+                {
+                    if (i->Translation.z <= -PLAYER_MAX_MOVEMENT)
+                    {
+                        i->Translation.z = -PLAYER_MAX_MOVEMENT;
+                    }
+                    else if (i->Translation.z >= PLAYER_MAX_MOVEMENT)
+                    {
+                        i->Translation.z = PLAYER_MAX_MOVEMENT;
+                    }
+                }
+
+                i->Update(deltaTime);
+            }
+
 
             /*ball*/
             playball->Update(deltaTime);

@@ -39,9 +39,10 @@ private:
     std::vector<PlayableChar*> players;
 
     float bounceFactor;
-    float bounceTime = 0.f;
-    float resetTime = 0.f;
-    float spawnTime = 0.f;
+    float bounceTime;
+    float resetTime;
+    float spawnTime;
+    float inplayTime;
     float ballHeight;
     bool collisionOn = true;
     bool resetB = false;

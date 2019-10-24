@@ -69,6 +69,8 @@ void Ball::Update(float deltaTime)
     {
         XMFLOAT3 pPos = Translation;
 
+        inplayTime += deltaTime;
+
         Translation.x += Velocity.x * Direction.x * deltaTime;
         Translation.z += Velocity.x * Direction.z * deltaTime;
 
@@ -79,7 +81,8 @@ void Ball::Update(float deltaTime)
         /*inc velocity*/
 
         Velocity.x += Velocity.x * 0.1f * deltaTime;
-
+        //Velocity.x = 35.f;// 1350 - 1318 / (1 + pow(double((inplayTime / 655)), 0.64));
+        // 1350.4 + (32.19252 - 1350.4)/(1 + (x/655.3164)^0.6426537)
         Velocity.x = min(Velocity.x, MAX_VELOCITY);
 
         /*check collision*/
@@ -154,7 +157,7 @@ void Ball::Update(float deltaTime)
 
 
         /*check if ball not defended*/
-        if (Translation.z <= -BALL_BORDER)
+        if (Translation.z <= -BALL_BORDER && !players[0]->npc)
         {
             resetB = true;
             DBOUT("Player 1 hit by Player " << lastTouch << "\n");
@@ -163,7 +166,7 @@ void Ball::Update(float deltaTime)
                 players[0]->controllingPlayer->hp--;
             }
         }
-        else if (Translation.z >= BALL_BORDER)
+        else if (Translation.z >= BALL_BORDER && !players[1]->npc)
         {
             resetB = true;
             DBOUT("Player 2 hit by Player " << lastTouch << "\n");
@@ -173,7 +176,7 @@ void Ball::Update(float deltaTime)
             }
         }
 
-        if (Translation.x <= -BALL_BORDER)
+        if (Translation.x <= -BALL_BORDER && !players[2]->npc)
         {
             resetB = true;
             DBOUT("Player 3 hit by Player " << lastTouch << "\n");
@@ -182,7 +185,7 @@ void Ball::Update(float deltaTime)
                 players[2]->controllingPlayer->hp--;
             }
         }
-        else if (Translation.x >= BALL_BORDER)
+        else if (Translation.x >= BALL_BORDER && !players[3]->npc)
         {
             resetB = true;
             DBOUT("Player 4 hit by Player " << lastTouch << "\n");
@@ -357,6 +360,7 @@ void Ball::resetBall()
 {
     ballState = BallState::FREEZE;
     resetTime = 0.f;
+    inplayTime = 0.f;
     Velocity.y = 0.f;
 
     Translation = XMFLOAT3(0.f, ballHeight, 0.f);

@@ -65,6 +65,7 @@ private:
     bool transToRegistration = false;
     bool transToEndScreen = false;
     XMFLOAT4 playerColors[4];
+    float PLAYER_MAX_MOVEMENT;
 
     float transitionTimer = 0.f;
     float endTimer = 0.f;
