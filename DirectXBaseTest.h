@@ -6,6 +6,7 @@
 #else
 #pragma comment(lib, "Effects11.lib")
 #endif
+#include "SoundEngine.h"
 #include "d3dx11effect.h"
 #include "InputManager.h"
 #include "Skybox.h"
@@ -41,9 +42,9 @@ private:
 
     /*+++*/
     InputManager* input;
-
     ResourceManager* res;
     Level* activeLevel, *gameLevel, *endLevel;
+    SoundEngine* sound;
     float clearColor[4], clearColorSec[4];
     Skybox* skybox;
     Camera introCamera;

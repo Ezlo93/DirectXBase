@@ -1,10 +1,5 @@
 #pragma once
 
-/*ball.h*/
-#define BALL_BORDER 43.f
-#define MAX_VELOCITY 500.f
-#define START_VELOCITY 35.f
-#define SPAWN_FREEZE .75f
 
 /*camera.h*/
 #define CAMERA_RESTRICTION_ANGLE 10.f
@@ -24,7 +19,13 @@
 
 #define TRANSITION_TIME 0.9f
 #define POST_PROCESS
-#define END_TIME_V 10.f
+#define END_TIME_V 9.f
+
+/*ball.h*/
+#define BALL_BORDER (PLAYER_DISTANCE + 3)
+#define MAX_VELOCITY 500.f
+#define START_VELOCITY 35.f
+#define SPAWN_FREEZE .75f
 
 /*level.h*/
 #define LEVEL_PATH "data/levels/"

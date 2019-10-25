@@ -21,6 +21,9 @@ Ball::Ball(std::string id, ResourceManager* r, std::vector<PlayableChar*> p)
 
     hitBox.Radius = 1.f;
 
+    maxPlayArea.Center = XMFLOAT3(0, 0, 0);
+    maxPlayArea.Extents = XMFLOAT3(BALL_BORDER * 1.2f, BALL_BORDER * 1.2f, BALL_BORDER);
+
     Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
 }
 
@@ -80,10 +83,26 @@ void Ball::Update(float deltaTime)
 
         /*inc velocity*/
 
-        Velocity.x += Velocity.x * 0.1f * deltaTime;
+        if (inplayTime < 25)
+        {
+            Velocity.x = START_VELOCITY + (inplayTime / 25.f) * (150-START_VELOCITY);
+        }
+        else if (inplayTime < 45)
+        {
+            Velocity.x = 150.f + ((inplayTime - 25.f) / 20.f) * 50.f;
+        }
+        else if (inplayTime < 120)
+        {
+            Velocity.x = 200.f + ((inplayTime - 45) / 120.f) * 150.f;
+        }
+        else
+        {
+            Velocity.x = 350.f;
+        }
+        Velocity.x = min(Velocity.x, MAX_VELOCITY);
+
         //Velocity.x = 35.f;// 1350 - 1318 / (1 + pow(double((inplayTime / 655)), 0.64));
         // 1350.4 + (32.19252 - 1350.4)/(1 + (x/655.3164)^0.6426537)
-        Velocity.x = min(Velocity.x, MAX_VELOCITY);
 
         /*check collision*/
 
@@ -193,6 +212,12 @@ void Ball::Update(float deltaTime)
             {
                 players[3]->controllingPlayer->hp--;
             }
+        }
+
+        if (!maxPlayArea.Contains(hitBox))
+        {
+            DBOUT("OUT OF MAX PLAY AREA\n");
+            resetB = true;
         }
 
         if (resetB)

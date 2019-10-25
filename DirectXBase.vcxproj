@@ -166,6 +166,7 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="SoundEngine.cpp" />
     <ClCompile Include="TextureCollection.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -198,6 +199,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShadowMap.h" />
     <ClInclude Include="Skybox.h" />
+    <ClInclude Include="SoundEngine.h" />
     <ClInclude Include="TextureCollection.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>

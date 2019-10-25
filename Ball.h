@@ -36,6 +36,7 @@ private:
     ResourceManager* res = 0;
     XMFLOAT4X4 World;
 
+    BoundingBox maxPlayArea;
     std::vector<PlayableChar*> players;
 
     float bounceFactor;
