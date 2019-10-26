@@ -20,6 +20,7 @@
 #include "PlayableChar.h"
 #include "Player.h"
 #include "ParticleSystem.h"
+#include <filesystem>
 
 enum class MainGameState
 {

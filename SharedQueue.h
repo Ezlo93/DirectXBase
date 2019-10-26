@@ -80,7 +80,7 @@ template <typename T>
 int SharedQueue<T>::size()
 {
     std::unique_lock<std::mutex> mlock(mutex_);
-    int size = queue_.size();
+    int size = (int)queue_.size();
     mlock.unlock();
     return size;
 }
