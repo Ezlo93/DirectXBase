@@ -23,8 +23,17 @@ public:
 
 
 private:
+
+    void loadFile(const std::wstring& file, std::vector<BYTE>& data, WAVEFORMATEX** formatEx, unsigned int& length);
+
+    /*xaudio2*/
     IXAudio2* soundMain;
     IXAudio2MasteringVoice* masterVoice;
+
+    /*wmf*/
+    IMFAttributes* srcReaderConfig;
+
+    /**/
     SharedQueue<int> playList;
 
 };
