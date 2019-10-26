@@ -18,4 +18,7 @@ SoundEngine::~SoundEngine()
     MFShutdown();
     masterVoice->DestroyVoice();
     soundMain->StopEngine();
+
+    SDelete(masterVoice);
+    SDelete(soundMain);
 }

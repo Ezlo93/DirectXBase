@@ -4,6 +4,7 @@
 #include <mfapi.h>
 #include <mfidl.h>
 #include <mfreadwrite.h>
+#include "SharedQueue.h"
 
 #pragma comment(lib, "mfreadwrite.lib")
 #pragma comment(lib, "mfplat.lib")
@@ -24,5 +25,6 @@ public:
 private:
     IXAudio2* soundMain;
     IXAudio2MasteringVoice* masterVoice;
+    SharedQueue<int> playList;
 
 };

@@ -198,6 +198,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShadowMap.h" />
+    <ClInclude Include="SharedQueue.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="SoundEngine.h" />
     <ClInclude Include="TextureCollection.h" />
