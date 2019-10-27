@@ -13,6 +13,8 @@ void XAudio2SoundEngine::Init()
      MFCreateAttributes(&srcReaderConfig, 1);
      srcReaderConfig->SetUINT32(MF_LOW_LATENCY, true);
 
+     //master volume
+     masterVoice->SetVolume(0.7f);
 
 }
 
@@ -103,19 +105,25 @@ SoundEngine::SoundEngine()
 {
     engine = new XAudio2SoundEngine();
     engine->Init();
+
+    playList.reserve(32);
 }
 
 SoundEngine::~SoundEngine()
 {
     SDelete(engine);
+
+    for (auto& i : soundCollection)
+    {
+        SDelete(i.second);
+    }
 }
 
 void SoundEngine::loadFile(const std::wstring& fileName)
 {
-    SoundEvent *event = new SoundEvent();
-    WAVEFORMATEX* formatEx;
-    engine->loadFile(fileName, event->audioData, &formatEx, event->waveLength);
-    event->waveFormat = *formatEx;
+    AudioData* data = new AudioData();
+    WAVEFORMATEX* wfx;
+    engine->loadFile(fileName, data->data, &wfx, data->waveLength);
 
     char id[128];
     char ext[8];
@@ -125,29 +133,27 @@ void SoundEngine::loadFile(const std::wstring& fileName)
     WideCharToMultiByte(CP_UTF8, 0, &fileName[0], (int)fileName.size(), &tStr[0], size_needed, NULL, NULL);
     _splitpath_s(tStr.c_str(), NULL, 0, NULL, 0, id, 128, ext, 8);
 
-    engine->soundMain->CreateSourceVoice(&event->srcVoice, &event->waveFormat);
-    ZeroMemory(&event->audioBuffer, sizeof(XAUDIO2_BUFFER));
-    event->audioBuffer.AudioBytes = (UINT32)event->audioData.size();
-    event->audioBuffer.pAudioData = (BYTE* const)& event->audioData[0];
-    event->audioBuffer.pContext = nullptr;
+    ZeroMemory(&data->audioBuffer, sizeof(XAUDIO2_BUFFER));
+    data->audioBuffer.AudioBytes = (UINT32)data->data.size();
+    data->audioBuffer.pAudioData = (BYTE* const)& data->data[0];
+    data->audioBuffer.pContext = nullptr;
 
-    soundCollection.insert(std::make_pair(id, event));
+    soundCollection.insert(std::make_pair(id, data));
 }
 
 void SoundEngine::add(const std::string& id)
 {
-    playList.push_back(id);
+    SoundEvent* event = new SoundEvent();
+
+    event->audio = soundCollection[id];
+    event->timePlaying = 0.f;
+    engine->soundMain->CreateSourceVoice(&event->srcVoice, &event->audio->waveFormat);
+
+    playList.push_back(event);
 }
 
-void SoundEngine::update()
+void SoundEngine::update(float deltaTime)
 {
     /*check queue and play if necessary*/
-    while (playList.size() > 0)
-    {
-        SoundEvent* event = soundCollection[playList.front()];
-        playList.pop_front();
-        event->srcVoice->SubmitSourceBuffer(&event->audioBuffer);
-        event->srcVoice->Start();
-    }
 
 }

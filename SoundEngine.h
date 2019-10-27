@@ -5,12 +5,34 @@
 #include <mfidl.h>
 #include <mfreadwrite.h>
 #include <map>
-#include "SharedQueue.h"
+#include <vector>
+#include <string>
 
 #pragma comment(lib, "mfreadwrite.lib")
 #pragma comment(lib, "mfplat.lib")
 #pragma comment(lib, "mfuuid")
 #pragma comment(lib, "xaudio2.lib")
+
+struct AudioData
+{
+    WAVEFORMATEX waveFormat;
+    unsigned int waveLength;
+    std::vector<BYTE> data;
+    XAUDIO2_BUFFER audioBuffer;
+};
+
+
+class SoundEvent
+{
+private:
+    IXAudio2SourceVoice* srcVoice = nullptr;
+    AudioData* audio;
+    float timePlaying = 0;
+
+public:
+    SoundEvent() = default;
+    friend class SoundEngine;
+};
 
 class XAudio2SoundEngine
 {
@@ -34,22 +56,6 @@ private:
     friend class SoundEngine;
 };
 
-class SoundEvent
-{
-private:
-    IXAudio2SourceVoice* srcVoice = nullptr;
-    WAVEFORMATEX waveFormat;
-    unsigned int waveLength = 0;
-    std::vector<BYTE> audioData;
-    XAUDIO2_BUFFER audioBuffer;
-    unsigned int index = 0;
-
-public:
-    SoundEvent() = default;
-
-    friend class SoundEngine;
-
-};
 
 class SoundEngine
 {
@@ -58,14 +64,12 @@ public:
     ~SoundEngine();
 
     void loadFile(const std::wstring& fileName);
-
     void add(const std::string& id);
-
-    void update();
+    void update(float deltaTime);
 
 private:
     XAudio2SoundEngine* engine;
-    std::map<std::string, SoundEvent*> soundCollection;
-    SharedQueue<std::string> playList;
+    std::map<std::string, AudioData*> soundCollection;
+    std::vector<SoundEvent*> playList;
 };
 

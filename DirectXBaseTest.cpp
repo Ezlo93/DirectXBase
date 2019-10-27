@@ -704,6 +704,9 @@ void DXTest::Update(float deltaTime)
     /*build shadow transform*/
     buildShadowTransform();
 
+    /*update sound*/
+    res->getSound()->update(deltaTime);
+
     /*update camera position*/
     activeCamera->UpdateViewMatrix();
 
@@ -875,8 +878,6 @@ void DXTest::Draw()
         deviceContext->PSSetShaderResources(0, 16, nullSRV);
 
     }
-
-    res->getSound()->update();
 
     //show backbuffer
                      //this value is vsync => 0 is off, 1 - 4 sync intervalls
