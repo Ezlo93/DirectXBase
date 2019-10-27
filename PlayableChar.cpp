@@ -24,6 +24,9 @@ PlayableChar::PlayableChar(std::string id, ResourceManager* r)
     hitBox.Center.x += Translation.x;
     hitBox.Center.y += Translation.y;
     hitBox.Center.z += Translation.z;
+
+    currState = PCState::REST;
+    prevState = currState;
 }
 
 PlayableChar::~PlayableChar()
@@ -36,9 +39,17 @@ PlayableChar::~PlayableChar()
 
 void PlayableChar::Update(float deltaTime)
 {
+    prevState = currState;
 
     if (Velocity.y > 0)
     {
+        currState = PCState::JUMP;
+
+        if (currState == PCState::JUMP && prevState == PCState::REST)
+        {
+            res->getSound()->add("boing");
+        }
+
         jumpTime += deltaTime;
 
         if (Translation.y >= BaseHeight)
@@ -50,6 +61,7 @@ void PlayableChar::Update(float deltaTime)
             jumpTime = 0.f;
             Velocity.y = 0.f;
             Translation.y = BaseHeight;
+            currState = PCState::REST;
         }
     }
 

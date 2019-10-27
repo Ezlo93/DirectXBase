@@ -80,7 +80,6 @@ DXTest::~DXTest()
     RenderStates::Destroy();
     Shaders::Destroy();
     InputLayouts::Destroy();
-    SDelete(sound);
 }
 
 bool DXTest::Initialisation()
@@ -107,7 +106,6 @@ bool DXTest::Initialisation()
 
     input = new InputManager();
     res = new ResourceManager(device, deviceContext);
-    sound = new SoundEngine();
 
     /*create default cube*/
     res->getModelCollection()->AddModel(DEFAULT_PLANE, res->getModelCollection()->CreatePlaneModel(1.f, 1.f));
@@ -134,7 +132,7 @@ bool DXTest::Initialisation()
     for (const auto& entry : std::filesystem::recursive_directory_iterator(std::filesystem::path(SOUND_PATH)))
     {
         DBOUT(L"Loading sound " << entry.path().c_str() << std::endl);
-        sound->loadFile(entry.path().c_str());
+        res->getSound()->loadFile(entry.path().c_str());
     }
 
     /*create 100 unit radius sized skysphere*/
@@ -374,7 +372,6 @@ void DXTest::Update(float deltaTime)
             gameState = MainGameState::INGAME;
             transitionInProgress = 2;
             transToIngame = 0;
-            sound->add("boing_x");
         }
 
         input->usedInputActive = false;
@@ -878,7 +875,9 @@ void DXTest::Draw()
         deviceContext->PSSetShaderResources(0, 16, nullSRV);
 
     }
-    sound->update();
+
+    res->getSound()->update();
+
     //show backbuffer
                      //this value is vsync => 0 is off, 1 - 4 sync intervalls
     swapChain->Present(0, 0);

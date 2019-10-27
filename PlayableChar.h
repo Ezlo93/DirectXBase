@@ -6,10 +6,14 @@
 #include "ResourceManager.h"
 #include "Player.h"
 
-struct PCHitbox
+enum class PCState
 {
-    XMFLOAT3 x,y;
+    REST,
+    MOVE,
+    JUMP,
+    DASH
 };
+
 
 class PlayableChar
 {
@@ -37,6 +41,8 @@ public:
     ID3D11RenderTargetView* splitScreenView;
     ID3D11ShaderResourceView* splitScreenSRV;
     ID3D11UnorderedAccessView* splitScreenUAV;
+
+    PCState currState, prevState;
 
 private:
     string modelID;

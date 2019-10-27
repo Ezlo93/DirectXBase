@@ -8,13 +8,14 @@ ResourceManager::ResourceManager(ID3D11Device* dev, ID3D11DeviceContext* con)
 
     texCollection = new TextureCollection(dev);
     modCollection = new ModelCollection(dev);
-
+    sound = new SoundEngine();
 }
 
 ResourceManager::~ResourceManager()
 {
     delete texCollection;
     delete modCollection;
+    delete sound;
 }
 
 /*load all models in specified folder*/
@@ -79,4 +80,7 @@ Model* ResourceManager::getModel(std::string id)
     return modCollection->Get(id);
 }
 
-
+SoundEngine* ResourceManager::getSound()
+{
+    return sound;
+}

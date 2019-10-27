@@ -3,6 +3,7 @@
 #include "util.h"
 #include "TextureCollection.h"
 #include "ModelCollection.h"
+#include "SoundEngine.h"
 #include <filesystem>
 
 class ResourceManager
@@ -19,6 +20,7 @@ public:
 
     TextureCollection* getTextureCollection();
     ModelCollection* getModelCollection();
+    SoundEngine* getSound();
 
     ID3D11ShaderResourceView* getTexture(std::string id);
     Model* getModel(std::string id);
@@ -29,5 +31,6 @@ private:
 
     TextureCollection* texCollection;
     ModelCollection* modCollection;
+    SoundEngine* sound;
 
 };

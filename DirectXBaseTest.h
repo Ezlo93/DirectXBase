@@ -45,7 +45,6 @@ private:
     InputManager* input;
     ResourceManager* res;
     Level* activeLevel, *gameLevel, *endLevel;
-    SoundEngine* sound;
     float clearColor[4], clearColorSec[4];
     Skybox* skybox;
     Camera introCamera;
