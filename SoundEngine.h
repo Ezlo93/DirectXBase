@@ -13,6 +13,8 @@
 #pragma comment(lib, "mfuuid")
 #pragma comment(lib, "xaudio2.lib")
 
+#define MAX_CHANNELS 32
+
 struct AudioData
 {
     WAVEFORMATEX waveFormat;
@@ -22,40 +24,18 @@ struct AudioData
 };
 
 
-class SoundEvent
+class SoundChannel
 {
 private:
     IXAudio2SourceVoice* srcVoice = nullptr;
-    AudioData* audio;
+    AudioData* audio = nullptr;
     float timePlaying = 0;
-
+    bool available = true;
+    bool isPlaying = false;
 public:
-    SoundEvent() = default;
+    SoundChannel() = default;
     friend class SoundEngine;
 };
-
-class XAudio2SoundEngine
-{
-
-public:
-    XAudio2SoundEngine() = default;
-    ~XAudio2SoundEngine();
-
-    void Init();
-    void loadFile(const std::wstring& file, std::vector<BYTE>& data, WAVEFORMATEX** formatEx, unsigned int& length);
-
-private:
-
-    /*xaudio2*/
-    IXAudio2* soundMain;
-    IXAudio2MasteringVoice* masterVoice;
-
-    /*wmf*/
-    IMFAttributes* srcReaderConfig;
-
-    friend class SoundEngine;
-};
-
 
 class SoundEngine
 {
@@ -68,8 +48,19 @@ public:
     void update(float deltaTime);
 
 private:
-    XAudio2SoundEngine* engine;
+
+    void Init();
+    void loadFile(const std::wstring& file, std::vector<BYTE>& data, WAVEFORMATEX** formatEx, unsigned int& length);
+
+    /*collection*/
     std::map<std::string, AudioData*> soundCollection;
-    std::vector<SoundEvent*> playList;
+    std::vector<SoundChannel*> channels;
+
+    /*xaudio2*/
+    IXAudio2* soundMain;
+    IXAudio2MasteringVoice* masterVoice;
+
+    /*wmf*/
+    IMFAttributes* srcReaderConfig;
 };
 

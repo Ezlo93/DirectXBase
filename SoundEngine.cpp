@@ -1,7 +1,7 @@
 #include "SoundEngine.h"
 #include "util.h"
 
-void XAudio2SoundEngine::Init()
+void SoundEngine::Init()
 {
     //xaudio2 init
      XAudio2Create(&soundMain);
@@ -18,7 +18,7 @@ void XAudio2SoundEngine::Init()
 
 }
 
-void XAudio2SoundEngine::loadFile(const std::wstring& file, std::vector<BYTE>& data, WAVEFORMATEX** formatEx, unsigned int& length)
+void SoundEngine::loadFile(const std::wstring& file, std::vector<BYTE>& data, WAVEFORMATEX** formatEx, unsigned int& length)
 {
 
     DWORD streamIndex = (DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM;
@@ -88,42 +88,11 @@ void XAudio2SoundEngine::loadFile(const std::wstring& file, std::vector<BYTE>& d
 }
 
 
-XAudio2SoundEngine::~XAudio2SoundEngine()
-{
-    MFShutdown();
-    masterVoice->DestroyVoice();
-    soundMain->StopEngine();
-
-    SDelete(masterVoice);
-    SDelete(soundMain);
-    SDelete(srcReaderConfig);
-}
-
-
-/*sound engine*/
-SoundEngine::SoundEngine()
-{
-    engine = new XAudio2SoundEngine();
-    engine->Init();
-
-    playList.reserve(32);
-}
-
-SoundEngine::~SoundEngine()
-{
-    SDelete(engine);
-
-    for (auto& i : soundCollection)
-    {
-        SDelete(i.second);
-    }
-}
-
 void SoundEngine::loadFile(const std::wstring& fileName)
 {
     AudioData* data = new AudioData();
     WAVEFORMATEX* wfx;
-    engine->loadFile(fileName, data->data, &wfx, data->waveLength);
+    loadFile(fileName, data->data, &wfx, data->waveLength);
 
     char id[128];
     char ext[8];
@@ -134,26 +103,84 @@ void SoundEngine::loadFile(const std::wstring& fileName)
     _splitpath_s(tStr.c_str(), NULL, 0, NULL, 0, id, 128, ext, 8);
 
     ZeroMemory(&data->audioBuffer, sizeof(XAUDIO2_BUFFER));
+    data->waveFormat = *wfx;
     data->audioBuffer.AudioBytes = (UINT32)data->data.size();
     data->audioBuffer.pAudioData = (BYTE* const)& data->data[0];
     data->audioBuffer.pContext = nullptr;
+    DBOUT("Length: " << data->waveLength << "\n");
 
     soundCollection.insert(std::make_pair(id, data));
 }
 
 void SoundEngine::add(const std::string& id)
 {
-    SoundEvent* event = new SoundEvent();
+    int usedChannel = -1;
 
-    event->audio = soundCollection[id];
-    event->timePlaying = 0.f;
-    engine->soundMain->CreateSourceVoice(&event->srcVoice, &event->audio->waveFormat);
+    for (int i = 0; i < MAX_CHANNELS; i++)
+    {
+        if (channels[i]->available)
+        {
+            usedChannel = i;
+            channels[i]->available = false;
+            break;
+        }
+    }
 
-    playList.push_back(event);
+    channels[usedChannel]->audio = soundCollection[id];
+    channels[usedChannel]->timePlaying = 0.f;
+    HRESULT hr = soundMain->CreateSourceVoice(&channels[usedChannel]->srcVoice, &channels[usedChannel]->audio->waveFormat);
+    if (FAILED(hr))
+        std::cerr << "Failed to create Source Voice\n";
+
 }
 
 void SoundEngine::update(float deltaTime)
 {
     /*check queue and play if necessary*/
 
+    for (auto& c : channels)
+    {
+        if (c->available == false)
+        {
+            if (c->isPlaying == false)
+            {
+                c->srcVoice->SubmitSourceBuffer(&c->audio->audioBuffer);
+                c->srcVoice->Start();
+                c->isPlaying = true;
+            }
+            //check if time is over length
+            else
+            {
+
+            }
+        }
+    }
+
+}
+
+
+SoundEngine::SoundEngine()
+{
+    Init();
+    
+    for (int i = 0; i < MAX_CHANNELS; i++)
+    {
+        channels.push_back(new SoundChannel());
+    }
+}
+
+SoundEngine::~SoundEngine()
+{
+    for (auto& i : soundCollection)
+    {
+        SDelete(i.second);
+    }
+
+    MFShutdown();
+    masterVoice->DestroyVoice();
+    soundMain->StopEngine();
+
+    SDelete(masterVoice);
+    SDelete(soundMain);
+    SDelete(srcReaderConfig);
 }

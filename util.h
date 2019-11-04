@@ -11,6 +11,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <iostream>
 #include "constants.h"
 #include "DDSTextureLoader.h"
 
