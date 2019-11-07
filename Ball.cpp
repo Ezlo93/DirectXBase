@@ -45,6 +45,7 @@ void Ball::Update(float deltaTime)
         }
         else
         {
+            res->getSound()->add("ball_hit");
             bounceTime = 0.f;
             Translation.y = ballHeight;
             Velocity.y = Velocity.y * 0.65f;
@@ -115,6 +116,7 @@ void Ball::Update(float deltaTime)
             {
                 DBOUT("Player " << index << " touched the ball\n");
                 bool skip = false;
+                res->getSound()->add("ball_hit");
 
                 switch (index)
                 {
@@ -222,7 +224,7 @@ void Ball::Update(float deltaTime)
 
         if (resetB)
         {
-            
+            res->getSound()->add("airhorn");
             ballState = BallState::RESET;
             distanceV = Translation;
 

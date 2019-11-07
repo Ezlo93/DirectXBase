@@ -390,7 +390,11 @@ void DXTest::Update(float deltaTime)
         introCamera.lookAt(introPos, XMFLOAT3(0.f, 0.f, 0.f), XMFLOAT3(0.f, 1.0f, 0.f));
 
         /*first player press start to continue*/
+#ifdef _DEBUG
         if (playerCount > 0)
+#else // DEBUG
+        if (playerCount > 1)
+#endif
         {
 
             if (input->ButtonPressed(players[0]->getInput(), START))
