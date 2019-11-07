@@ -14,6 +14,7 @@
 #pragma comment(lib, "xaudio2.lib")
 
 #define MAX_CHANNELS 32
+#define SAMPLE_RATE 11025
 
 struct AudioData
 {
@@ -21,6 +22,7 @@ struct AudioData
     unsigned int waveLength;
     std::vector<BYTE> data;
     XAUDIO2_BUFFER audioBuffer;
+    double length;
 };
 
 

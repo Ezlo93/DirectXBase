@@ -468,6 +468,7 @@ void DXTest::Update(float deltaTime)
             transitionInProgress = 2;
             lightRotationAngle = XM_PIDIV4;
             transToEndScreen = false;
+            res->getSound()->add("cheer_long");
         }
         else if (!allDead)
         {

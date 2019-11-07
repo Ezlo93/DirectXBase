@@ -45,7 +45,6 @@ void Ball::Update(float deltaTime)
         }
         else
         {
-            res->getSound()->add("ahem_x");
             bounceTime = 0.f;
             Translation.y = ballHeight;
             Velocity.y = Velocity.y * 0.65f;

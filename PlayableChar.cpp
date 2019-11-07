@@ -47,10 +47,7 @@ void PlayableChar::Update(float deltaTime)
 
         if (currState == PCState::JUMP && prevState == PCState::REST)
         {
-            if(metaPosition == 1)
             res->getSound()->add("boing");
-            if (metaPosition == 0)
-                res->getSound()->add("ahem_x");
         }
 
         jumpTime += deltaTime;

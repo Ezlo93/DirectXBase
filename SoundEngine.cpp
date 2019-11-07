@@ -107,7 +107,9 @@ void SoundEngine::loadFile(const std::wstring& fileName)
     data->audioBuffer.AudioBytes = (UINT32)data->data.size();
     data->audioBuffer.pAudioData = (BYTE* const)& data->data[0];
     data->audioBuffer.pContext = nullptr;
-    DBOUT("Length: " << data->waveLength << "\n");
+    data->length = static_cast<double>(data->audioBuffer.AudioBytes) / SAMPLE_RATE;
+
+    DBOUT("Length: " << data->length << "\n");
 
     soundCollection.insert(std::make_pair(id, data));
 }
@@ -116,6 +118,14 @@ void SoundEngine::add(const std::string& id)
 {
     int usedChannel = -1;
 
+    /*sound in collection ?*/
+    if (soundCollection.find(id) == soundCollection.end())
+    {
+        MessageBox(NULL, L"Missing sound file!", NULL, MB_OK | MB_ICONERROR);
+        return;
+    }
+
+    /*find open voice channel*/
     for (int i = 0; i < MAX_CHANNELS; i++)
     {
         if (channels[i]->available)
@@ -126,6 +136,7 @@ void SoundEngine::add(const std::string& id)
         }
     }
 
+    /*push data in voice*/
     channels[usedChannel]->audio = soundCollection[id];
     channels[usedChannel]->timePlaying = 0.f;
     HRESULT hr = soundMain->CreateSourceVoice(&channels[usedChannel]->srcVoice, &channels[usedChannel]->audio->waveFormat);
@@ -140,6 +151,8 @@ void SoundEngine::update(float deltaTime)
 
     for (auto& c : channels)
     {
+        c->timePlaying += deltaTime;
+
         if (c->available == false)
         {
             if (c->isPlaying == false)
@@ -151,6 +164,15 @@ void SoundEngine::update(float deltaTime)
             //check if time is over length
             else
             {
+                /*release voice if sound fully played*/
+                if (c->timePlaying > c->audio->length)
+                {
+                    c->available = true;
+                    c->srcVoice->Stop();
+                    c->audio = nullptr;
+                    c->timePlaying = 0;
+                    c->isPlaying = false;
+                }
 
             }
         }
@@ -174,6 +196,11 @@ SoundEngine::~SoundEngine()
     for (auto& i : soundCollection)
     {
         SDelete(i.second);
+    }
+
+    for (auto& i : channels)
+    {
+        SDelete(i);
     }
 
     MFShutdown();
