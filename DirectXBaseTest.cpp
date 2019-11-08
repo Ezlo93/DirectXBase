@@ -207,7 +207,7 @@ bool DXTest::Initialisation()
     OnWindowResize();
 
 #ifndef _DEBUG
-    //goFullscreen(true);
+    goFullscreen(true);
 #endif
 
     themeChannel = res->getSound()->add("theme", true);
@@ -323,11 +323,11 @@ void DXTest::Update(float deltaTime)
 
     /*game logic*/
 
-    /*dont update if window inactive*/
-    if (wndInactive)
-    {
-        return;
-    }
+    ///*dont update if window inactive*/
+    //if (wndInactive)
+    //{
+    //    return;
+    //}
 
     if (transitionInProgress > 0)
     {

@@ -312,17 +312,17 @@ int DirectXBase::Run()
         {
             gTime.Inc();
 
-            if (!wndInactive)
-            {
-                UpdateFPSCounter();
-                Update(gTime.getDeltaTime());
-                Draw();
-            }
-            else
-            {
-                /*wait for active again*/
-                Sleep(10);
-            }
+            //if (!wndInactive)
+            //{
+            UpdateFPSCounter();
+            Update(gTime.getDeltaTime());
+            Draw();
+            //}
+            //else
+            //{
+            //    /*wait for active again*/
+            //    Sleep(10);
+            //}
 
         }
     }
@@ -343,12 +343,10 @@ LRESULT DirectXBase::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if (LOWORD(wParam) == WA_INACTIVE)
         {
             wndInactive = true;
-            gTime.Stop();
         }
         else
         {
             wndInactive = false;
-            gTime.Start();
         }
         return 0;
 
