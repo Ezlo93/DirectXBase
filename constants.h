@@ -7,7 +7,8 @@
 /*directxbase.h*/
 #define MODEL_PATH "data/models"
 #define TEXTURE_PATH "data/textures"
-#define SOUND_PATH "data/sound"
+#define SOUND_PATH_MUSIC "data/sound/mu"
+#define SOUND_PATH_EFFECTS "data/sound/fx"
 #define PLAYER_DISTANCE 40.f
 
 #define INTROCAMERA_RADIUS 80.f

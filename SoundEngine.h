@@ -16,13 +16,20 @@
 #define MAX_CHANNELS 32
 #define SAMPLE_RATE 11025
 
+enum class SoundType
+{
+    Music,
+    Effect
+};
+
 struct AudioData
 {
     WAVEFORMATEX waveFormat;
-    unsigned int waveLength;
+    unsigned int waveLength = 0;
     std::vector<BYTE> data;
     XAUDIO2_BUFFER audioBuffer;
-    double length;
+    double length = 0;
+    SoundType soundType = SoundType::Effect;
 };
 
 
@@ -45,9 +52,10 @@ public:
     SoundEngine();
     ~SoundEngine();
 
-    void loadFile(const std::wstring& fileName);
-    void add(const std::string& id);
+    void loadFile(const std::wstring& fileName, SoundType st);
+    int add(const std::string& id, bool loop = false);
     void update(float deltaTime);
+    void forceStop(unsigned char channel);
 
 private:
 

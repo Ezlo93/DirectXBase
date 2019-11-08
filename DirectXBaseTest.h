@@ -52,6 +52,8 @@ private:
     float introCameraTime = 0;
     float endCameraTime = 0;
 
+    unsigned char themeChannel = 255;
+
     /*gameplay related*/
     Ball* playball;
     std::vector<PlayableChar*> playCharacters;

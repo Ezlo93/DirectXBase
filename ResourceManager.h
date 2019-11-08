@@ -12,8 +12,8 @@ public:
     ResourceManager(ID3D11Device* dev, ID3D11DeviceContext* con);
     ~ResourceManager();
 
-    bool AddModelsFromFolder(std::filesystem::path p);
-    bool AddTexturesFromFolder(std::filesystem::path p);
+    bool AddModelsFromFolder(const std::filesystem::path& p);
+    bool AddTexturesFromFolder(const std::filesystem::path& p);
 
     bool AddModelFromFile(std::string file);
     bool AddTextureFromFile(std::string file);

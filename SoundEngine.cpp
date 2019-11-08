@@ -14,7 +14,7 @@ void SoundEngine::Init()
      srcReaderConfig->SetUINT32(MF_LOW_LATENCY, true);
 
      //master volume
-     masterVoice->SetVolume(0.7f);
+     masterVoice->SetVolume(1.0f);
 
 }
 
@@ -88,7 +88,7 @@ void SoundEngine::loadFile(const std::wstring& file, std::vector<BYTE>& data, WA
 }
 
 
-void SoundEngine::loadFile(const std::wstring& fileName)
+void SoundEngine::loadFile(const std::wstring& fileName, SoundType st)
 {
     AudioData* data = new AudioData();
     WAVEFORMATEX* wfx;
@@ -107,14 +107,18 @@ void SoundEngine::loadFile(const std::wstring& fileName)
     data->audioBuffer.AudioBytes = (UINT32)data->data.size();
     data->audioBuffer.pAudioData = (BYTE* const)& data->data[0];
     data->audioBuffer.pContext = nullptr;
+    if (st == SoundType::Music)
+    {
+        data->audioBuffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+    }
     data->length = static_cast<double>(data->audioBuffer.AudioBytes) / SAMPLE_RATE;
 
-    DBOUT("Length: " << data->length << "\n");
+    data->soundType = st;
 
     soundCollection.insert(std::make_pair(id, data));
 }
 
-void SoundEngine::add(const std::string& id)
+int SoundEngine::add(const std::string& id, bool loop)
 {
     int usedChannel = -1;
 
@@ -122,7 +126,7 @@ void SoundEngine::add(const std::string& id)
     if (soundCollection.find(id) == soundCollection.end())
     {
         MessageBox(NULL, L"Missing sound file!", NULL, MB_OK | MB_ICONERROR);
-        return;
+        return -1;
     }
 
     /*find open voice channel*/
@@ -143,6 +147,7 @@ void SoundEngine::add(const std::string& id)
     if (FAILED(hr))
         std::cerr << "Failed to create Source Voice\n";
 
+    return usedChannel;
 }
 
 void SoundEngine::update(float deltaTime)
@@ -158,6 +163,17 @@ void SoundEngine::update(float deltaTime)
             if (c->isPlaying == false)
             {
                 c->srcVoice->SubmitSourceBuffer(&c->audio->audioBuffer);
+
+                /*custom volume per type*/
+                if (c->audio->soundType == SoundType::Music)
+                {
+                    c->srcVoice->SetVolume(0.6f);
+                }
+                else if (c->audio->soundType == SoundType::Effect)
+                {
+                    c->srcVoice->SetVolume(0.9f);
+                }
+
                 c->srcVoice->Start();
                 c->isPlaying = true;
             }
@@ -180,6 +196,21 @@ void SoundEngine::update(float deltaTime)
 
 }
 
+
+void SoundEngine::forceStop(unsigned char channel)
+{
+    if (channel > MAX_CHANNELS) return;
+
+    if (channels[channel]->isPlaying)
+    {
+        channels[channel]->available = true;
+        channels[channel]->srcVoice->Stop();
+        channels[channel]->audio = nullptr;
+        channels[channel]->timePlaying = 0;
+        channels[channel]->isPlaying = false;
+    }
+
+}
 
 SoundEngine::SoundEngine()
 {

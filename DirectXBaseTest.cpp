@@ -129,10 +129,16 @@ bool DXTest::Initialisation()
     res->getModelCollection()->SetDefaultModel("defaultCube");
 
     /*load all sounds*/
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(std::filesystem::path(SOUND_PATH)))
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(std::filesystem::path(SOUND_PATH_MUSIC)))
     {
         DBOUT(L"Loading sound " << entry.path().c_str() << std::endl);
-        res->getSound()->loadFile(entry.path().c_str());
+        res->getSound()->loadFile(entry.path().c_str(), SoundType::Music);
+    }
+
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(std::filesystem::path(SOUND_PATH_EFFECTS)))
+    {
+        DBOUT(L"Loading sound " << entry.path().c_str() << std::endl);
+        res->getSound()->loadFile(entry.path().c_str(), SoundType::Effect);
     }
 
     /*create 100 unit radius sized skysphere*/
@@ -203,6 +209,8 @@ bool DXTest::Initialisation()
 #ifndef _DEBUG
     //goFullscreen(true);
 #endif
+
+    themeChannel = res->getSound()->add("theme", true);
 
     return true;
 }
@@ -372,6 +380,7 @@ void DXTest::Update(float deltaTime)
             gameState = MainGameState::INGAME;
             transitionInProgress = 2;
             transToIngame = 0;
+            res->getSound()->forceStop(themeChannel);
         }
 
         input->usedInputActive = false;
@@ -628,6 +637,7 @@ void DXTest::Update(float deltaTime)
             gameState = MainGameState::PLAYER_REGISTRATION;
             transitionInProgress = 2;
             transToRegistration = false;
+            themeChannel = res->getSound()->add("theme", true);
         }
         else
         {
@@ -1231,5 +1241,3 @@ void DXTest::setupEndScreen()
     }
 
 }
-
-

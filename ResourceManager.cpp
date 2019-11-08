@@ -19,7 +19,7 @@ ResourceManager::~ResourceManager()
 }
 
 /*load all models in specified folder*/
-bool ResourceManager::AddModelsFromFolder(std::filesystem::path p)
+bool ResourceManager::AddModelsFromFolder(const std::filesystem::path& p)
 {
 
     for (const auto& entry : std::filesystem::recursive_directory_iterator(p))
@@ -35,7 +35,7 @@ bool ResourceManager::AddModelsFromFolder(std::filesystem::path p)
 }
 
 /*load all models from specified folder*/
-bool ResourceManager::AddTexturesFromFolder(std::filesystem::path p)
+bool ResourceManager::AddTexturesFromFolder(const std::filesystem::path& p)
 {
     for (const auto& entry : std::filesystem::recursive_directory_iterator(p))
     {
