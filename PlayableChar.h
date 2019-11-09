@@ -6,6 +6,9 @@
 #include "ResourceManager.h"
 #include "Player.h"
 
+#define DASH_CD 1.75f
+#define DASH_DURATION .4f
+
 enum class PCState
 {
     REST,
@@ -28,6 +31,8 @@ public:
 
     void Update(float deltaTime);
 
+    void initDash();
+
     void Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX shadowT);
     void ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX lightView, XMMATRIX lightProj);
 
@@ -43,6 +48,8 @@ public:
     ID3D11UnorderedAccessView* splitScreenUAV;
 
     PCState currState, prevState;
+    float dashTimer = 0.f;
+    int dashDirection = 1;
 
 private:
     string modelID;
@@ -50,4 +57,6 @@ private:
     XMFLOAT4X4 World, CamWorld;
     Camera* cam;
     float jumpTime = 0.f;
+    float dashCooldown = 0.f;
+
 };

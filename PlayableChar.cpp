@@ -65,6 +65,27 @@ void PlayableChar::Update(float deltaTime)
         }
     }
 
+    dashCooldown -= deltaTime;
+    if (dashCooldown < 0)
+    {
+        dashCooldown = 0.f;
+    }
+
+    if (currState == PCState::DASH)
+    {
+        if (dashTimer > DASH_DURATION)
+        {
+            dashTimer = 0.f;
+            currState = PCState::MOVE;
+        }
+        else
+        {
+            dashTimer += deltaTime;
+        }
+    }
+
+
+
     hitBox.Center.x = res->getModel(modelID)->collisionBox.Center.x + Translation.x;
     hitBox.Center.y = res->getModel(modelID)->collisionBox.Center.y + Translation.y;
     hitBox.Center.z = res->getModel(modelID)->collisionBox.Center.z + Translation.z;
@@ -80,7 +101,20 @@ void PlayableChar::Update(float deltaTime)
     cam->UpdateViewMatrix();
 }
 
-
+void PlayableChar::initDash()
+{
+    if (dashCooldown == 0.f)
+    {
+        currState = PCState::DASH;
+        dashCooldown = DASH_CD;
+        dashTimer = 0.f;
+        res->getSound()->add("woosh");
+    }
+    else
+    {
+        res->getSound()->add("no");
+    }
+}
 
 void PlayableChar::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX shadowT)
 {

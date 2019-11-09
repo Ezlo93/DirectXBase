@@ -502,23 +502,62 @@ void DXTest::Update(float deltaTime)
                 float leftJoystickX = in->trigger[THUMB_LX];
                 float leftJoystickY = in->trigger[THUMB_RX];
 
-                if (playCharacters[playerCharID]->metaPosition == 0)
+                if (input->ButtonPressed(inputID, BUTTON_B))
                 {
-                    playCharacters[playerCharID]->Translation.x += leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
-                }
-                else if (playCharacters[playerCharID]->metaPosition == 1)
-                {
-                    playCharacters[playerCharID]->Translation.x -= leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
-                }
-                else if (playCharacters[playerCharID]->metaPosition == 2)
-                {
-                    playCharacters[playerCharID]->Translation.z -= leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
-                }
-                else if (playCharacters[playerCharID]->metaPosition == 3)
-                {
-                    playCharacters[playerCharID]->Translation.z += leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
+                    if (playCharacters[playerCharID]->currState != PCState::DASH)
+                    {
+                        playCharacters[playerCharID]->dashDirection = leftJoystickX >= 0 ? 1 : -1;
+                    }
+                    playCharacters[playerCharID]->initDash();
                 }
 
+                if (playCharacters[playerCharID]->currState != PCState::DASH)
+                {
+
+                    if (playCharacters[playerCharID]->metaPosition == 0)
+                    {
+                        playCharacters[playerCharID]->Translation.x += leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
+                    }
+                    else if (playCharacters[playerCharID]->metaPosition == 1)
+                    {
+                        playCharacters[playerCharID]->Translation.x -= leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
+                    }
+                    else if (playCharacters[playerCharID]->metaPosition == 2)
+                    {
+                        playCharacters[playerCharID]->Translation.z -= leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
+                    }
+                    else if (playCharacters[playerCharID]->metaPosition == 3)
+                    {
+                        playCharacters[playerCharID]->Translation.z += leftJoystickX * playCharacters[playerCharID]->Speed * deltaTime;
+                    }
+
+                }
+                else
+                {
+
+                    float dashSpeed = (playCharacters[playerCharID]->Speed * 4) * ((DASH_DURATION - playCharacters[playerCharID]->dashTimer)/DASH_DURATION);
+                    if (dashSpeed < playCharacters[playerCharID]->Speed) { dashSpeed = playCharacters[playerCharID]->Speed; }
+
+
+                    if (playCharacters[playerCharID]->metaPosition == 0)
+                    {
+                        playCharacters[playerCharID]->Translation.x += playCharacters[playerCharID]->dashDirection * dashSpeed * deltaTime;
+                    }
+                    else if (playCharacters[playerCharID]->metaPosition == 1)
+                    {
+                        playCharacters[playerCharID]->Translation.x -= playCharacters[playerCharID]->dashDirection * dashSpeed * deltaTime;
+                    }
+                    else if (playCharacters[playerCharID]->metaPosition == 2)
+                    {
+                        playCharacters[playerCharID]->Translation.z -= playCharacters[playerCharID]->dashDirection * dashSpeed * deltaTime;
+                    }
+                    else if (playCharacters[playerCharID]->metaPosition == 3)
+                    {
+                        playCharacters[playerCharID]->Translation.z += playCharacters[playerCharID]->dashDirection * dashSpeed * deltaTime;
+                    }
+
+
+                }
 
             }
 
