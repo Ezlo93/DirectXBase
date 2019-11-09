@@ -14,7 +14,7 @@ void SoundEngine::Init()
      srcReaderConfig->SetUINT32(MF_LOW_LATENCY, true);
 
      //master volume
-     masterVoice->SetVolume(1.0f);
+     masterVoice->SetVolume(0.6f);
 
 }
 

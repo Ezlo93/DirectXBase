@@ -593,7 +593,7 @@ void DXTest::Update(float deltaTime)
                         i->Translation.x = PLAYER_MAX_MOVEMENT;
                     }
                 }
-                else if (i->metaPosition == 0)
+                else if (i->metaPosition == 1)
                 {
                     if (i->Translation.x <= -PLAYER_MAX_MOVEMENT)
                     {
@@ -604,7 +604,7 @@ void DXTest::Update(float deltaTime)
                         i->Translation.x = PLAYER_MAX_MOVEMENT;
                     }
                 }
-                else if (i->metaPosition == 1)
+                else if (i->metaPosition == 2)
                 {
                     if (i->Translation.z <= -PLAYER_MAX_MOVEMENT)
                     {

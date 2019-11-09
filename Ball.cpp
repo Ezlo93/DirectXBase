@@ -224,7 +224,7 @@ void Ball::Update(float deltaTime)
 
         if (resetB)
         {
-            res->getSound()->add("airhorn");
+            res->getSound()->add("boom");
             ballState = BallState::RESET;
             distanceV = Translation;
 
