@@ -7,7 +7,7 @@
 #include "Player.h"
 
 #define DASH_CD 1.75f
-#define DASH_DURATION .4f
+#define DASH_DURATION .35f
 
 enum class PCState
 {

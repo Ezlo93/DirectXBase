@@ -535,7 +535,7 @@ void DXTest::Update(float deltaTime)
                 else
                 {
 
-                    float dashSpeed = (playCharacters[playerCharID]->Speed * 4) * ((DASH_DURATION - playCharacters[playerCharID]->dashTimer)/DASH_DURATION);
+                    float dashSpeed = (playCharacters[playerCharID]->Speed * 3) * ((DASH_DURATION - playCharacters[playerCharID]->dashTimer)/DASH_DURATION);
                     if (dashSpeed < playCharacters[playerCharID]->Speed) { dashSpeed = playCharacters[playerCharID]->Speed; }
 
 
