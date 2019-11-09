@@ -535,8 +535,13 @@ void DXTest::Update(float deltaTime)
                 else
                 {
 
-                    float dashSpeed = (playCharacters[playerCharID]->Speed * 3) * ((DASH_DURATION - playCharacters[playerCharID]->dashTimer)/DASH_DURATION);
-                    if (dashSpeed < playCharacters[playerCharID]->Speed) { dashSpeed = playCharacters[playerCharID]->Speed; }
+                    float dashSpeed = (PLAYER_SPEED * 3.5) * ((DASH_DURATION - playCharacters[playerCharID]->dashTimer) / DASH_DURATION);
+                    playCharacters[playerCharID]->Speed = dashSpeed;
+
+                    if (dashSpeed < PLAYER_SPEED)
+                    {
+                        dashSpeed = PLAYER_SPEED;
+                    }
 
 
                     if (playCharacters[playerCharID]->metaPosition == 0)
@@ -636,6 +641,7 @@ void DXTest::Update(float deltaTime)
 
             /*check if player dead*/
             allDead = true;
+            int pAlive = 0;
             for (auto& i : playCharacters)
             {
                 if (i->controllingPlayer == nullptr)
@@ -653,11 +659,33 @@ void DXTest::Update(float deltaTime)
                 }
                 else
                 {
+                    pAlive++;
                     allDead = false;
                 }
 
 
             }
+
+#ifndef _DEBUG
+            if (pAlive == 1)
+            {
+
+                for (auto& i : playCharacters)
+                {
+                    if (i->controllingPlayer == nullptr) continue;
+
+                    if (i->controllingPlayer->hp > 0)
+                    {
+                        DBOUT("Player " << i->controllingPlayer->pID << " wins!\n");
+                        winOrder.push_back(i->controllingPlayer);
+                        i->controllingPlayer = nullptr;
+                        allDead = true;
+                    }
+
+                }
+
+            }
+#endif
 
             if (allDead)
             {

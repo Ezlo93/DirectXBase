@@ -6,6 +6,8 @@
 #include "ResourceManager.h"
 #include "Player.h"
 
+#define PLAYER_SPEED 40.f
+
 #define DASH_CD 1.75f
 #define DASH_DURATION .35f
 

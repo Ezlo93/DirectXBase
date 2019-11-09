@@ -14,7 +14,7 @@ PlayableChar::PlayableChar(std::string id, ResourceManager* r)
     Velocity = XMFLOAT3(0.f, 0.f, 0.f);
 
     Color = XMFLOAT4(.5f, 0.5f, 0.5f, 1.0f);
-    Speed = 40.f;
+    Speed = PLAYER_SPEED;
     cam = new Camera();
 
     hitBox.Center = res->getModel(modelID)->collisionBox.Center;
@@ -77,6 +77,7 @@ void PlayableChar::Update(float deltaTime)
         {
             dashTimer = 0.f;
             currState = PCState::MOVE;
+            Speed = PLAYER_SPEED;
         }
         else
         {
