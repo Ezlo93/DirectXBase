@@ -140,6 +140,12 @@ int SoundEngine::add(const std::string& id, bool loop)
         }
     }
 
+    if (usedChannel == -1)
+    {
+        DBOUT("SOUND CHANNELS FULL!");
+        return -1;
+    }
+
     /*push data in voice*/
     channels[usedChannel]->audio = soundCollection[id];
     channels[usedChannel]->timePlaying = 0.f;
@@ -156,10 +162,12 @@ void SoundEngine::update(float deltaTime)
 
     for (auto& c : channels)
     {
-        c->timePlaying += deltaTime;
 
         if (c->available == false)
         {
+
+            c->timePlaying += deltaTime;
+
             if (c->isPlaying == false)
             {
                 c->srcVoice->SubmitSourceBuffer(&c->audio->audioBuffer);

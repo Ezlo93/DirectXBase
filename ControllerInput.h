@@ -22,7 +22,7 @@ polls input and status data from up to 4 controllers
 #define INPUT_DEADZONE (0.24f* float(0x7FFF))
 /*time between checking capabilites/battery level
   same controller is polled every CAP_BATTERY_POLL_TIME * 4*/
-#define CAP_BATTERY_POLL_TIME 10.f
+#define CAP_BATTERY_POLL_TIME 20.f
 
 struct ControllerState {
     XINPUT_STATE state;

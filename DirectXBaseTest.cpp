@@ -502,11 +502,11 @@ void DXTest::Update(float deltaTime)
                 float leftJoystickX = in->trigger[THUMB_LX];
                 float leftJoystickY = in->trigger[THUMB_RX];
 
-                if (input->ButtonPressed(inputID, BUTTON_B))
+                if (input->ButtonPressed(inputID, LEFT_SHOULDER) || input->ButtonPressed(inputID, RIGHT_SHOULDER))
                 {
                     if (playCharacters[playerCharID]->currState != PCState::DASH)
                     {
-                        playCharacters[playerCharID]->dashDirection = leftJoystickX >= 0 ? 1 : -1;
+                        playCharacters[playerCharID]->dashDirection = input->ButtonPressed(inputID, LEFT_SHOULDER) ? -1 : 1;
                     }
                     playCharacters[playerCharID]->initDash();
                 }
