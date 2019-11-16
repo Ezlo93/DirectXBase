@@ -1,7 +1,13 @@
 #pragma once
 
 #pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "Dwrite.lib")
+#pragma comment(lib, "D2d1.lib")
 #include <d3d11.h>
+#include <d2d1.h>
+#include <d2d1_2.h>
+#include <dwrite.h>
+#include <wrl/client.h>
 #include <DirectXMath.h>
 #include <DirectXCollision.h>
 #include <DirectXPackedVector.h>

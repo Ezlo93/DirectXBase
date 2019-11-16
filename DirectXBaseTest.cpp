@@ -40,9 +40,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 DXTest::DXTest(HINSTANCE hProgramID) : DirectXBase(hProgramID)
 {
-    wndTitle = L"DirectXBaseTest";
-
-    gCamera.setPosition(0.f, 4.f, -25.f);
+    wndTitle = L"Pong3D";
 
     /*clear color to silver*/
     clearColor[0] = 0.75f;
@@ -80,6 +78,8 @@ DXTest::~DXTest()
     RenderStates::Destroy();
     Shaders::Destroy();
     InputLayouts::Destroy();
+
+    DirectXBase::~DirectXBase();
 }
 
 bool DXTest::Initialisation()
@@ -188,7 +188,6 @@ bool DXTest::Initialisation()
 
     introCamera.setPosition(10.f, 15.f, 10.f);
 
-    gCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
     introCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
     endScreenCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
 
@@ -207,7 +206,7 @@ bool DXTest::Initialisation()
     OnWindowResize();
 
 #ifndef _DEBUG
-    goFullscreen(true);
+    //goFullscreen(true);
 #endif
 
     themeChannel = res->getSound()->add("theme", true);
@@ -228,12 +227,6 @@ void DXTest::OnWindowResize()
     /*recalc camera*/
 
     activeCamera->setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
-
-    /*
-    gCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
-    introCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
-    endScreenCamera.setLens(0.2f * XM_PI, getAspectRatio(), .01f, 1000.f);
-    */
 
     for (auto& i : playCharacters)
     {
@@ -535,7 +528,7 @@ void DXTest::Update(float deltaTime)
                 else
                 {
 
-                    float dashSpeed = (PLAYER_SPEED * 3.5) * ((DASH_DURATION - playCharacters[playerCharID]->dashTimer) / DASH_DURATION);
+                    float dashSpeed = (PLAYER_SPEED * 3.5f) * ((DASH_DURATION - playCharacters[playerCharID]->dashTimer) / DASH_DURATION);
                     playCharacters[playerCharID]->Speed = dashSpeed;
 
                     if (dashSpeed < PLAYER_SPEED)
@@ -772,7 +765,7 @@ void DXTest::Update(float deltaTime)
     //gCamera.pitch(pitch);
 
     /*particle system*/
-    //mFire.update(deltaTime, gTime.getTotalTime());
+
     activeLevel->Update(deltaTime);
     mRain.update(deltaTime, gTime.getTotalTime());
 
@@ -792,9 +785,6 @@ void DXTest::Update(float deltaTime)
     /*update camera position*/
     activeCamera->UpdateViewMatrix();
 
-    /*gCamera.UpdateViewMatrix();
-    introCamera.UpdateViewMatrix();
-    endScreenCamera.UpdateViewMatrix();*/
 }
 
 
@@ -961,6 +951,13 @@ void DXTest::Draw()
 
     }
 
+    /*D2D Stuff*/
+    d2dContext->BeginDraw();
+
+    drawFPSCounter();
+
+    d2dContext->EndDraw();
+
     //show backbuffer
                      //this value is vsync => 0 is off, 1 - 4 sync intervalls
     swapChain->Present(0, 0);
@@ -1067,8 +1064,8 @@ void DXTest::DrawScreenQuad(ID3D11ShaderResourceView* srv)
                 world = XMMATRIX(
                     0.5f, 0.0f, 0.0f, 0.0f,
                     0.0f, 0.5f, 0.0f, 0.0f,
-                    0.0f, 0.0f, 1.0f, 0.0f,
-                    -0.5f, 0.5f, 0.0f, 1.0f);
+                    0.0f, 0.0f, 1.f, 0.0f,
+                    -0.5f, 0.5f, 0.0f, 1.f);
             }
             else if (k == 1)
             {

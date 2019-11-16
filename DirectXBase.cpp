@@ -55,6 +55,20 @@ DirectXBase::~DirectXBase()
     DXRelease(deviceContext);
     DXRelease(device);
 
+    d2dFactory->Release();
+    d2dDevice->Release();
+    d2dContext->Release();
+
+    dwriteFactory->Release();
+
+    blackBrush->Release();
+    whiteBrush->Release();
+    redBrush->Release();
+    blueBrush->Release();
+    yellowBrush->Release();
+
+    stdTextFormat->Release();
+    fpsOutLayout->Release();
 }
 
 /*getter*/
@@ -157,7 +171,7 @@ bool DirectXBase::InitDirect3D()
         0,
         D3D_DRIVER_TYPE_HARDWARE,
         0,
-        0,
+        D3D11_CREATE_DEVICE_BGRA_SUPPORT,
         0,
         0,
         D3D11_SDK_VERSION,
@@ -230,6 +244,22 @@ bool DirectXBase::InitDirect3D()
     /*disable alt enter*/
     dxgiFactory->MakeWindowAssociation(wndHandle, DXGI_MWA_NO_ALT_ENTER | DXGI_MWA_NO_WINDOW_CHANGES);
 
+    /*init d2d and dwrite*/
+    DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), (IUnknown**)&dwriteFactory);
+
+    D2D1_FACTORY_OPTIONS fOptions;
+
+#ifdef _DEBUG
+    fOptions.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
+#else
+    fOptions.debugLevel = D2D1_DEBUG_LEVEL_NONE;
+#endif
+
+    D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory2), &fOptions,(void**)&d2dFactory);
+    d2dFactory->CreateDevice(dxgiDevice, &d2dDevice);
+    d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS, &d2dContext);
+
+    initializeTextFormats();
 
     DXRelease(dxgiDevice);
     DXRelease(dxgiAdapter);
@@ -238,6 +268,57 @@ bool DirectXBase::InitDirect3D()
     DirectXBase::OnWindowResize();
 
     return true;
+}
+
+void DirectXBase::createD2DRenderTarget()
+{
+
+    // specify the desired bitmap properties
+    D2D1_BITMAP_PROPERTIES1 bp;
+    bp.pixelFormat.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    bp.pixelFormat.alphaMode = D2D1_ALPHA_MODE_IGNORE;
+    bp.dpiX = 96.0f;
+    bp.dpiY = 96.0f;
+    bp.bitmapOptions = D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW;
+    bp.colorContext = nullptr;
+
+    // Direct2D needs the DXGI version of the back buffer
+    IDXGISurface* dxgiBuffer;
+    swapChain->GetBuffer(0, __uuidof(IDXGISurface), (void**)&dxgiBuffer);
+
+    // create the bitmap
+    ID2D1Bitmap1* targetBitmap;
+    d2dContext->CreateBitmapFromDxgiSurface(dxgiBuffer, &bp, &targetBitmap);
+
+    // set the newly created bitmap as render target
+    d2dContext->SetTarget(targetBitmap);
+
+    // return success
+    return;
+
+
+}
+
+void DirectXBase::initializeTextFormats()
+{
+
+    // create standard brushes
+    d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &blackBrush);
+    d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &whiteBrush);
+    d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), &redBrush);
+    d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::DeepSkyBlue), &blueBrush);
+    d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gold), &yellowBrush);
+
+
+    // set up text formats
+
+    // Standard Text
+    dwriteFactory->CreateTextFormat(L"Lucida Console", nullptr, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-GB", &stdTextFormat);
+    stdTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+    stdTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+
+    return;
+
 }
 
 /*window resize*/
@@ -288,6 +369,7 @@ void DirectXBase::OnWindowResize()
 
     deviceContext->RSSetViewports(1, &mainViewport);
 
+    createD2DRenderTarget();
 }
 
 
@@ -447,8 +529,9 @@ void DirectXBase::UpdateFPSCounter()
         std::wostringstream out;
         out.precision(6);
 
-        out << wndTitle << L"     FPS: " << fps << L" Frame Time: " << mspf << L"ms";
-        SetWindowText(wndHandle, out.str().c_str());
+        out << wndTitle << L"FPS: " << fps << std::endl << L"Frame Time: " << mspf << L"ms";
+
+        dwriteFactory->CreateTextLayout(out.str().c_str(), (UINT32)out.str().size(), stdTextFormat.Get(), (float)wndWidth, (float)wndHeight, &fpsOutLayout);
 
         frameCount = 0;
         timeElapsed += 1.0f;
@@ -478,4 +561,14 @@ bool DirectXBase::goFullscreen(bool s)
     }
 
     return true;
+}
+
+void DirectXBase::drawFPSCounter()
+{
+
+    if (fpsOutLayout)
+    {
+        d2dContext->DrawTextLayout(D2D1::Point2F(2.0f, 5.0f), fpsOutLayout.Get(), yellowBrush.Get());
+    }
+
 }
