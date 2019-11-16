@@ -3,11 +3,16 @@
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "Dwrite.lib")
 #pragma comment(lib, "D2d1.lib")
+#pragma comment (lib, "Windowscodecs.lib")
+
 #include <d3d11.h>
 #include <d2d1.h>
 #include <d2d1_2.h>
 #include <dwrite.h>
 #include <wrl/client.h>
+#include <wincodec.h>	// Windows Imaging Component
+#include <WTypes.h>
+#include <winerror.h>
 #include <DirectXMath.h>
 #include <DirectXCollision.h>
 #include <DirectXPackedVector.h>
@@ -21,6 +26,7 @@
 #include "constants.h"
 #include "DDSTextureLoader.h"
 
+
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 using namespace std;
@@ -30,6 +36,7 @@ using namespace std;
 /*release Dx11 COMs*/
 #define DXRelease(x) { if(x && x != nullptr){x->Release(); x = 0; }}
 #define SDelete(x) { delete x; x = 0;}
+
 
 /*print to vs output, only in debug mode*/
 #ifdef _DEBUG

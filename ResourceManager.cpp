@@ -1,6 +1,6 @@
 #include "ResourceManager.h"
 
-ResourceManager::ResourceManager(ID3D11Device* dev, ID3D11DeviceContext* con)
+ResourceManager::ResourceManager(ID3D11Device* dev, ID3D11DeviceContext* con,Microsoft::WRL::ComPtr<IWICImagingFactory2> fac, Microsoft::WRL::ComPtr<ID2D1DeviceContext1> d2con)
 {
 
     device = dev;
@@ -9,6 +9,7 @@ ResourceManager::ResourceManager(ID3D11Device* dev, ID3D11DeviceContext* con)
     texCollection = new TextureCollection(dev);
     modCollection = new ModelCollection(dev);
     sound = new SoundEngine();
+    bitmap = new BitmapManager(fac, d2con);
 }
 
 ResourceManager::~ResourceManager()
@@ -83,4 +84,9 @@ Model* ResourceManager::getModel(std::string id)
 SoundEngine* ResourceManager::getSound()
 {
     return sound;
+}
+
+BitmapManager* ResourceManager::getBitmap()
+{
+    return bitmap;
 }

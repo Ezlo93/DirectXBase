@@ -70,6 +70,7 @@ protected:
     Microsoft::WRL::ComPtr<ID2D1SolidColorBrush> yellowBrush;
 
     Microsoft::WRL::ComPtr<IDWriteTextFormat> stdTextFormat;
-
     Microsoft::WRL::ComPtr<IDWriteTextLayout> fpsOutLayout;
+
+    Microsoft::WRL::ComPtr<IWICImagingFactory2> WICFactory;
 };

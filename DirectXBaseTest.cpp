@@ -105,7 +105,7 @@ bool DXTest::Initialisation()
     /*...*/
 
     input = new InputManager();
-    res = new ResourceManager(device, deviceContext);
+    res = new ResourceManager(device, deviceContext, WICFactory, d2dContext);
 
     /*create default cube*/
     res->getModelCollection()->AddModel(DEFAULT_PLANE, res->getModelCollection()->CreatePlaneModel(1.f, 1.f));
@@ -127,6 +127,17 @@ bool DXTest::Initialisation()
 
     res->getTextureCollection()->SetDefaultTexture("default");
     res->getModelCollection()->SetDefaultModel("defaultCube");
+
+    /*load all bitmaps*/
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(std::filesystem::path(BITMAP_PATH)))
+    {
+        DBOUT(L"Loading sprite " << entry.path().c_str() << std::endl);
+
+        std::wstring wt = entry.path().wstring();
+        LPWSTR t = &wt[0];
+        res->getBitmap()->loadBitmap(t);
+    }
+
 
     /*load all sounds*/
     for (const auto& entry : std::filesystem::recursive_directory_iterator(std::filesystem::path(SOUND_PATH_MUSIC)))
@@ -951,12 +962,45 @@ void DXTest::Draw()
 
     }
 
-    /*D2D Stuff*/
+    /*D2D and DWrite Rendering*/
+
     d2dContext->BeginDraw();
+
+    /*test heart*/
+    D2D1_RECT_F r = D2D1::RectF(100, 100, 120, 120);
+    d2dContext->DrawBitmap(res->getBitmap()->get(L"heart"), r, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, NULL);
 
     drawFPSCounter();
 
     d2dContext->EndDraw();
+
+    /* Ellipse test
+    D2D1_ELLIPSE l;
+    l.point.x = 50.f;
+    l.point.y = 50.f;
+    l.radiusX = 20.f;
+    l.radiusY = 44.f;
+    ID2D1StrokeStyle* str;
+
+    float dashes[] = { 1.0f, 2.0f, 2.0f, 3.0f, 2.0f, 2.0f };
+
+
+        d2dFactory->CreateStrokeStyle(
+            D2D1::StrokeStyleProperties(
+            D2D1_CAP_STYLE_FLAT,
+            D2D1_CAP_STYLE_FLAT,
+            D2D1_CAP_STYLE_ROUND,
+            D2D1_LINE_JOIN_MITER,
+            10.0f,
+            D2D1_DASH_STYLE_CUSTOM,
+            0.0f),
+            dashes,
+            ARRAYSIZE(dashes), &str
+        );
+    
+
+    d2dContext->DrawEllipse(l, blackBrush.Get(), 1.f, str);
+    */
 
     //show backbuffer
                      //this value is vsync => 0 is off, 1 - 4 sync intervalls

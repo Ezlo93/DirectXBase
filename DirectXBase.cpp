@@ -22,8 +22,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 DirectXBase::DirectXBase(HINSTANCE hProgramID) :
     programID(hProgramID),
     wndTitle(L"DirectXBase"),
-    wndWidth(1280),
-    wndHeight(720),
+    wndWidth(1600),
+    wndHeight(900),
     wndHandle(0),
     wndInactive(false),
     wndMaximized(false),
@@ -36,7 +36,7 @@ DirectXBase::DirectXBase(HINSTANCE hProgramID) :
     renderTargetView(0),
     depthStencilView(0)
 {
-
+    CoInitialize(NULL);
     RtlSecureZeroMemory(&mainViewport, sizeof(D3D11_VIEWPORT));
     directXBase = this;
 }
@@ -44,6 +44,22 @@ DirectXBase::DirectXBase(HINSTANCE hProgramID) :
 /*destructor release all d3d11 vars*/
 DirectXBase::~DirectXBase()
 {
+    WICFactory.ReleaseAndGetAddressOf();
+    blackBrush.ReleaseAndGetAddressOf();
+    whiteBrush.ReleaseAndGetAddressOf();
+    redBrush.ReleaseAndGetAddressOf();
+    blueBrush.ReleaseAndGetAddressOf();
+    yellowBrush.ReleaseAndGetAddressOf();
+
+    stdTextFormat.ReleaseAndGetAddressOf();
+    fpsOutLayout.ReleaseAndGetAddressOf();
+
+    d2dFactory.ReleaseAndGetAddressOf();
+    d2dDevice.ReleaseAndGetAddressOf();
+    d2dContext.ReleaseAndGetAddressOf();
+
+    dwriteFactory.ReleaseAndGetAddressOf();
+
     DXRelease(renderTargetView);
     DXRelease(depthStencilView);
     DXRelease(swapChain);
@@ -55,20 +71,8 @@ DirectXBase::~DirectXBase()
     DXRelease(deviceContext);
     DXRelease(device);
 
-    d2dFactory->Release();
-    d2dDevice->Release();
-    d2dContext->Release();
+    CoUninitialize();
 
-    dwriteFactory->Release();
-
-    blackBrush->Release();
-    whiteBrush->Release();
-    redBrush->Release();
-    blueBrush->Release();
-    yellowBrush->Release();
-
-    stdTextFormat->Release();
-    fpsOutLayout->Release();
 }
 
 /*getter*/
@@ -245,15 +249,18 @@ bool DirectXBase::InitDirect3D()
     dxgiFactory->MakeWindowAssociation(wndHandle, DXGI_MWA_NO_ALT_ENTER | DXGI_MWA_NO_WINDOW_CHANGES);
 
     /*init d2d and dwrite*/
+
+    CoCreateInstance(CLSID_WICImagingFactory2, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory2, &WICFactory);
+
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), (IUnknown**)&dwriteFactory);
 
     D2D1_FACTORY_OPTIONS fOptions;
 
-#ifdef _DEBUG
-    fOptions.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
-#else
+//#ifdef _DEBUG     if this is disabled no mem leak warnings on exit
+//    fOptions.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
+//#else
     fOptions.debugLevel = D2D1_DEBUG_LEVEL_NONE;
-#endif
+//#endif
 
     D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory2), &fOptions,(void**)&d2dFactory);
     d2dFactory->CreateDevice(dxgiDevice, &d2dDevice);
@@ -529,7 +536,7 @@ void DirectXBase::UpdateFPSCounter()
         std::wostringstream out;
         out.precision(6);
 
-        out << wndTitle << L"FPS: " << fps << std::endl << L"Frame Time: " << mspf << L"ms";
+        out << L"Resolution: " << wndWidth << L" x " << wndHeight << L"\nFPS: " << fps << L"\nFrame Time: " << mspf << L"ms";
 
         dwriteFactory->CreateTextLayout(out.str().c_str(), (UINT32)out.str().size(), stdTextFormat.Get(), (float)wndWidth, (float)wndHeight, &fpsOutLayout);
 
