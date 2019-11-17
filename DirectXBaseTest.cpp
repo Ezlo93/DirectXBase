@@ -145,9 +145,17 @@ bool DXTest::Initialisation()
 
 
     /*ui bitmaps*/
-    bTitle.setup(L"default", relativePos(0.3f, 0.1f, 0.7f, 0.5f, wndWidth, wndHeight),0.9f);
 
+    /*title screen*/
+    bTitle.setup(L"default", relativePos(0.1f, 0.1f, 0.85f, 0.65f, wndWidth, wndHeight),0.9f);
+    bPressA.setup(L"default", relativePos(0.35f, 0.7f, 0.65f, 0.75f, wndWidth, wndHeight), 0.9f);
+    bPressStart.setup(L"default", relativePos(0.35f, 0.8f, 0.65f, 0.85f, wndWidth, wndHeight), 0.9f);
 
+    /*ingame*/
+    uiBase[0] = { 0.02f, 0.4f, 0.05f, 0.f };
+    uiBase[1] = { 0.52f, 0.4f, 0.55f, 0.f };
+    uiBase[2] = { 0.02f, 0.9f, 0.05f, 0.f };
+    uiBase[3] = { 0.52f, 0.9f, 0.55f, 0.f };
 
     /*load all sounds*/
     for (const auto& entry : std::filesystem::recursive_directory_iterator(std::filesystem::path(SOUND_PATH_MUSIC)))
@@ -977,16 +985,44 @@ void DXTest::Draw()
     d2dContext->BeginDraw();
 
     /*test heart*/
-    D2D1_RECT_F r = D2D1::RectF(100, 100, 150, 150);
+    //D2D1_RECT_F r = D2D1::RectF(100, 100, 150, 150);
     //d2dContext->DrawBitmap(res->getBitmap()->get(L"heart"), r, .5f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, NULL);
 
     if (gameState == MainGameState::PLAYER_REGISTRATION)
     {
         bTitle.draw(d2dContext.Get(), res);
+        bPressStart.draw(d2dContext.Get(), res);
+        bPressA.draw(d2dContext.Get(), res);
+    }
+    else if (gameState == MainGameState::INGAME)
+    {
+
+        /*draw player hp*/
+        for (auto& p : playCharacters)
+        {
+            int i = p->metaPosition;
+            /*draw bot icon*/
+            if (p->npc || p->controllingPlayer == nullptr)
+            {
+                d2dContext->DrawBitmap(res->getBitmap()->get(L"default"), relativePos(uiBase[i].left, uiBase[i].top, uiBase[i].right, wndWidth, wndHeight));
+            }
+            /*draw hp*/
+            else
+            {
+                D2D1_RECT_F hpRect;
+
+                for (int h = 0; h < p->controllingPlayer->hp; h++)
+                {
+                    hpRect = relativePos(uiBase[i].left + h * 0.035f, uiBase[i].top, uiBase[i].right + h*0.035f, wndWidth, wndHeight);
+                    d2dContext->DrawBitmap(res->getBitmap()->get(L"heart"), hpRect, 1.f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, NULL);
+                }
+
+            }
+        }
+
     }
 
     static D2D1_RECT_F fadeRect = D2D1::RectF(0, 0, (float)wndWidth, (float)wndHeight);
-
     if (fadeValue > 0)
     {
         fadeBrush->SetOpacity(fadeValue);

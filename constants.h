@@ -46,10 +46,11 @@
 
 /*player.h*/
 #ifdef _DEBUG
-#define MAX_HP 1
+#define MAX_HP 2
 #else
 #define MAX_HP 3
 #endif
+#define HP_LIMIT 6
 
 /*shadowmap.h*/
 #define SHADOW_HIGH 4096

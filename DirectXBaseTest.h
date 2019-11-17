@@ -122,7 +122,13 @@ private:
     bool renderWireFrame = false;
 
     /*D2D / UI*/
+
+    /*title screen*/
     DrawableBitmap bTitle, bPressStart, bPressA;
 
+    /*ingame*/
+    D2D1_RECT_F uiBase[4];
+
+    /*endscreen*/
 
 };

@@ -34,3 +34,8 @@ static D2D_RECT_F relativePos(float x, float y, float x2, float y2, int wndW, in
 {
     return D2D1::RectF(x * wndW, y * wndH, x2 * wndW, y2 * wndH);
 }
+
+static D2D_RECT_F relativePos(float x, float y, float x2, int wndW, int wndH)
+{
+    return D2D1::RectF(x * wndW, y * wndH, x2 * wndW, y*wndH + (x2*wndW - x * wndW));
+}
