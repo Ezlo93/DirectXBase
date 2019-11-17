@@ -181,6 +181,7 @@
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="DirectXBase.h" />
     <ClInclude Include="DirectXBaseTest.h" />
+    <ClInclude Include="DrawableBitmap.h" />
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="InputLayout.h" />
     <ClInclude Include="InputManager.h" />

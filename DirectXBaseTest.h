@@ -11,6 +11,7 @@
 #include "InputManager.h"
 #include "Skybox.h"
 #include "ResourceManager.h"
+#include "DrawableBitmap.h"
 #include <chrono>
 #include "ModelInstanceStatic.h"
 #include "Level.h"
@@ -104,6 +105,7 @@ private:
     int transitionInProgress = 0;
     bool UpdateTransition(float deltaTime);
     float fadeValue = 0.f;
+    ID2D1SolidColorBrush* fadeBrush;
 
     Camera* activeCamera = 0;
     ID3D11Buffer* mScreenQuadVB;
@@ -118,4 +120,9 @@ private:
     ID3D11RenderTargetView* mOffscreenRTV;
 
     bool renderWireFrame = false;
+
+    /*D2D / UI*/
+    DrawableBitmap bTitle, bPressStart, bPressA;
+
+
 };

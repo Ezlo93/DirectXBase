@@ -138,6 +138,16 @@ bool DXTest::Initialisation()
         res->getBitmap()->loadBitmap(t);
     }
 
+    /*brushes*/
+    d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF(0.f, 0.f, 0.f, 1.0f)),
+                                      &fadeBrush);
+
+
+
+    /*ui bitmaps*/
+    bTitle.setup(L"default", relativePos(0.3f, 0.1f, 0.7f, 0.5f, wndWidth, wndHeight),0.9f);
+
+
 
     /*load all sounds*/
     for (const auto& entry : std::filesystem::recursive_directory_iterator(std::filesystem::path(SOUND_PATH_MUSIC)))
@@ -967,8 +977,21 @@ void DXTest::Draw()
     d2dContext->BeginDraw();
 
     /*test heart*/
-    D2D1_RECT_F r = D2D1::RectF(100, 100, 120, 120);
-    d2dContext->DrawBitmap(res->getBitmap()->get(L"heart"), r, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, NULL);
+    D2D1_RECT_F r = D2D1::RectF(100, 100, 150, 150);
+    //d2dContext->DrawBitmap(res->getBitmap()->get(L"heart"), r, .5f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, NULL);
+
+    if (gameState == MainGameState::PLAYER_REGISTRATION)
+    {
+        bTitle.draw(d2dContext.Get(), res);
+    }
+
+    static D2D1_RECT_F fadeRect = D2D1::RectF(0, 0, (float)wndWidth, (float)wndHeight);
+
+    if (fadeValue > 0)
+    {
+        fadeBrush->SetOpacity(fadeValue);
+        d2dContext->FillRectangle(fadeRect, fadeBrush);
+    }
 
     drawFPSCounter();
 
@@ -1158,7 +1181,7 @@ void DXTest::DrawScreenQuad(ID3D11ShaderResourceView* srv)
                 Shaders::fullscreenShader->SetTexture(srv);
             }
 
-            Shaders::fullscreenShader->SetFadeValue(fadeValue);
+            //Shaders::fullscreenShader->SetFadeValue(0.f);
 
             tech->GetPassByIndex(p)->Apply(0, deviceContext);
             deviceContext->DrawIndexed(6, 0, 0);
