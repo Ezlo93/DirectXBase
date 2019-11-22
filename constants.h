@@ -20,6 +20,7 @@
 #define ENDCAMERA_Y 22
 #define ENDCAMERA_Z -30
 
+#define PAUSE_FADE_TIME 0.2f
 #define TRANSITION_TIME 0.9f
 #define POST_PROCESS
 #define END_TIME_V 9.f

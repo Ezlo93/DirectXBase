@@ -28,6 +28,16 @@ enum class MainGameState
     PLAYER_REGISTRATION, INGAME, END_SCREEN
 };
 
+enum class InGameState
+{
+    PLAY, PAUSE
+};
+
+enum class RegistrationState
+{
+    BLANK, JOINED, FULL
+};
+
 class DXTest : public DirectXBase
 {
 public:
@@ -62,6 +72,10 @@ private:
     std::vector<Player*> winOrder;
     MainGameState gameState = MainGameState::PLAYER_REGISTRATION;
     MainGameState prevGameState = MainGameState::PLAYER_REGISTRATION;
+    InGameState ingameState = InGameState::PLAY;
+    RegistrationState regState = RegistrationState::BLANK;
+
+    float pauseFadeTimer = 0.f;
 
     int playerCount = 0;
     bool allDead = false;
@@ -128,6 +142,7 @@ private:
 
     /*ingame*/
     D2D1_RECT_F uiBase[4];
+    DrawableBitmap bPause;
 
     /*endscreen*/
 

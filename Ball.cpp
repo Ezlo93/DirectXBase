@@ -416,6 +416,8 @@ void Ball::resetBall()
     Velocity.z = START_VELOCITY;
     Velocity.x = START_VELOCITY;
  
+    Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
+
     collisionOn = true;
     resetB = false;
 }

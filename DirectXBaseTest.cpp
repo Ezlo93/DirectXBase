@@ -147,15 +147,18 @@ bool DXTest::Initialisation()
     /*ui bitmaps*/
 
     /*title screen*/
-    bTitle.setup(L"default", relativePos(0.1f, 0.1f, 0.85f, 0.65f, wndWidth, wndHeight),0.9f);
-    bPressA.setup(L"default", relativePos(0.35f, 0.7f, 0.65f, 0.75f, wndWidth, wndHeight), 0.9f);
-    bPressStart.setup(L"default", relativePos(0.35f, 0.8f, 0.65f, 0.85f, wndWidth, wndHeight), 0.9f);
+    bTitle.setup(L"title", relativePos(0.1f, 0.1f, 0.85f, 0.65f, wndWidth, wndHeight),0.9f);
+    bPressA.setup(L"pressa", relativePos(0.35f, 0.7f, 0.65f, 0.75f, wndWidth, wndHeight), 0.9f);
+    bPressStart.setup(L"pressstart", relativePos(0.35f, 0.8f, 0.65f, 0.85f, wndWidth, wndHeight), 0.9f);
 
     /*ingame*/
     uiBase[0] = { 0.02f, 0.4f, 0.05f, 0.f };
     uiBase[1] = { 0.52f, 0.4f, 0.55f, 0.f };
     uiBase[2] = { 0.02f, 0.9f, 0.05f, 0.f };
     uiBase[3] = { 0.52f, 0.9f, 0.55f, 0.f };
+
+    /*pause*/
+    bPause.setup(L"pause", relativePos(0.35f, 0.2f, 0.65f, 0.4f, wndWidth, wndHeight), 0.8f);
 
     /*load all sounds*/
     for (const auto& entry : std::filesystem::recursive_directory_iterator(std::filesystem::path(SOUND_PATH_MUSIC)))
@@ -288,7 +291,7 @@ void DXTest::buildShadowTransform()
 
     // Transform bounding sphere to light space.
     XMFLOAT3 sphereCenterLS;
-    XMStoreFloat3(&sphereCenterLS, XMVector3TransformCoord(targetPos, V));
+    DirectX::XMStoreFloat3(&sphereCenterLS, XMVector3TransformCoord(targetPos, V));
 
     // Ortho frustum in light space encloses scene.
     float l = sphereCenterLS.x - sceneBounds.Radius;
@@ -375,7 +378,7 @@ void DXTest::Update(float deltaTime)
         mousePos.y -= wndCenterY;
     }
 
-    SetCursorPos(wndCenterX, wndCenterY);
+    //SetCursorPos(wndCenterX, wndCenterY);
 
     /*but dont update when in transition*/
     if (transitionInProgress == 0)
@@ -400,6 +403,7 @@ void DXTest::Update(float deltaTime)
         if (transToIngame && transitionInProgress == 0)
         {
             gameState = MainGameState::INGAME;
+            regState = RegistrationState::BLANK;
             transitionInProgress = 2;
             transToIngame = 0;
             res->getSound()->forceStop(themeChannel);
@@ -421,11 +425,8 @@ void DXTest::Update(float deltaTime)
         introCamera.lookAt(introPos, XMFLOAT3(0.f, 0.f, 0.f), XMFLOAT3(0.f, 1.0f, 0.f));
 
         /*first player press start to continue*/
-#ifdef _DEBUG
+
         if (playerCount > 0)
-#else // DEBUG
-        if (playerCount > 1)
-#endif
         {
 
             if (input->ButtonPressed(players[0]->getInput(), START))
@@ -452,6 +453,7 @@ void DXTest::Update(float deltaTime)
             {
                 break;
             }
+
             /*skip already registered inputs*/
             for (auto& p : players)
             {
@@ -481,6 +483,16 @@ void DXTest::Update(float deltaTime)
 
                 input->addUsedInput(i);
                 DBOUT("Player " << playerCount << " registered to input " << i << std::endl);
+
+                if (playerCount > 3)
+                {
+                    regState = RegistrationState::FULL;
+                }
+                else
+                {
+                    regState = RegistrationState::JOINED;
+                }
+
                 break;
             }
 
@@ -507,6 +519,49 @@ void DXTest::Update(float deltaTime)
         }
         else if (!allDead)
         {
+
+            /*pause screen*/
+            if (input->ButtonPressed(players.front()->getInput(), START)){
+
+                if (ingameState == InGameState::PAUSE && pauseFadeTimer >= PAUSE_FADE_TIME)
+                {
+                    ingameState = InGameState::PLAY;
+                }
+                else  if (ingameState == InGameState::PLAY)
+                {
+                    ingameState = InGameState::PAUSE;
+                    pauseFadeTimer = 0.f;
+                }
+
+            }
+
+            if (ingameState == InGameState::PAUSE)
+            {
+                pauseFadeTimer += deltaTime;
+                if (pauseFadeTimer > PAUSE_FADE_TIME)
+                {
+                    pauseFadeTimer = PAUSE_FADE_TIME;
+                }
+
+                fadeValue = 0.6f * (pauseFadeTimer / PAUSE_FADE_TIME);
+
+                return;
+            }
+            else
+            {
+
+                pauseFadeTimer -= deltaTime;
+                if (pauseFadeTimer < 0)
+                {
+                    pauseFadeTimer = 0;
+                }
+
+                fadeValue = 0.6f * (pauseFadeTimer / PAUSE_FADE_TIME);
+            }
+
+            
+
+            /*********/
 
             activeCamera = playCharacters[players.front()->getCharacter()]->getCamera();
 
@@ -803,7 +858,7 @@ void DXTest::Update(float deltaTime)
     XMMATRIX R = XMMatrixRotationY(lightRotationAngle);
     XMVECTOR lDir = XMLoadFloat3(&originalLightDir);
     lDir = XMVector3TransformNormal(lDir, R);
-    XMStoreFloat3(&gDirLights.Direction, lDir);
+    DirectX::XMStoreFloat3(&gDirLights.Direction, lDir);
 
     /*build shadow transform*/
     buildShadowTransform();
@@ -991,8 +1046,18 @@ void DXTest::Draw()
     if (gameState == MainGameState::PLAYER_REGISTRATION)
     {
         bTitle.draw(d2dContext.Get(), res);
-        bPressStart.draw(d2dContext.Get(), res);
-        bPressA.draw(d2dContext.Get(), res);
+
+        if (regState != RegistrationState::FULL)
+        {
+            bPressA.draw(d2dContext.Get(), res);
+        }
+
+        if (regState != RegistrationState::BLANK)
+        {
+            bPressStart.draw(d2dContext.Get(), res);
+        }
+        
+        
     }
     else if (gameState == MainGameState::INGAME)
     {
@@ -1004,7 +1069,7 @@ void DXTest::Draw()
             /*draw bot icon*/
             if (p->npc || p->controllingPlayer == nullptr)
             {
-                d2dContext->DrawBitmap(res->getBitmap()->get(L"default"), relativePos(uiBase[i].left, uiBase[i].top, uiBase[i].right, wndWidth, wndHeight));
+                d2dContext->DrawBitmap(res->getBitmap()->get(L"bot"), relativePos(uiBase[i].left, uiBase[i].top, uiBase[i].right, wndWidth, wndHeight));
             }
             /*draw hp*/
             else
@@ -1014,7 +1079,7 @@ void DXTest::Draw()
                 for (int h = 0; h < p->controllingPlayer->hp; h++)
                 {
                     hpRect = relativePos(uiBase[i].left + h * 0.035f, uiBase[i].top, uiBase[i].right + h*0.035f, wndWidth, wndHeight);
-                    d2dContext->DrawBitmap(res->getBitmap()->get(L"heart"), hpRect, 1.f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, NULL);
+                    d2dContext->DrawBitmap(res->getBitmap()->get(L"heart2"), hpRect, 1.f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, NULL);
                 }
 
             }
@@ -1022,12 +1087,20 @@ void DXTest::Draw()
 
     }
 
+    /*fade in / out effect*/
     static D2D1_RECT_F fadeRect = D2D1::RectF(0, 0, (float)wndWidth, (float)wndHeight);
     if (fadeValue > 0)
     {
         fadeBrush->SetOpacity(fadeValue);
         d2dContext->FillRectangle(fadeRect, fadeBrush);
     }
+
+    /*pause bitmap*/
+    if (ingameState == InGameState::PAUSE)
+    {
+        bPause.draw(d2dContext.Get(), res);
+    }
+
 
     drawFPSCounter();
 
