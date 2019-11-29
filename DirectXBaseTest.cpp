@@ -239,11 +239,6 @@ bool DXTest::Initialisation()
     BuildScreenQuadGeometryBuffers();
 
     OnWindowResize();
-
-#ifndef _DEBUG
-    //goFullscreen(true);
-#endif
-
     themeChannel = res->getSound()->add("theme", true);
 
     return true;
@@ -396,7 +391,6 @@ void DXTest::Update(float deltaTime)
         exit(0);
     }
 
-
     /*update depending on gamestate*/
 
     /*player registration*/
@@ -410,6 +404,11 @@ void DXTest::Update(float deltaTime)
             transitionInProgress = 2;
             transToIngame = 0;
             res->getSound()->forceStop(themeChannel);
+        }
+
+        if (input->ButtonPressed(0, BUTTON_X))
+        {
+            goFullscreen(!isFullscreen);
         }
 
         input->usedInputActive = false;

@@ -22,8 +22,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 DirectXBase::DirectXBase(HINSTANCE hProgramID) :
     programID(hProgramID),
     wndTitle(L"DirectXBase"),
-    wndWidth(1600),
-    wndHeight(900),
+    wndWidth(1920),
+    wndHeight(1080),
     wndHandle(0),
     wndInactive(false),
     wndMaximized(false),
@@ -34,9 +34,14 @@ DirectXBase::DirectXBase(HINSTANCE hProgramID) :
     swapChain(0),
     depthStencilBuffer(0),
     renderTargetView(0),
-    depthStencilView(0)
+    depthStencilView(0),
+    isFullscreen(false)
 {
-    CoInitialize(NULL);
+    if (CoInitialize(NULL) != S_OK)
+    {
+        DBOUT("Failed COM Init!");
+    }
+
     RtlSecureZeroMemory(&mainViewport, sizeof(D3D11_VIEWPORT));
     directXBase = this;
 }
@@ -561,12 +566,16 @@ bool DirectXBase::goFullscreen(bool s)
         return false;
     }
 
-    hr = swapChain->SetFullscreenState(s, display);
+    hr = swapChain->SetFullscreenState(s, s ? display : nullptr);
 
     if (FAILED(hr))
     {
         return false;
     }
+
+    OnWindowResize();
+
+    isFullscreen = s;
 
     return true;
 }

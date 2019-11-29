@@ -43,7 +43,7 @@ protected:
     HINSTANCE programID;
     HWND wndHandle;
 
-    bool wndInactive, wndMinimized, wndMaximized, wndResizing;
+    bool wndInactive, wndMinimized, wndMaximized, wndResizing, isFullscreen;
     UINT wndWidth, wndHeight;
 
     /*dx11 related*/
