@@ -41,7 +41,13 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-	return gTexture.Sample(samLinear, pin.Tex) - float4(fadeValue,fadeValue,fadeValue,1.0f);
+	/*grey scale*/
+	/*float4 c = gTexture.Sample(samLinear, pin.Tex);
+	c.r = c.r * 0.21f + c.b * 0.72f + c.g * 0.07f;
+	c.g = c.r;
+	c.b = c.r;
+	return c;*/
+	return gTexture.Sample(samLinear, pin.Tex);
 }
  
 technique11 Standard

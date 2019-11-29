@@ -171,6 +171,7 @@
     <ClCompile Include="TextureCollection.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimatedBitmap.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="BitmapManager.h" />
     <ClInclude Include="Blur.h" />

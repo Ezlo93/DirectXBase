@@ -23,7 +23,7 @@ public:
         context->DrawBitmap(r->getBitmap()->get(id), currentPosition, alpha, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, NULL);
     }
 
-private:
+protected:
 
     std::wstring id = L"default";
     D2D_RECT_F currentPosition;

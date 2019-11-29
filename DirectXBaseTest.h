@@ -12,6 +12,7 @@
 #include "Skybox.h"
 #include "ResourceManager.h"
 #include "DrawableBitmap.h"
+#include "AnimatedBitmap.h"
 #include <chrono>
 #include "ModelInstanceStatic.h"
 #include "Level.h"
@@ -138,7 +139,9 @@ private:
     /*D2D / UI*/
 
     /*title screen*/
-    DrawableBitmap bTitle, bPressStart, bPressA;
+    DrawableBitmap bTitle;
+
+    AnimatedBitmap bPressStart, bPressA;
 
     /*ingame*/
     D2D1_RECT_F uiBase[4];

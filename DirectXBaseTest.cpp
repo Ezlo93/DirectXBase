@@ -151,6 +151,9 @@ bool DXTest::Initialisation()
     bPressA.setup(L"pressa", relativePos(0.35f, 0.7f, 0.65f, 0.75f, wndWidth, wndHeight), 0.9f);
     bPressStart.setup(L"pressstart", relativePos(0.35f, 0.8f, 0.65f, 0.85f, wndWidth, wndHeight), 0.9f);
 
+    bPressA.setAnim(3.f, relativePos(0.35f, 0.7f, 0.65f, 0.75f, wndWidth, wndHeight), relativePos(0.33f, 0.68f, 0.67f, 0.77f, wndWidth, wndHeight));
+    bPressStart.setAnim(3.f, relativePos(0.35f, 0.8f, 0.65f, 0.85f, wndWidth, wndHeight), relativePos(0.33f, 0.78f, 0.67f, 0.87f, wndWidth, wndHeight));
+
     /*ingame*/
     uiBase[0] = { 0.02f, 0.4f, 0.05f, 0.f };
     uiBase[1] = { 0.52f, 0.4f, 0.55f, 0.f };
@@ -862,6 +865,10 @@ void DXTest::Update(float deltaTime)
 
     /*build shadow transform*/
     buildShadowTransform();
+
+    /*update 2d*/
+    bPressA.update(deltaTime);
+    bPressStart.update(deltaTime);
 
     /*update sound*/
     res->getSound()->update(deltaTime);

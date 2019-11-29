@@ -536,7 +536,8 @@ void DirectXBase::UpdateFPSCounter()
         std::wostringstream out;
         out.precision(6);
 
-        out << L"Resolution: " << wndWidth << L" x " << wndHeight << L"\nFPS: " << fps << L"\nFrame Time: " << mspf << L"ms";
+        out << L"Resolution: " << wndWidth << L" x " << wndHeight << L"\nFPS: " << fps 
+            << L"\nFrame Time: " << mspf << L"ms";
 
         dwriteFactory->CreateTextLayout(out.str().c_str(), (UINT32)out.str().size(), stdTextFormat.Get(), (float)wndWidth, (float)wndHeight, &fpsOutLayout);
 
