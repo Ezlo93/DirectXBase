@@ -346,12 +346,6 @@ void DXTest::Update(float deltaTime)
 
     /*game logic*/
 
-    ///*dont update if window inactive*/
-    //if (wndInactive)
-    //{
-    //    return;
-    //}
-
     if (transitionInProgress > 0)
     {
         UpdateTransition(deltaTime);
@@ -431,12 +425,13 @@ void DXTest::Update(float deltaTime)
         if (playerCount > 0)
         {
 
-            if (input->ButtonPressed(players[0]->getInput(), START))
+            if (input->ButtonPressed(players[0]->getInput(), START) && !transToIngame)
             {
                 blurStrength = 0;
                 input->usedInputActive = true;
                 transitionInProgress = 1;
                 transToIngame = true;
+                res->getSound()->add("action");
             }
 
         }
@@ -485,6 +480,7 @@ void DXTest::Update(float deltaTime)
 
                 input->addUsedInput(i);
                 DBOUT("Player " << playerCount << " registered to input " << i << std::endl);
+                res->getSound()->add("action");
 
                 if (playerCount > 3)
                 {
@@ -528,11 +524,13 @@ void DXTest::Update(float deltaTime)
                 if (ingameState == InGameState::PAUSE && pauseFadeTimer >= PAUSE_FADE_TIME)
                 {
                     ingameState = InGameState::PLAY;
+                    res->getSound()->add("action");
                 }
                 else  if (ingameState == InGameState::PLAY)
                 {
                     ingameState = InGameState::PAUSE;
                     pauseFadeTimer = 0.f;
+                    res->getSound()->add("action");
                 }
 
             }
@@ -546,8 +544,7 @@ void DXTest::Update(float deltaTime)
                 }
 
                 fadeValue = 0.6f * (pauseFadeTimer / PAUSE_FADE_TIME);
-
-                return;
+                goto updSound;
             }
             else
             {
@@ -851,6 +848,8 @@ void DXTest::Update(float deltaTime)
     //gCamera.pitch(pitch);
 
     /*particle system*/
+
+updSound:;
 
     activeLevel->Update(deltaTime);
     mRain.update(deltaTime, gTime.getTotalTime());

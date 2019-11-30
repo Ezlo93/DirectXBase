@@ -126,6 +126,12 @@ void Ball::Update(float deltaTime)
                             skip = true; collisionOn = false;
                             Translation = pPos;
                             Direction.x *= -1;
+
+                            if (players[index]->currState == PCState::DASH)
+                            {
+                               
+                            }
+
                         }
                         break;
                     case 1:
