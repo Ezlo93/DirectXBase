@@ -742,7 +742,7 @@ void DXTest::Update(float deltaTime)
 
             }
 
-#ifndef _DEBUG
+#ifdef _DEBUG
             if (pAlive == 1)
             {
 
