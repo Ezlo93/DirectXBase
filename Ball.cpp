@@ -114,6 +114,8 @@ void Ball::Update(float deltaTime)
 
             if (hitBox.Intersects(players[index]->hitBox))
             {
+                if (lastHitBy == index) continue;
+
                 DBOUT("Player " << index << " touched the ball\n");
                 bool skip = false;
                 res->getSound()->add("ball_hit");
@@ -121,20 +123,20 @@ void Ball::Update(float deltaTime)
                 switch (index)
                 {
                     case 0:
+                        lastHitBy = 0;
+
                         if (hitBox.Center.z < players[index]->hitBox.Center.z + players[index]->hitBox.Extents.z)
                         {
                             skip = true; collisionOn = false;
                             Translation = pPos;
                             Direction.x *= -1;
 
-                            if (players[index]->currState == PCState::DASH)
-                            {
-                               
-                            }
-
                         }
                         break;
+
                     case 1:
+                        lastHitBy = 1;
+
                         if (hitBox.Center.z > players[index]->hitBox.Center.z - players[index]->hitBox.Extents.z)
                         {
                             skip = true; collisionOn = false;
@@ -142,7 +144,10 @@ void Ball::Update(float deltaTime)
                             Direction.x *= -1;
                         }
                         break;
+
                     case 2:
+                        lastHitBy = 2;
+
                         if (hitBox.Center.x < players[index]->hitBox.Center.x + players[index]->hitBox.Extents.z)
                         {
                             skip = true; collisionOn = false;
@@ -150,7 +155,10 @@ void Ball::Update(float deltaTime)
                             Direction.z *= -1;
                         }
                         break;
+
                     case 3:
+                        lastHitBy = 3;
+
                         if (hitBox.Center.x > players[index]->hitBox.Center.x - players[index]->hitBox.Extents.z)
                         {
                             skip = true; collisionOn = false;
@@ -158,6 +166,7 @@ void Ball::Update(float deltaTime)
                             Direction.z *= -1;
                         }
                         break;
+
                 }
                 
                 if(!skip)
@@ -166,17 +175,23 @@ void Ball::Update(float deltaTime)
                     Color = players[index]->Color;
                     lastTouch = index;
 
+                    Translation = pPos;
+
                     if (players[index]->Orientation)
                     {
-                        Translation = pPos;
                         Direction.x *= -1;
                     }
                     else
                     {
-
-                        Translation = pPos;
                         Direction.z *= -1;
                     }
+                    
+                    if (players[index]->currState == PCState::DASH)
+                    {
+                        Direction.x *= -1;
+                    }
+
+
 
                 }
             }
@@ -396,6 +411,7 @@ void Ball::resetBall()
     inplayTime = 0.f;
     Velocity.y = 0.f;
 
+
     Translation = XMFLOAT3(0.f, ballHeight, 0.f);
 
     /*random direction*/
@@ -424,6 +440,7 @@ void Ball::resetBall()
  
     Color = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
 
+    lastHitBy = -1;
     collisionOn = true;
     resetB = false;
 }

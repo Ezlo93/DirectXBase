@@ -30,6 +30,7 @@ public:
     void ShadowDraw(ID3D11Device* device, ID3D11DeviceContext* deviceContext, Camera* c, XMMATRIX lightView, XMMATRIX lightProj);
 
     void resetBallFull();
+
 private:
 
     std::string modelID;
@@ -48,6 +49,7 @@ private:
     bool collisionOn = true;
     bool resetB = false;
     XMFLOAT3 distanceV;
+    int lastHitBy = -1;
 
     BallState ballState;
     
