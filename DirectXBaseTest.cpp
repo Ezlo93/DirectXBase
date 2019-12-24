@@ -183,7 +183,7 @@ bool DXTest::Initialisation()
     shadowMap = new ShadowMap(device, SHADOW_HIGH);
 
     sceneBounds.Center = XMFLOAT3(0.f, 0.f, 0.f);
-    sceneBounds.Radius = sqrtf(4000);
+    sceneBounds.Radius = sqrtf(16000);
 
     /*add static models for testing*/
     gameLevel = new Level(res, device, deviceContext);
@@ -610,8 +610,9 @@ void DXTest::Update(float deltaTime)
                 }
                 else
                 {
+                    float dashSpeed = (PLAYER_SPEED * 3.0f) * ((DASH_DURATION - playCharacters[playerCharID]->dashTimer) / DASH_DURATION);
 
-                    float dashSpeed = (PLAYER_SPEED * 3.5f) * ((DASH_DURATION - playCharacters[playerCharID]->dashTimer) / DASH_DURATION);
+                    //float dashSpeed = (PLAYER_SPEED * 3.5f) * ((DASH_DURATION - playCharacters[playerCharID]->dashTimer) / DASH_DURATION);
                     playCharacters[playerCharID]->Speed = dashSpeed;
 
                     if (dashSpeed < PLAYER_SPEED)

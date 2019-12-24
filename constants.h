@@ -10,7 +10,7 @@
 #define SOUND_PATH_MUSIC "data/sound/mu"
 #define SOUND_PATH_EFFECTS "data/sound/fx"
 #define BITMAP_PATH "data/sprites"
-#define PLAYER_DISTANCE 40.f
+#define PLAYER_DISTANCE 50.f
 
 #define INTROCAMERA_RADIUS 80.f
 #define INTROCAMERA_HEIGHT 35.f
@@ -27,9 +27,10 @@
 
 /*ball.h*/
 #define BALL_BORDER (PLAYER_DISTANCE + 3)
-#define MAX_VELOCITY 500.f
+#define MAX_VELOCITY 400.f
 #define START_VELOCITY 35.f
 #define SPAWN_FREEZE .75f
+#define BALL_SIZE 3.25f
 
 /*level.h*/
 #define LEVEL_PATH "data/levels/"

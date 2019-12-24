@@ -8,7 +8,7 @@ Ball::Ball(std::string id, ResourceManager* r, std::vector<PlayableChar*> p)
     modelID = id;
     XMStoreFloat4x4(&World, XMMatrixIdentity());
 
-    Scale = XMFLOAT3(2.f, 2.f, 2.f);
+    Scale = XMFLOAT3(BALL_SIZE, BALL_SIZE, BALL_SIZE);
     ballHeight = Scale.x / 2.f;
     Translation = XMFLOAT3(0.f, ballHeight,0.f);
     
@@ -20,7 +20,7 @@ Ball::Ball(std::string id, ResourceManager* r, std::vector<PlayableChar*> p)
 
     players = p;
 
-    hitBox.Radius = 1.f;
+    hitBox.Radius = ballHeight;
 
     maxPlayArea.Center = XMFLOAT3(0, 0, 0);
     maxPlayArea.Extents = XMFLOAT3(BALL_BORDER * 1.2f, BALL_BORDER * 1.2f, BALL_BORDER);
@@ -77,38 +77,18 @@ void Ball::Update(float deltaTime)
         inplayTime += deltaTime;
 
 
-        if (spinRotation != 0)
-        {
-            double dx = (double)Velocity.x * Direction.x;
-            double dy = (double)Velocity.x * Direction.z;
+        spinTimer += deltaTime;
 
-            double velocity = sqrt(dx * dx + dy * dy);
+        double x = acosf(Direction.x);
+        double y = asinf(Direction.z);
 
-            double nx = dx / velocity;
-            double ny = dx / velocity;
+        x = XMConvertToDegrees(x * (y > 0 ? 1.0f : -1.0f)) + spinRotation * spinTimer;
 
-            double accel = spinCoefficient * velocity * spinRotation;
-            dx -= ny * accel;
-            dy += nx * accel;
+        Direction.x = (float)cos(XMConvertToRadians((float)x));
+        Direction.z = (float)sin(XMConvertToRadians((float)x));
 
-            Translation.x += dx;
-            Translation.y += dy;
-        }
-        else
-        {
-            Translation.x += Velocity.x * Direction.x * deltaTime;
-            Translation.z += Velocity.x * Direction.z * deltaTime;
-        }        
-
-        /*
-        spinCof = ? some value 
-        var ballVelocity = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
-        var nx = ball.dx / ballVelocity;  // get normalised vector of motion
-        var ny = ball.dy / ballVelocity;
-        var accel = spinCof * ballVelocity * ball.dr; // get the acceleration due to spin
-        ball.dx -= ny * accel;  // apply acceleration perpendicular to motion
-        ball.dy += nx * accel;  
-        */
+        Translation.x += Velocity.x * Direction.x * deltaTime;
+        Translation.z += Velocity.x * Direction.z * deltaTime;     
 
         /*update hitbox*/
         hitBox.Center.x = Translation.x;
@@ -119,20 +99,21 @@ void Ball::Update(float deltaTime)
 
         if (inplayTime < 25)
         {
-            Velocity.x = START_VELOCITY + (inplayTime / 25.f) * (150-START_VELOCITY);
+            Velocity.x = START_VELOCITY + (inplayTime / 25.f) * (130-START_VELOCITY);
         }
-        else if (inplayTime < 45)
+        else if (inplayTime < 55)
         {
-            Velocity.x = 150.f + ((inplayTime - 25.f) / 20.f) * 50.f;
+            Velocity.x = 130.f + ((inplayTime - 25.f) / 20.f) * 70.f;
         }
         else if (inplayTime < 120)
         {
-            Velocity.x = 200.f + ((inplayTime - 45) / 120.f) * 150.f;
+            Velocity.x = 200.f + ((inplayTime - 45) / 120.f) * 120.f;
         }
         else
         {
-            Velocity.x = 350.f;
+            Velocity.x = 320.f;
         }
+
         Velocity.x = min(Velocity.x, MAX_VELOCITY);
 
         /*check collision*/
@@ -149,6 +130,7 @@ void Ball::Update(float deltaTime)
                 DBOUT("Player " << index << " touched the ball\n");
                 bool skip = false;
                 res->getSound()->add("ball_hit");
+                spinTimer = 0;
 
                 switch (index)
                 {
@@ -216,10 +198,13 @@ void Ball::Update(float deltaTime)
                         Direction.z *= -1;
                     }
                     
-                    if (players[index]->currState != PCState::DASH) //!!!
+                    if (players[index]->currState == PCState::DASH)
                     {
-                        spinRotation += (Velocity.x - players[index]->Velocity.x) / hitBox.Radius;
-                        DBOUT("Spin Rotation: " << spinRotation << "\n");
+
+
+                        spinRotation = BALL_SPIN_COEFF * players[index]->dashDirection * (Velocity.x / START_VELOCITY)
+                                        * (players[index]->Speed / PLAYER_SPEED);
+
                     }
                     else
                     {
@@ -456,7 +441,7 @@ void Ball::resetBall()
     Direction.z = (float)sin(rDir);
 
     double assertTest = sqrt(Direction.x * Direction.x + Direction.z * Direction.z);
-    DBOUT("Direction Length: " << assertTest << "\n");
+    DBOUT("Direction Length: " << assertTest << " (" << rDir << ")\n");
 
     if (rand() % 2 == 0)
     {

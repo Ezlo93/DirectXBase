@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "PlayableChar.h"
 
-#include "Box2D/Box2D.h"
+#define BALL_SPIN_COEFF 0.015
 
 enum class BallState
 {
@@ -23,7 +23,8 @@ public:
     XMFLOAT3 Translation, Rotation, Scale, Velocity, Direction;
 
     double spinRotation;
-    double spinCoefficient = 0.01;
+    double spinTimer = 0;
+    XMFLOAT3 initialDirection;
 
     bool Collision = true;
     BoundingSphere hitBox;
@@ -60,11 +61,6 @@ private:
     BallState ballState;
     
     void resetBall();
-
-
-    /*box2d*/
-    b2Vec2 gravity{ 0.0f, -9.81f };
-    b2World* b2dWorld;
 
 
 };

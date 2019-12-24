@@ -6,10 +6,13 @@
 #include "ResourceManager.h"
 #include "Player.h"
 
-#define PLAYER_SPEED 40.f
+#define PLAYER_SPEED 50.f
 
-#define DASH_CD 1.75f
+#define DASH_CD 1.5f
 #define DASH_DURATION .35f
+
+#define CAMERA_DIST_UP 5.5f
+#define CAMERA_DIST_BACK 33.0f
 
 enum class PCState
 {
