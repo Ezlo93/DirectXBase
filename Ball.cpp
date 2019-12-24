@@ -13,6 +13,7 @@ Ball::Ball(std::string id, ResourceManager* r, std::vector<PlayableChar*> p)
     Translation = XMFLOAT3(0.f, ballHeight,0.f);
     
     Rotation = XMFLOAT3(0.f, 0.f, 0.f);
+    spinRotation = 0;
 
     bounceFactor = 0.75f;
     bounceTime = 1.f;
@@ -75,9 +76,41 @@ void Ball::Update(float deltaTime)
 
         inplayTime += deltaTime;
 
-        Translation.x += Velocity.x * Direction.x * deltaTime;
-        Translation.z += Velocity.x * Direction.z * deltaTime;
 
+        if (spinRotation != 0)
+        {
+            double dx = (double)Velocity.x * Direction.x;
+            double dy = (double)Velocity.x * Direction.z;
+
+            double velocity = sqrt(dx * dx + dy * dy);
+
+            double nx = dx / velocity;
+            double ny = dx / velocity;
+
+            double accel = spinCoefficient * velocity * spinRotation;
+            dx -= ny * accel;
+            dy += nx * accel;
+
+            Translation.x += dx;
+            Translation.y += dy;
+        }
+        else
+        {
+            Translation.x += Velocity.x * Direction.x * deltaTime;
+            Translation.z += Velocity.x * Direction.z * deltaTime;
+        }        
+
+        /*
+        spinCof = ? some value 
+        var ballVelocity = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
+        var nx = ball.dx / ballVelocity;  // get normalised vector of motion
+        var ny = ball.dy / ballVelocity;
+        var accel = spinCof * ballVelocity * ball.dr; // get the acceleration due to spin
+        ball.dx -= ny * accel;  // apply acceleration perpendicular to motion
+        ball.dy += nx * accel;  
+        */
+
+        /*update hitbox*/
         hitBox.Center.x = Translation.x;
         hitBox.Center.y = Translation.y;
         hitBox.Center.z = Translation.z;
@@ -101,9 +134,6 @@ void Ball::Update(float deltaTime)
             Velocity.x = 350.f;
         }
         Velocity.x = min(Velocity.x, MAX_VELOCITY);
-
-        //Velocity.x = 35.f;// 1350 - 1318 / (1 + pow(double((inplayTime / 655)), 0.64));
-        // 1350.4 + (32.19252 - 1350.4)/(1 + (x/655.3164)^0.6426537)
 
         /*check collision*/
 
@@ -186,9 +216,14 @@ void Ball::Update(float deltaTime)
                         Direction.z *= -1;
                     }
                     
-                    if (players[index]->currState == PCState::DASH)
+                    if (players[index]->currState != PCState::DASH) //!!!
                     {
-                        Direction.x *= -1;
+                        spinRotation += (Velocity.x - players[index]->Velocity.x) / hitBox.Radius;
+                        DBOUT("Spin Rotation: " << spinRotation << "\n");
+                    }
+                    else
+                    {
+                        spinRotation = 0;
                     }
 
 
@@ -410,7 +445,7 @@ void Ball::resetBall()
     resetTime = 0.f;
     inplayTime = 0.f;
     Velocity.y = 0.f;
-
+    spinRotation = 0;
 
     Translation = XMFLOAT3(0.f, ballHeight, 0.f);
 
@@ -419,6 +454,9 @@ void Ball::resetBall()
 
     Direction.x = (float)cos(rDir);
     Direction.z = (float)sin(rDir);
+
+    double assertTest = sqrt(Direction.x * Direction.x + Direction.z * Direction.z);
+    DBOUT("Direction Length: " << assertTest << "\n");
 
     if (rand() % 2 == 0)
     {
@@ -429,10 +467,10 @@ void Ball::resetBall()
         Direction.y *= -1;
     }
 
-//#ifdef _DEBUG
-//    Direction.x = 0.f;
-//    Direction.z = -1.f;
-//#endif
+#ifdef _DEBUG
+    Direction.x = 0.f;
+    Direction.z = -1.f;
+#endif
     DBOUT("Direction: " << Direction.x << " | " << Direction.z << "\n");
 
     Velocity.z = START_VELOCITY;

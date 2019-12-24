@@ -6,6 +6,8 @@
 #include "Camera.h"
 #include "PlayableChar.h"
 
+#include "Box2D/Box2D.h"
+
 enum class BallState
 {
     SPAWN, FREEZE, INPLAY, RESET
@@ -19,6 +21,10 @@ public:
     ~Ball();
 
     XMFLOAT3 Translation, Rotation, Scale, Velocity, Direction;
+
+    double spinRotation;
+    double spinCoefficient = 0.01;
+
     bool Collision = true;
     BoundingSphere hitBox;
     XMFLOAT4 Color;
@@ -48,10 +54,17 @@ private:
     float ballHeight;
     bool collisionOn = true;
     bool resetB = false;
-    XMFLOAT3 distanceV;
+    XMFLOAT3 distanceV; //  used for transitioning ball back to middle
     int lastHitBy = -1;
 
     BallState ballState;
     
     void resetBall();
+
+
+    /*box2d*/
+    b2Vec2 gravity{ 0.0f, -9.81f };
+    b2World* b2dWorld;
+
+
 };
