@@ -202,6 +202,9 @@ void Ball::Update(float deltaTime)
                     {
 
 
+                    //spinRotation = BALL_SPIN_COEFF * players[index]->dashDirection * (Velocity.x / START_VELOCITY)
+                    //    * (players[index]->Velocity.x || players[index]->Velocity.z / PLAYER_SPEED);
+
                         spinRotation = BALL_SPIN_COEFF * players[index]->dashDirection * (Velocity.x / START_VELOCITY)
                                         * (players[index]->Speed / PLAYER_SPEED);
 

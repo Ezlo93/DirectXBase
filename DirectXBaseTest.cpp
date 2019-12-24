@@ -744,24 +744,24 @@ void DXTest::Update(float deltaTime)
             }
 
 #ifndef _DEBUG
-            if (pAlive == 1)
-            {
+            //if (pAlive == 1)
+            //{
 
-                for (auto& i : playCharacters)
-                {
-                    if (i->controllingPlayer == nullptr) continue;
+            //    for (auto& i : playCharacters)
+            //    {
+            //        if (i->controllingPlayer == nullptr) continue;
 
-                    if (i->controllingPlayer->hp > 0)
-                    {
-                        DBOUT("Player " << i->controllingPlayer->pID << " wins!\n");
-                        winOrder.push_back(i->controllingPlayer);
-                        i->controllingPlayer = nullptr;
-                        allDead = true;
-                    }
+            //        if (i->controllingPlayer->hp > 0)
+            //        {
+            //            DBOUT("Player " << i->controllingPlayer->pID << " wins!\n");
+            //            winOrder.push_back(i->controllingPlayer);
+            //            i->controllingPlayer = nullptr;
+            //            allDead = true;
+            //        }
 
-                }
+            //    }
 
-            }
+            //}
 #endif
 
             if (allDead)
