@@ -28,7 +28,7 @@
 /*ball.h*/
 #define BALL_BORDER (PLAYER_DISTANCE + 3)
 #define MAX_VELOCITY 400.f
-#define START_VELOCITY 35.f
+#define START_VELOCITY 40.f
 #define SPAWN_FREEZE .75f
 #define BALL_SIZE 3.25f
 

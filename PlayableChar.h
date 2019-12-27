@@ -11,8 +11,8 @@
 #define DASH_CD 1.5f
 #define DASH_DURATION .35f
 
-#define CAMERA_DIST_UP 5.5f
-#define CAMERA_DIST_BACK 33.0f
+#define CAMERA_DIST_UP 6.0f
+#define CAMERA_DIST_BACK 40.0f
 
 enum class PCState
 {

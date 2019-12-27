@@ -82,7 +82,7 @@ void Ball::Update(float deltaTime)
         double x = acosf(Direction.x);
         double y = asinf(Direction.z);
 
-        x = XMConvertToDegrees(x * (y > 0 ? 1.0f : -1.0f)) + spinRotation * spinTimer;
+        x = (double) XMConvertToDegrees( float(x) * (y > 0 ? 1.0f : -1.0f)) + spinRotation * spinTimer;
 
         Direction.x = (float)cos(XMConvertToRadians((float)x));
         Direction.z = (float)sin(XMConvertToRadians((float)x));
@@ -99,19 +99,19 @@ void Ball::Update(float deltaTime)
 
         if (inplayTime < 25)
         {
-            Velocity.x = START_VELOCITY + (inplayTime / 25.f) * (130-START_VELOCITY);
+            Velocity.x = START_VELOCITY + (inplayTime / 25.f) * (100-START_VELOCITY);
         }
         else if (inplayTime < 55)
         {
-            Velocity.x = 130.f + ((inplayTime - 25.f) / 20.f) * 70.f;
+            Velocity.x = 100.f + ((inplayTime - 25.f) / 20.f) * 60.f;
         }
         else if (inplayTime < 120)
         {
-            Velocity.x = 200.f + ((inplayTime - 45) / 120.f) * 120.f;
+            Velocity.x = 160.f + ((inplayTime - 45) / 120.f) * 100.f;
         }
         else
         {
-            Velocity.x = 320.f;
+            Velocity.x = 260.f;
         }
 
         Velocity.x = min(Velocity.x, MAX_VELOCITY);
