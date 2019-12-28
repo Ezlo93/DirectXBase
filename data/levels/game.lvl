@@ -7,9 +7,35 @@
          "texture":"flare0.dds",
          "maxParticles":500,
          "position":[
-            -5.25,
-            9.5,
+            -3.25,
+            22,
+            -4.5
+         ],
+         "size":[
+            2,
             2
+         ],
+         "direction":[
+            0,
+            0,
+            0
+         ],
+         "acceleration":[
+            0,
+            8,
+            0
+         ]
+      },
+      {
+         "id":20002,
+         "type":"particle",
+         "shader":"fire",
+         "texture":"flare0.dds",
+         "maxParticles":500,
+         "position":[
+            3.25,
+            22,
+            -4.5
          ],
          "size":[
             2,
@@ -51,34 +77,12 @@
          "overwriteNormal":"floor_nmap"
       },
       {
-         "id":10002,
-         "model":"defaultCube",
-         "shader":"basictexture",
-         "position":[
-            -18.5,
-            0.61,
-            2.5
-         ],
-         "scale":[
-            5.2,
-            5.2,
-            1.2
-         ],
-         "rotation":[
-            0,
-            10,
-            0
-         ],
-         "overwriteTexture":"bricks",
-         "overwriteNormal":"bricks_nmap"
-      },
-      {
          "id":10003,
          "model":"skull",
          "shader":"basicnotexture",
          "position":[
-            -32,
-            2,
+            0,
+            10,
             0
          ],
          "scale":[
@@ -93,6 +97,94 @@
          ],
          "overwriteTexture":"none",
          "overwriteNormal":"none"
+      },
+      {
+         "id":10012,
+         "model":"plant",
+         "shader":"normalmap",
+         "position":[
+            -52,
+            0,
+            52
+         ],
+         "scale":[
+            2,
+            2,
+            2
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": true
+      },
+      {
+         "id":10013,
+         "model":"plant",
+         "shader":"normalmap",
+         "position":[
+            -52,
+            0,
+            -52
+         ],
+         "scale":[
+            2,
+            2,
+            2
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": true
+      },
+      {
+         "id":10014,
+         "model":"plant",
+         "shader":"normalmap",
+         "position":[
+            52,
+            0,
+            -52
+         ],
+         "scale":[
+            2,
+            2,
+            2
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": true
+      },
+      {
+         "id":10015,
+         "model":"plant",
+         "shader":"normalmap",
+         "position":[
+            52,
+            0,
+            52
+         ],
+         "scale":[
+            2,
+            2,
+            2
+         ],
+         "rotation":[
+            0,
+            0,
+            0
+         ],
+         "isInvisible": false,
+         "castsShadow": true
       }
    ]
 }
