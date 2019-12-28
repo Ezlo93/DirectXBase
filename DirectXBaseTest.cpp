@@ -468,6 +468,7 @@ void DXTest::Update(float deltaTime)
             {
                 Player* p = new Player();
                 p->AssignCharacter(playerCount++);
+
                 p->AssignInput(i);
                 p->AssignColor(playerColors[playerCount - 1]);
                 p->pID = playerCount;
@@ -477,7 +478,7 @@ void DXTest::Update(float deltaTime)
 
                 playCharacters[p->getCharacter()]->Velocity.y = 8.f;
                 playCharacters[p->getCharacter()]->controllingPlayer = p;
-
+                playerCount++;
                 input->addUsedInput(i);
                 DBOUT("Player " << playerCount << " registered to input " << i << std::endl);
                 res->getSound()->add("action");
